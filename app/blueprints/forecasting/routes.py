@@ -89,9 +89,10 @@ def predict_2028():
             preds = avg_preds_base + np.random.normal(0, 0.005, len(template))
         else:
             archetype = ARCHETYPES.get(profile, ARCHETYPES['populist'])
-            X_raw = template[['RINKEJU_SKAICIUS', 'VISO_DALYVAVO', 'APYGARDOS_PAVADINIMAS']].copy()
+            # IMPORTANT: Column order must exactly match the Training Set used by CatBoost
+            X_raw = template[['SARASO_PAVADINIMAS', 'APYGARDOS_PAVADINIMAS', 'RINKEJU_SKAICIUS']].copy()
             X_raw['SARASO_PAVADINIMAS'] = archetype
-            X_raw = X_raw[['RINKEJU_SKAICIUS', 'SARASO_PAVADINIMAS', 'APYGARDOS_PAVADINIMAS']]
+            X_raw = X_raw[['SARASO_PAVADINIMAS', 'APYGARDOS_PAVADINIMAS', 'RINKEJU_SKAICIUS']]
             
             # Predict
             preds = ensemble.models['catboost'].predict(X_raw)

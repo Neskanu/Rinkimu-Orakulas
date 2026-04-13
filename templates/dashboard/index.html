@@ -8,25 +8,28 @@
             <p class="text-slate-500">Analyze Lithuanian election results with deep drill-down capabilities.</p>
         </div>
         <form action="/dashboard/" method="get" class="flex items-center space-x-4">
-            <select name="year" onchange="this.form.submit()" class="rounded-xl border-slate-200 text-sm focus:ring-indigo-500 focus:border-indigo-500">
-                <option value="2024" {% if year == 2024 %}selected{% endif %}>2024 (Latest)</option>
-                <option value="2020" {% if year == 2020 %}selected{% endif %}>2020</option>
-                <option value="2016" {% if year == 2016 %}selected{% endif %}>2016</option>
-                <option value="2012" {% if year == 2012 %}selected{% endif %}>2012</option>
+            <select name="year" onchange="this.form.submit()"
+                class="rounded-xl border-slate-200 text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                <option value="2024" {% if year==2024 %}selected{% endif %}>2024 (Latest)</option>
+                <option value="2020" {% if year==2020 %}selected{% endif %}>2020</option>
+                <option value="2016" {% if year==2016 %}selected{% endif %}>2016</option>
+                <option value="2012" {% if year==2012 %}selected{% endif %}>2012</option>
             </select>
-            
-            <select name="district" onchange="this.form.submit()" class="rounded-xl border-slate-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 min-w-[200px]">
+
+            <select name="district" onchange="this.form.submit()"
+                class="rounded-xl border-slate-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 min-w-[200px]">
                 <option value="">Full National Data</option>
                 {% for d in districts %}
-                    <option value="{{ d }}" {% if d == selected_district %}selected{% endif %}>{{ d }}</option>
+                <option value="{{ d }}" {% if d==selected_district %}selected{% endif %}>{{ d }}</option>
                 {% endfor %}
             </select>
 
             {% if selected_district %}
-            <select name="precinct" onchange="this.form.submit()" class="rounded-xl border-slate-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 min-w-[200px]">
+            <select name="precinct" onchange="this.form.submit()"
+                class="rounded-xl border-slate-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 min-w-[200px]">
                 <option value="">All Precincts</option>
                 {% for p in precincts %}
-                    <option value="{{ p }}" {% if p == selected_precinct %}selected{% endif %}>{{ p }}</option>
+                <option value="{{ p }}" {% if p==selected_precinct %}selected{% endif %}>{{ p }}</option>
                 {% endfor %}
             </select>
             {% endif %}
@@ -34,13 +37,33 @@
     </div>
 
     {% if plot_json %}
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-            <div id="bar-chart" class="w-full h-[500px]"></div>
+    <div class="flex flex-col space-y-8 w-full">
+        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm w-full">
+            <div id="pie-chart" class="w-full h-[550px]"></div>
         </div>
-        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-            <div id="pie-chart" class="w-full h-[500px]"></div>
+        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm w-full">
+            <div id="bar-chart" class="w-full h-[600px]"></div>
         </div>
+    </div>
+
+    <!-- Model Stats -->
+    <div>
+        <h2 class="text-2xl font-bold text-slate-900 mb-4">Model Performance</h2>
+        {% if metrics %}
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {% for model_name, stats in metrics.items() %}
+            <div class="bg-indigo-900 text-white p-4 rounded-2xl shadow-lg border border-indigo-700">
+                <span class="text-[10px] uppercase font-black opacity-60">{{ model_name }}</span>
+                <p class="text-xl font-black">{{ "%.4f"|format(stats.mae) }}</p>
+                <span class="text-[10px] opacity-40">MAE</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="bg-slate-100 border border-slate-200 p-6 rounded-2xl text-center text-slate-500 italic">
+            No trained models found. Please run training in the Models section.
+        </div>
+        {% endif %}
     </div>
     {% else %}
     <div class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl p-20 text-center">

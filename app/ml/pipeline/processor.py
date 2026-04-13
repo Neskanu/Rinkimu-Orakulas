@@ -21,12 +21,20 @@ class DataProcessor:
             return None
             
         full_df = pd.concat(dfs, ignore_index=True)
+
+        # Clean encoding artifacts in names
+        name_cols = ['APYGARDOS_PAVADINIMAS', 'APYLINKES_PAVADINIMAS', 'SARASO_PAVADINIMAS']
+        for col in name_cols:
+            if col in full_df.columns:
+                full_df[col] = full_df[col].astype(str).str.replace('ā€“', '-', regex=False)
+                full_df[col] = full_df[col].str.replace('SÅ«duvos', 'Sūduvos', regex=False)
         
-        # Calculate Vote Share
-        full_df['VOTE_SHARE'] = full_df['BALSU_VISO'] / full_df['VISO_DALYVAVO'].replace(0, 1)
+        # Force numeric types before math to prevent 'garbage' training targets
+        full_df['BALSU_VISO'] = pd.to_numeric(full_df['BALSU_VISO'], errors='coerce').fillna(0)
+        full_df['VISO_DALYVAVO'] = pd.to_numeric(full_df['VISO_DALYVAVO'], errors='coerce').fillna(0)
         
-        # Create a unique ID for precincts: District_NR + Precinct_NR
-        full_df['PRECINCT_ID'] = full_df['APYGARDOS_NR'].astype(str) + "_" + full_df['APYLINKES_NR'].astype(str)
+        # Calculate Vote Share (0-100 scale)
+        full_df['VOTE_SHARE'] = (full_df['BALSU_VISO'] / full_df['VISO_DALYVAVO'].replace(0, 1)) * 100
         
         # Train-Test Split: Strictly enforce 2024 as hold-out
         train_df = full_df[full_df['YEAR'] < 2024].copy()
@@ -48,11 +56,26 @@ class DataProcessor:
         return template
 
     def encode_features(self, df):
-        """One-hot encodes categorical features."""
+        """One-hot encodes categorical features using sparse matrices for efficiency."""
         df = df.copy()
         categorical_cols = ['SARASO_PAVADINIMAS', 'APYGARDOS_PAVADINIMAS']
-        encoded_df = pd.get_dummies(df, columns=categorical_cols, drop_first=True)
+        
+        # Convert to category type first (speeds up get_dummies)
+        for col in categorical_cols:
+            if col in df.columns:
+                df[col] = df[col].astype('category')
+                
+        encoded_df = pd.get_dummies(df, columns=categorical_cols, drop_first=True, sparse=True)
         return encoded_df
 
+    def close(self):
+        """Explicitly close the database session."""
+        if hasattr(self, 'session'):
+            self.session.close()
+
     def __del__(self):
-        self.session.close()
+        # Fallback closure (non-blocking)
+        try:
+            self.session.close()
+        except:
+            pass

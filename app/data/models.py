@@ -198,8 +198,11 @@ class ForecastScenario(Base):
 class EnsembleConfig(Base):
     __tablename__ = "ensemble_configs"
     id: Mapped[int] = mapped_column(primary_key=True)
-    rf_weight: Mapped[float] = mapped_column(Float, default=0.33)
-    nn_weight: Mapped[float] = mapped_column(Float, default=0.33)
-    catboost_weight: Mapped[float] = mapped_column(Float, default=0.34)
+    rf_weight: Mapped[float] = mapped_column(Float, default=0.20)
+    nn_weight: Mapped[float] = mapped_column(Float, default=0.20)
+    catboost_weight: Mapped[float] = mapped_column(Float, default=0.20)
+    xgboost_weight: Mapped[float] = mapped_column(Float, default=0.20)
+    lgbm_weight: Mapped[float] = mapped_column(Float, default=0.10)
+    elasticnet_weight: Mapped[float] = mapped_column(Float, default=0.10)
     is_active: Mapped[bool] = mapped_column(default=True)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

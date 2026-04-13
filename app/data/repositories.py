@@ -2,9 +2,11 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select, func
 from app.data.models import *
 import pandas as pd
-
+import numpy as np
 import ftfy
+from functools import lru_cache
 
+@lru_cache(maxsize=4096)
 def fix_encoding(val):
     """Fix Lithuanian mojibake (mixed double-encoded UTF-8 in SQLite).
     Two passes:
@@ -14,6 +16,11 @@ def fix_encoding(val):
     """
     if not isinstance(val, str):
         return val
+    # Fast path: Skip the expensive repair if the string is likely clean
+    # (Checking for the common signature character of Lithuanian double-encoding)
+    if 'Ã' not in val and 'ā' not in val:
+        return val
+        
     # Pass 1: ftfy (handles most common garbling)
     val = ftfy.fix_text(val)
     # Pass 2: detect and fix double-encoded multi-byte sequences
@@ -93,43 +100,65 @@ class ElectionRepository:
 
     def get_dataframe_for_ml(self, year: int, district: str = None, precinct: str = None):
         """Returns a cleaned pandas DataFrame for ML processing with calculated vote shares."""
-        raw_data = self.get_all_multi_mandate_raw(year, district, precinct)
-        if not raw_data:
+        table_map = {2024: Daugiamandates2024, 2020: Daugiamandates2020, 2016: Daugiamandates2016, 2012: Daugiamandates2012}
+        model = table_map.get(year)
+        if not model:
             return pd.DataFrame()
         
-        # Convert to list of dicts
-        data = []
-        for row in raw_data:
-            d = {c.name: getattr(row, c.name) for c in row.__table__.columns}
-            data.append(d)
+        # Select all columns defined in the table
+        columns = [getattr(model, c.name) for c in model.__table__.columns]
+        col_names = [c.name for c in model.__table__.columns]
         
-        df = pd.DataFrame(data)
+        stmt = select(*columns)
         
-        # Cleanup Column Names (if col_ prefix was added)
-        df.columns = [c[4:] if c.startswith('col_') else c for c in df.columns]
+        # Filtering with mojibake fallback
+        if district:
+            try:
+                raw_variant = district.encode('utf-8').decode('latin-1')
+                stmt = stmt.where((model.APYGARDOS_PAVADINIMAS == district) | (model.APYGARDOS_PAVADINIMAS == raw_variant))
+            except Exception:
+                stmt = stmt.where(model.APYGARDOS_PAVADINIMAS == district)
+        if precinct:
+            try:
+                raw_variant = precinct.encode('utf-8').decode('latin-1')
+                stmt = stmt.where((model.APYLINKES_PAVADINIMAS == precinct) | (model.APYLINKES_PAVADINIMAS == raw_variant))
+            except Exception:
+                stmt = stmt.where(model.APYLINKES_PAVADINIMAS == precinct)
+            
+        result = self.session.execute(stmt)
+        # Use row._mapping to ensure data is correctly assigned to column names regardless of SQL order
+        rows = [row._mapping for row in result.all()]
         
+        if not rows:
+            return pd.DataFrame()
+            
+        df = pd.DataFrame(rows)
+        df.columns = [c.upper() for c in df.columns]
+        
+        # De-duplicate any columns that might arise from case-insensitivity in SQLite
+        df = df.loc[:, ~df.columns.duplicated()]
+
         # Fix mojibake encoding on all string/name columns
         for col in ['APYGARDOS_PAVADINIMAS', 'APYLINKES_PAVADINIMAS', 'SARASO_PAVADINIMAS']:
             if col in df.columns:
                 df[col] = df[col].apply(fix_encoding)
+            elif col == 'APYLINKES_PAVADINIMAS':
+                df[col] = 'DISTRICT_LEVEL'
         
-        # Convert numeric columns from string to float/int
-        numeric_cols = [
-            'RINKEJU_SKAICIUS', 'VISO_DALYVAVO', 'BALSADEZEJE_GALIOJANTYS', 
-            'BALSADEZEJE_NEGALIOJANTYS', 'BALSU_BALSADEZEJE', 'BALSU_PASTU', 'BALSU_VISO'
-        ]
+        # Ensure all numeric columns exist
+        numeric_cols = ['RINKEJU_SKAICIUS', 'VISO_DALYVAVO', 'BALSADEZEJE_GALIOJANTYS', 'BALSU_VISO']
         for col in numeric_cols:
-            if col in df.columns:
-                df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
+            if col not in df.columns: df[col] = 0
+            if df[col].dtype == object:
+                df[col] = df[col].astype(str).str.replace(r'\s+', '', regex=True).str.replace(',', '.')
+                df[col] = pd.to_numeric(df[col], errors='coerce').replace({np.nan: 0})
         
         df['YEAR'] = year
-        
-        # Calculate Vote Share
-        if 'BALSU_VISO' in df.columns and 'VISO_DALYVAVO' in df.columns:
-            # We group by precinct (APYLINKES_PAVADINIMAS) to get the correct denominator for that location
-            # or just use the sum of all BALSU_VISO in the current selection if it's filtered
-            df['VOTE_SHARE'] = df['BALSU_VISO'] / df.groupby('APYLINKES_PAVADINIMAS')['BALSU_VISO'].transform('sum')
-            df['VOTE_SHARE'] = df['VOTE_SHARE'].fillna(0)
+        if 'BALSU_VISO' in df.columns:
+            group_col = 'APYLINKES_PAVADINIMAS' if 'APYLINKES_PAVADINIMAS' in df.columns and (df['APYLINKES_PAVADINIMAS'] != 'DISTRICT_LEVEL').any() else 'APYGARDOS_PAVADINIMAS'
+            total_in_unit = df.groupby(group_col)['BALSU_VISO'].transform('sum')
+            df['VOTE_SHARE'] = (df['BALSU_VISO'] / total_in_unit.replace(0, 1)) * 100
+            df['VOTE_SHARE'] = df['VOTE_SHARE'].replace({np.nan: 0})
             
         return df
 

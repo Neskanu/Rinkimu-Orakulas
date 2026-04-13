@@ -1,3 +1,27 @@
+# Database
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
 rinkimai.db
 rinkimai.db.bak
-app/ml/models/
+rinkimai_v2.db.bak
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Models and Training Data
+app/ml/models/*.pkl
+app/ml/models/*.cbm
+app/ml/models/*.pt
+app/ml/models/*.joblib
+app/data/training/*.csv
+app/data/training/*.xlsx
+
+# OS
+.DS_Store
+Thumbs.db

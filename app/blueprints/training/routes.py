@@ -34,13 +34,14 @@ def start_training():
     data = request.json
     timeout = data.get('timeout', 60)
     models = data.get('models', [])
+    params = data.get('params', {})
     
     # Run trainer in background thread
-    thread = threading.Thread(target=train_suite, args=(models, timeout))
+    thread = threading.Thread(target=train_suite, args=(models, params, timeout))
     thread.daemon = True
     thread.start()
     
-    return jsonify({"status": "started", "message": f"Training started for {len(models)} models with {timeout}s timeout"})
+    return jsonify({"status": "started", "message": f"Training started for {len(models)} models."})
 
 @training_bp.route('/metrics')
 def get_metrics():
@@ -53,14 +54,28 @@ def get_metrics():
 def update_weights():
     data = request.json
     session = SessionLocal()
-    
-    # Update active config
-    stmt = update(EnsembleConfig).where(EnsembleConfig.is_active == True).values(
-        rf_weight=data.get('rf', 0.33),
-        nn_weight=data.get('nn', 0.33),
-        catboost_weight=data.get('catboost', 0.34)
-    )
-    session.execute(stmt)
-    session.commit()
-    session.close()
-    return jsonify({"status": "success"})
+    try:
+        # Get active config
+        stmt = select(EnsembleConfig).where(EnsembleConfig.is_active == True).order_by(EnsembleConfig.updated_at.desc()).limit(1)
+        config = session.execute(stmt).scalar_one_or_none()
+        
+        if not config:
+            config = EnsembleConfig(is_active=True)
+            session.add(config)
+        
+        # Update weights from JSON (0-1 range)
+        config.rf_weight = float(data.get('rf', 0))
+        config.nn_weight = float(data.get('nn', 0))
+        config.catboost_weight = float(data.get('catboost', 0))
+        config.xgboost_weight = float(data.get('xgboost', 0))
+        config.lgbm_weight = float(data.get('lgbm', 0))
+        config.elasticnet_weight = float(data.get('elasticnet', 0))
+        
+        config.updated_at = datetime.now()
+        session.commit()
+        return jsonify({"status": "success", "message": "Ensemble weights updated successfully."})
+    except Exception as e:
+        session.rollback()
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        session.close()
