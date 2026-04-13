@@ -17,11 +17,11 @@ dashboard_bp = Blueprint('dashboard', __name__)
 def get_vote_col(df):
     """Identify the specific party vote column, strictly avoiding precinct-level totals."""
     party_vote_columns = [
-        'BALSU_SKAICIUS',          
-        'BALSAI_UZ_SARASA',        
-        'PADUOTI_BALSAI',          
-        'GALI_BALSAI',             
-        'BALSU_VISO'               
+        'BALSU_SKAICIUS',
+        'BALSAI_UZ_SARASA',
+        'PADUOTI_BALSAI',
+        'GALI_BALSAI',
+        'BALSU_VISO'
     ]
     for col in party_vote_columns:
         if col in df.columns:
@@ -39,18 +39,18 @@ def load_model_by_id(model_id=None):
         model_entry = session.execute(
             select(MLModelRegistry).order_by(MLModelRegistry.mae.asc())
         ).scalars().first()
-    
+
     if not model_entry:
         session.close()
         return None, None, None
-    
+
     path = model_entry.file_path
     model_type = model_entry.model_type
     session.close()
-    
+
     if not os.path.exists(path):
         return None, None, None
-        
+
     try:
         if model_type == 'catboost':
             from catboost import CatBoostRegressor
@@ -67,14 +67,14 @@ def load_model_by_id(model_id=None):
 def run_inference_on_2024(test_df, model_id=None):
     """Run inference using the specified model."""
     model, model_type, actual_id = load_model_by_id(model_id)
-    
+
     if model is None:
         return None, "No valid model found", None
 
     cat_features = ['SARASO_PAVADINIMAS', 'APYGARDOS_PAVADINIMAS']
     num_features = ['RINKEJU_SKAICIUS']
     features = cat_features + num_features
-    
+
     for col in num_features:
         # Strictly avoid the pandas DataFrame downcasting FutureWarning
         test_df[col] = pd.to_numeric(test_df[col], errors='coerce').replace({np.nan: 0})
@@ -82,7 +82,7 @@ def run_inference_on_2024(test_df, model_id=None):
     # Ensure categorical features are strings (critical for CatBoost)
     for col in cat_features:
         test_df[col] = test_df[col].astype(str).replace('nan', 'Unknown')
-    
+
     X = test_df[features].copy()
 
     if model_type == 'catboost':
@@ -90,16 +90,34 @@ def run_inference_on_2024(test_df, model_id=None):
         X[cat_features] = X[cat_features].astype(str)
         preds = model.predict(X)
     else:
-        all_enc = pd.get_dummies(X, drop_first=True)
-        if hasattr(model, 'feature_names_in_'):
-            expected_cols = model.feature_names_in_
-            all_enc = all_enc.reindex(columns=expected_cols, fill_value=0)
-        preds = model.predict(all_enc.values.astype(np.float32))
+        # Load the feature encoder that was saved during training
+        import pickle
+        from scipy.sparse import hstack
+
+        encoder_path = 'app/ml/models/feature_encoder.pkl'
+        encoder = None
+        if os.path.exists(encoder_path):
+            with open(encoder_path, 'rb') as f:
+                encoder = pickle.load(f)
+
+        if encoder is not None:
+            # Use the same encoding as during training
+            X_cat = encoder.transform(X[cat_features])
+            X_num = X[num_features].values
+            X_enc = hstack([X_num, X_cat])
+            preds = model.predict(X_enc)
+        else:
+            # Fallback if encoder not found (should not happen if model was trained properly)
+            all_enc = pd.get_dummies(X, drop_first=True)
+            if hasattr(model, 'feature_names_in_'):
+                expected_cols = model.feature_names_in_
+                all_enc = all_enc.reindex(columns=expected_cols, fill_value=0)
+            preds = model.predict(all_enc.values.astype(np.float32))
 
     result_df = test_df[['APYGARDOS_PAVADINIMAS', 'APYLINKES_PAVADINIMAS',
                          'SARASO_PAVADINIMAS', 'VOTE_SHARE']].copy()
-    
-    result_df['PREDICTED'] = np.clip(preds, 0, 100) 
+
+    result_df['PREDICTED'] = np.clip(preds, 0, 100)
     return result_df, model_type, actual_id
 
 
@@ -139,7 +157,7 @@ def index():
 
     agg_df = df.groupby('SARASO_PAVADINIMAS')[vote_col].sum().reset_index()
     total_votes = agg_df[vote_col].sum()
-    
+
     if total_votes == 0:
         return render_template('dashboard/index.html', plot_json=None, pie_json=None,
                                year=year, districts=districts, precincts=precincts)
@@ -162,18 +180,18 @@ def index():
         textposition='outside',
         hovertemplate='<b>%{customdata[0]}</b><br>Votes: %{customdata[1]:,.0f}<br>Share: %{x:.2f}%<extra></extra>'
     )
-    
+
     max_share = top_10['SHARE_PCT'].max()
     fig_bar.update_layout(
-        template='plotly_white', 
-        margin=dict(l=250, r=50), 
-        yaxis={'categoryorder': 'total ascending'}, 
-        xaxis=dict(range=[0, max_share * 1.15]), 
+        template='plotly_white',
+        margin=dict(l=250, r=50),
+        yaxis={'categoryorder': 'total ascending'},
+        xaxis=dict(range=[0, max_share * 1.15]),
         coloraxis_showscale=False
     )
     bar_json = json.dumps(fig_bar, cls=plotly.utils.PlotlyJSONEncoder)
 
-    # --- Pie Chart (Safe Method) ---
+    # --- Improved Pie Chart (Safe Method) ---
     pie_data = []
     other_votes = 0.0
     other_share = 0.0
@@ -181,38 +199,77 @@ def index():
     for _, row in agg_df.iterrows():
         if row['SHARE_PCT'] >= 1.5:
             pie_data.append({
-                'Party': str(row['SARASO_PAVADINIMAS']), 
-                'Votes': float(row[vote_col]), 
+                'Party': str(row['SARASO_PAVADINIMAS']),
+                'Votes': float(row[vote_col]),
                 'Share': float(row['SHARE_PCT'])
             })
         else:
             other_votes += float(row[vote_col])
             other_share += float(row['SHARE_PCT'])
-            
+
     if other_share > 0:
         pie_data.append({
-            'Party': 'Kitos partijos', 
-            'Votes': float(other_votes), 
+            'Party': 'Kitos partijos',
+            'Votes': float(other_votes),
             'Share': float(other_share)
         })
 
     clean_pie_df = pd.DataFrame(pie_data)
 
-    fig_pie = px.pie(clean_pie_df, values='Share', names='Party',
-                     title="National Vote Distribution", hole=0.4,
-                     custom_data=['Votes'])
-    
+    # 1. Sort: largest → smallest, "Kitos partijos" always last
+    main_df = clean_pie_df[clean_pie_df['Party'] != 'Kitos partijos'].sort_values('Share', ascending=False)
+    other_df = clean_pie_df[clean_pie_df['Party'] == 'Kitos partijos']
+    clean_pie_df = pd.concat([main_df, other_df], ignore_index=True)
+
+    # Calculate total for optional center text
+    total_votes = int(clean_pie_df['Votes'].sum())
+
+    fig_pie = px.pie(
+        clean_pie_df,
+        values='Share',
+        names='Party',
+        title="National Vote Distribution",
+        hole=0.35,                    # slightly smaller hole = more space for labels
+        custom_data=['Votes'],
+        color_discrete_sequence=px.colors.qualitative.Bold  # high-contrast, colorblind-friendly
+    )
+
     fig_pie.update_traces(
-        textposition='inside', 
-        textinfo='percent',
-        hovertemplate='<b>%{label}</b><br>Votes: %{customdata[0]:,.0f}<br>Share: %{value:.2f}%<extra></extra>'
+        textposition='auto',          # ← best readability: inside when it fits, outside otherwise
+        textinfo='label+percent',     # shows party name + % directly on the chart
+        textfont=dict(size=13, color='white'),   # bigger, white text (contrast)
+        hovertemplate='<b>%{label}</b><br>Votes: %{customdata[0]:,.0f}<br>Share: %{value:.2f}%<extra></extra>',
+        # nice visual separation between slices
+        marker=dict(line=dict(color='white', width=2.5))
     )
-    
+
+    # Center annotation (total votes) – very useful for donut charts
     fig_pie.update_layout(
-        legend=dict(orientation="h", yanchor="top", y=-0.15, xanchor="center", x=0.5),
+        annotations=[
+            dict(
+                text=f"<b>Total votes</b><br>{total_votes:,}",
+                x=0.5, y=0.5,
+                font=dict(size=14, color="#333"),
+                showarrow=False,
+                xanchor="center",
+                yanchor="middle"
+            )
+        ],
+        legend=dict(
+            orientation="h",
+            yanchor="top",
+            y=-0.12,               # slightly higher than before to avoid crowding
+            xanchor="center",
+            x=0.5,
+            font=dict(size=12),
+            title_text=""          # remove default "Party" title
+        ),
         template='plotly_white',
-        margin=dict(t=50, b=100, l=20, r=20)
+        margin=dict(t=60, b=110, l=20, r=20),   # extra bottom margin for legend
+        title=dict(font=dict(size=18), x=0.5),
+        font=dict(family="Arial, sans-serif", size=13)  # global font improvement
     )
+
     pie_json = json.dumps(fig_pie, cls=plotly.utils.PlotlyJSONEncoder)
 
     return render_template('dashboard/index.html', plot_json=bar_json, pie_json=pie_json,
@@ -347,4 +404,3 @@ def backtest():
         selected_precinct=precinct_filter,
         error_msg=error_msg
     )
-   
