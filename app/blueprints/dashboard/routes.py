@@ -3,8 +3,7 @@ from app.data.database import SessionLocal, get_db
 from app.data.repositories import ElectionRepository
 from app.data.models import MLModelRegistry, EnsembleConfig
 from app.ml.pipeline.processor import DataProcessor
-from app.ml.pipeline.models import EnsembleModel
-from sqlalchemy import select
+from app.ml.pipeline.models import EnsembleModel, TreeModel, XGBModel, LGBMModel, PolyElasticNetModel, CatBoostModel
 import json
 import plotly
 import plotly.express as px
@@ -12,6 +11,8 @@ import pandas as pd
 import numpy as np
 import joblib
 import os
+from datetime import datetime
+from sqlalchemy import select
 
 dashboard_bp = Blueprint('dashboard', __name__)
 
@@ -60,12 +61,12 @@ def load_model_instance(model_name="Ensemble"):
                 config = EnsembleConfig()
             
             weights = {
-                'RandomForest': config.rf_weight,
-                'NeuralNetwork': config.nn_weight,
-                'CatBoost': config.catboost_weight,
-                'XGBoost': config.xgboost_weight,
-                'LightGBM': config.lgbm_weight,
-                'ElasticNet': config.elasticnet_weight
+                'rf': config.rf_weight,
+                'nn': config.nn_weight,
+                'catboost': config.catboost_weight,
+                'xgboost': config.xgboost_weight,
+                'lgbm': config.lgbm_weight,
+                'elasticnet': config.elasticnet_weight
             }
             
         return EnsembleModel(models, weights), "Ensemble"
@@ -96,7 +97,8 @@ def run_inference(test_df, model_name="Ensemble"):
     if model is None:
         return None, "No model found"
 
-    features = ['RINKEJU_SKAICIUS', 'SARASO_PAVADINIMAS', 'APYGARDOS_PAVADINIMAS']
+    # Order MUST match EnsembleModel expectation: 0:SARASO, 1:APYGARDA, 2:RINKEJU
+    features = ['SARASO_PAVADINIMAS', 'APYGARDOS_PAVADINIMAS', 'RINKEJU_SKAICIUS']
     X = test_df[features].copy()
 
     # Pre-process numeric
@@ -128,7 +130,7 @@ def run_inference(test_df, model_name="Ensemble"):
             preds = model.predict(X)
 
     result_df = test_df[['APYGARDOS_PAVADINIMAS', 'APYLINKES_PAVADINIMAS',
-                         'SARASO_PAVADINIMAS', 'VOTE_SHARE']].copy()
+                         'SARASO_PAVADINIMAS', 'VOTE_SHARE', 'BALSU_VISO', 'VISO_DALYVAVO']].copy()
     
     # Ensure 0-100 scale
     result_df['PREDICTED'] = np.clip(preds, 0, 100) 
@@ -283,10 +285,15 @@ def backtest():
     districts = repo.get_districts(2024)
     precincts = repo.get_precincts(2024, district_filter) if district_filter else []
 
-    # Get available models for the dropdown
+    # Get available models for the dropdown (Sync with backend model_configs)
     available_models = [
-        "Ensemble", "RandomForest", "NeuralNetwork", 
-        "CatBoost", "XGBoost", "LightGBM", "ElasticNet"
+        ("Ensemble", "Full Ensemble Mix"),
+        ("rf", "Random Forest"),
+        ("nn", "Neural Network"),
+        ("catboost", "CatBoost"),
+        ("xgboost", "XGBoost"),
+        ("lgbm", "LightGBM"),
+        ("elasticnet", "ElasticNet")
     ]
     
     # Fetch metrics from registry for display
@@ -345,11 +352,13 @@ def backtest():
                 fig_scatter.update_layout(template='plotly_white', xaxis=dict(range=[0, 100]), yaxis=dict(range=[0, 100]))
                 scatter_json = json.dumps(fig_scatter, cls=plotly.utils.PlotlyJSONEncoder)
 
-                # --- Bar: Top 15 Comparison ---
-                party_agg = result_df.groupby('SARASO_PAVADINIMAS').agg({
-                    'VOTE_SHARE': 'mean',
-                    'PREDICTED': 'mean'
-                }).reset_index()
+                # --- Bar: Top 15 Comparison (Weighted Aggregation) ---
+                # To get accurate national/district totals, we must weight by precinct size
+                party_agg = result_df.groupby('SARASO_PAVADINIMAS').apply(lambda x: pd.Series({
+                    'VOTE_SHARE': (x['BALSU_VISO'].sum() / max(1, x['VISO_DALYVAVO'].sum())) * 100,
+                    'PREDICTED': ((x['PREDICTED'] * x['VISO_DALYVAVO']).sum() / max(1, x['VISO_DALYVAVO'].sum()))
+                }), include_groups=False).reset_index()
+                # Sort by Actual then Predicted
                 
                 comp_df = party_agg.sort_values('VOTE_SHARE', ascending=False).head(15).copy()
                 comp_df = comp_df.melt(id_vars=['SARASO_PAVADINIMAS'],
@@ -369,10 +378,10 @@ def backtest():
                 # --- District breakdown ---
                 for dist in sorted(result_df['APYGARDOS_PAVADINIMAS'].unique()):
                     dist_df = result_df[result_df['APYGARDOS_PAVADINIMAS'] == dist]
-                    dist_party = dist_df.groupby('SARASO_PAVADINIMAS').agg({
-                        'VOTE_SHARE': 'mean',
-                        'PREDICTED': 'mean'
-                    }).reset_index().sort_values('VOTE_SHARE', ascending=False)
+                    dist_party = dist_df.groupby('SARASO_PAVADINIMAS').apply(lambda x: pd.Series({
+                        'VOTE_SHARE': (x['BALSU_VISO'].sum() / max(1, x['VISO_DALYVAVO'].sum())) * 100,
+                        'PREDICTED': ((x['PREDICTED'] * x['VISO_DALYVAVO']).sum() / max(1, x['VISO_DALYVAVO'].sum()))
+                    }), include_groups=False).reset_index().sort_values('VOTE_SHARE', ascending=False)
 
                     # Determine winners for the UI labels
                     top_actual = dist_party.iloc[0]['SARASO_PAVADINIMAS'] if not dist_party.empty else 'N/A'

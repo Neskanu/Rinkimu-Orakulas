@@ -61,51 +61,76 @@
     </div>
 
     <!-- Active Training / Progress -->
-    <div id="training-status" class="hidden bg-white p-10 rounded-[2.5rem] border-2 border-indigo-100 shadow-xl space-y-8">
-        <div class="flex justify-between items-center">
-            <h2 class="text-2xl font-black text-slate-900 flex items-center">
-                <span id="progress-spinner" class="relative flex h-4 w-4 mr-4">
+    <div id="training-status" class="hidden bg-white p-6 rounded-[2rem] border-2 border-indigo-100 shadow-xl space-y-6">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+            <h2 class="text-xl font-black text-slate-900 flex items-center">
+                <span id="progress-spinner" class="relative flex h-3 w-3 mr-3">
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-4 w-4 bg-indigo-500"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-indigo-500"></span>
                 </span>
-                <span id="progress-title">Training in Progress...</span>
+                <span id="progress-title">Training Suite...</span>
             </h2>
-            <p id="current-stage" class="text-indigo-600 font-black font-mono text-sm bg-indigo-50 px-4 py-2 rounded-full"></p>
+            <p id="current-stage" class="text-indigo-600 font-black font-mono text-[10px] bg-indigo-50 px-3 py-1 rounded-full uppercase"></p>
         </div>
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            <div class="space-y-6">
-                <div id="progress-graph" class="w-full h-[300px]"></div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left: Stats & Status (Compact) -->
+            <div class="lg:col-span-1 space-y-4">
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="bg-slate-50 p-4 rounded-2xl">
+                        <span class="text-[9px] text-slate-400 uppercase font-black block mb-1">MAE Accuracy</span>
+                        <span id="latest-metric" class="text-3xl font-black text-slate-800">--</span>
+                    </div>
+                    <div class="bg-indigo-50/50 p-4 rounded-2xl">
+                        <span class="text-[9px] text-indigo-400 uppercase font-black block mb-1">R² Confidence</span>
+                        <span id="r2-metric" class="text-3xl font-black text-indigo-700">--</span>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-2xl flex justify-between items-center">
+                        <div>
+                            <span class="text-[9px] text-slate-400 uppercase font-black block mb-1">RMSE</span>
+                            <span id="rmse-metric" class="text-xl font-black text-slate-600">--</span>
+                        </div>
+                        <div class="text-right">
+                            <span id="pipeline-status-text" class="px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded-md font-black text-[9px] uppercase">Active</span>
+                        </div>
+                    </div>
+                </div>
                 <!-- Mini Log for sub-steps -->
-                <div class="bg-slate-900 rounded-2xl p-6 font-mono text-[10px] text-indigo-300 h-40 overflow-y-auto" id="training-log">
-                    <div class="text-indigo-500 opacity-50 border-b border-indigo-900/50 pb-2 mb-2 uppercase font-black">Sub-Step Execution Log</div>
+                <div class="bg-slate-900 rounded-2xl p-4 font-mono text-[9px] text-indigo-300 h-24 overflow-y-auto" id="training-log">
+                    <div class="text-white opacity-50 mb-1 font-black underline decoration-indigo-800 text-[8px]">EXECution LOG</div>
                     <div class="text-white">> Engine initialized...</div>
                 </div>
             </div>
-            <div class="flex flex-col justify-center space-y-6">
-                <div class="grid grid-cols-2 gap-6">
-                    <div class="bg-slate-50 p-6 rounded-3xl group hover:bg-white hover:shadow-lg transition-all border border-transparent hover:border-slate-100">
-                        <span class="text-xs text-slate-400 uppercase font-black block mb-2">MAE (Error)</span>
-                        <span id="latest-metric" class="text-4xl font-black text-slate-800">--</span>
-                    </div>
-                    <div class="bg-indigo-50/50 p-6 rounded-3xl group hover:bg-white hover:shadow-lg transition-all border border-transparent hover:border-indigo-100">
-                        <span class="text-xs text-indigo-400 uppercase font-black block mb-2">R² Accuracy</span>
-                        <span id="r2-metric" class="text-4xl font-black text-indigo-700">--</span>
-                    </div>
+
+            <!-- Right: Graph (Larger) -->
+            <div class="lg:col-span-2 bg-slate-50/30 rounded-2xl p-4 border border-slate-100 flex flex-col">
+                <div class="flex justify-between items-center mb-2 px-2">
+                    <span class="text-[9px] text-slate-400 uppercase font-black tracking-widest text-[8px]">Accuracy Benchmarks (MAE)</span>
+                    <span id="training-message" class="text-[9px] text-yellow-600 font-bold italic truncate ml-4"></span>
                 </div>
-                <div class="bg-slate-50 p-6 rounded-3xl flex justify-between items-center">
-                    <div>
-                        <span class="text-xs text-slate-400 uppercase font-black block mb-2">RMSE (Magnitude)</span>
-                        <span id="rmse-metric" class="text-2xl font-black text-slate-600">--</span>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-[10px] text-indigo-400 uppercase font-black block mb-2">Pipeline Status</span>
-                        <span id="pipeline-status-text" class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-lg font-black text-xs">Active</span>
-                    </div>
-                </div>
-                <div class="flex items-start space-x-3 p-4 bg-yellow-50 rounded-2xl border border-yellow-100">
-                    <svg class="w-5 h-5 text-yellow-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <p id="training-message" class="text-sm text-yellow-800 font-medium italic"></p>
-                </div>
+                <div id="progress-graph" class="w-full h-full min-h-[220px]"></div>
+            </div>
+        </div>
+
+        <!-- Suite Completion Report -->
+        <div id="results-summary-container" class="hidden animate-in fade-in slide-in-from-top-4 duration-500 border-t border-slate-100 pt-8">
+            <h3 class="text-lg font-black text-slate-900 mb-6 flex items-center">
+                <svg class="w-6 h-6 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Suite Completion Report
+            </h3>
+            <div class="overflow-hidden rounded-2xl border border-slate-100">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-slate-50 text-[10px] uppercase font-black text-slate-400">
+                        <tr>
+                            <th class="px-6 py-4">Model</th>
+                            <th class="px-6 py-4">Status</th>
+                            <th class="px-6 py-4">MAE</th>
+                            <th class="px-6 py-4">R² Score</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-table-body" class="divide-y divide-slate-100 font-bold text-slate-700">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -242,6 +267,8 @@
         
         // Reset UI for fresh run
         document.getElementById('training-status').classList.remove('hidden');
+        document.getElementById('results-summary-container').classList.add('hidden');
+        document.getElementById('results-table-body').innerHTML = "";
         document.getElementById('current-stage').innerText = "Connecting...";
         document.getElementById('latest-metric').innerText = "--";
         document.getElementById('r2-metric').innerText = "--";
@@ -279,8 +306,9 @@
             }
             
             emptyCount = 0;
-            const activeModelKey = Object.keys(data).find(k => data[k].current_stage != 'Finished' && data[k].current_stage != 'Failed' && data[k].current_stage != 'CRITICAL ERROR');
-            const displayKey = activeModelKey || Object.keys(data).reverse()[0];
+            const modelKeys = Object.keys(data).filter(k => k !== 'suite_history' && k !== 'SYSTEM');
+            const activeModelKey = modelKeys.find(k => data[k].current_stage != 'Finished' && data[k].current_stage != 'Failed' && data[k].current_stage != 'CRITICAL ERROR');
+            const displayKey = activeModelKey || modelKeys.reverse()[0];
             if (displayKey) {
                 const modelData = data[displayKey];
                 const newTitle = `${displayKey.toUpperCase()}: ${modelData.current_stage}`;
@@ -310,17 +338,68 @@
                     return;
                 }
 
-                if (modelData.history && modelData.history.length > 0) {
-                    const trace = { x: modelData.history.map((_, i) => i), y: modelData.history.map(h => h.value), type: 'scatter', mode: 'lines+markers', line: {color: '#6366f1'} };
-                    Plotly.newPlot('progress-graph', [trace], { margin: { t: 0, r: 0, b: 20, l: 30 }, paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)', xaxis: { showgrid: false }, yaxis: { showgrid: true, gridcolor: '#f1f5f9' } }, {responsive: true, displayModeBar: false});
+                if (data.suite_history && data.suite_history.length > 0) {
+                    const trace = {
+                        x: data.suite_history.map(h => h.name.toUpperCase()),
+                        y: data.suite_history.map(h => h.value),
+                        type: 'bar',
+                        marker: {
+                            color: data.suite_history.map((h, i) => i % 2 == 0 ? '#6366f1' : '#818cf8'),
+                            line: { width: 0 }
+                        },
+                        text: data.suite_history.map(h => h.value.toFixed(4)),
+                        textposition: 'auto',
+                    };
+                    
+                    const layout = {
+                        margin: { t: 0, r: 20, b: 40, l: 40 },
+                        paper_bgcolor: 'rgba(0,0,0,0)',
+                        plot_bgcolor: 'rgba(0,0,0,0)',
+                        xaxis: { 
+                            showgrid: false,
+                            tickfont: { family: 'Outfit', size: 10, color: '#94a3b8', weight: 'bold' }
+                        },
+                        yaxis: { 
+                            showgrid: true, 
+                            gridcolor: '#f1f5f9',
+                            tickfont: { family: 'Outfit', size: 10, color: '#94a3b8' },
+                            title: { text: 'MAE', font: { size: 10, color: '#cbd5e1' } }
+                        },
+                        bargap: 0.4
+                    };
+                    
+                    Plotly.react('progress-graph', [trace], layout, {responsive: true, displayModeBar: false});
                 }
             }
-            const allFinishedOrFailed = Object.values(data).every(m => ['Finished', 'Failed', 'CRITICAL ERROR'].includes(m.current_stage));
+            const allFinishedOrFailed = Object.keys(data)
+                .filter(k => k !== 'suite_history' && k !== 'SYSTEM')
+                .every(k => ['Finished', 'Failed', 'CRITICAL ERROR'].includes(data[k].current_stage));
             if (allFinishedOrFailed && Object.keys(data).length > 0) {
                 isTraining = false;
-                document.getElementById('progress-title').innerText = "Training Session Complete";
+                document.getElementById('progress-title').innerText = "✨ Training Finished";
                 document.getElementById('progress-spinner').classList.add('hidden');
-                setTimeout(() => { alert("Training cycle finished. View individual model statuses."); }, 500);
+                
+                // Build Final Results Table
+                const tbody = document.getElementById('results-table-body');
+                tbody.innerHTML = "";
+                Object.keys(data).forEach(mid => {
+                    if (mid === 'SYSTEM' || mid === 'suite_history') return;
+                    const m = data[mid];
+                    const row = document.createElement('tr');
+                    const isSuccess = m.current_stage === 'Finished';
+                    const statusClass = isSuccess ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
+                    
+                    row.innerHTML = `
+                        <td class="px-6 py-4 font-black">${mid.toUpperCase()}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 ${statusClass} rounded-lg text-[10px] uppercase font-black">${m.current_stage}</span>
+                        </td>
+                        <td class="px-6 py-4 text-slate-500">${(m.metrics && m.metrics.mae) ? m.metrics.mae.toFixed(4) : '--'}</td>
+                        <td class="px-6 py-4 text-indigo-600">${(m.metrics && m.metrics.r2) ? m.metrics.r2.toFixed(4) : '--'}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                document.getElementById('results-summary-container').classList.remove('hidden');
             }
         } catch (err) {
             console.error("Polling error:", err);

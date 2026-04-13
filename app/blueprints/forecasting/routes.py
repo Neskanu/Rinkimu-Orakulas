@@ -3,7 +3,7 @@ from app.data.database import SessionLocal
 from app.data.models import EnsembleConfig
 from app.ml.pipeline.processor import DataProcessor
 from app.ml.pipeline.models import EnsembleModel, TreeModel, XGBModel, LGBMModel, PolyElasticNetModel, CatBoostModel
-import pickle
+import joblib
 import pandas as pd
 import numpy as np
 import os
@@ -37,10 +37,12 @@ def load_ensemble():
     for mid in ['rf', 'xgboost', 'lgbm', 'elasticnet']:
         path = f'app/ml/models/{mid}_tuned.pkl'
         if os.path.exists(path):
-            with open(path, 'rb') as f:
+            try:
                 wrapped = MODEL_MAP[mid]()
-                wrapped.model = pickle.load(f)
+                wrapped.model = joblib.load(path)
                 models_dict[mid] = wrapped
+            except Exception as e:
+                print(f"Error loading {mid} in forecast: {e}")
     
     cb_path = 'app/ml/models/catboost_tuned.cbm'
     if os.path.exists(cb_path):

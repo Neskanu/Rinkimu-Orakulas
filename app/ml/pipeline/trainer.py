@@ -35,14 +35,31 @@ class ElectionTrainer:
         
         if model_name not in data:
             data[model_name] = {"history": [], "current_stage": "", "metrics": {}, "message": ""}
+        
+        # Initialize suite_history if missing
+        if "suite_history" not in data:
+            data["suite_history"] = []
             
         data[model_name]["current_stage"] = stage
         if metrics:
-            # We track MAE in history for the graph
             mae = metrics.get('mae', 0)
             data[model_name]["current_value"] = mae
             data[model_name]["metrics"] = metrics
+            
+            # Per-model history (for convergence)
             data[model_name]["history"].append({"value": mae, "time": time.time()})
+            
+            # Suite-wide history (if it's a final metric for a model)
+            if stage == "Finished":
+                # Check if this model is already in suite_history, if so update it
+                found = False
+                for item in data["suite_history"]:
+                    if item["name"] == model_name:
+                        item["value"] = mae
+                        found = True
+                        break
+                if not found:
+                    data["suite_history"].append({"name": model_name, "value": mae})
             
         if message:
             data[model_name]["message"] = message
@@ -113,8 +130,9 @@ class ElectionTrainer:
             }
 
             results = []
-            trained_models = {}
+            suite_model_registry = {}
             session = SessionLocal()
+            print(f"[*] DATA DTYPES: {train_df.dtypes.to_dict()}")
             
             enabled_models = [m for m in model_configs.keys() if not selected_models or m in selected_models]
             print(f"[*] Selected models: {', '.join([m.upper() for m in enabled_models])}")
@@ -145,8 +163,8 @@ class ElectionTrainer:
                         model_inst.train(X_train_enc, y_train)
                         preds = model_inst.predict(X_test_enc)
                         self.update_progress(name, "Saving", message=f"Saving {cfg['label']} artifact...")
-                        with open(os.path.join(self.models_dir, cfg['filename']), 'wb') as f:
-                            pickle.dump(model_inst, f)
+                        import joblib
+                        joblib.dump(model_inst, os.path.join(self.models_dir, cfg['filename']))
 
                     self.update_progress(name, "Evaluation", message="Computing accuracy metrics...")
                     mae = mean_absolute_error(y_test, preds)
@@ -167,7 +185,8 @@ class ElectionTrainer:
                     session.add(new_model)
                     session.commit() # Save progress model-by-model
                     
-                    trained_models[name] = model_inst
+                    suite_model_registry[name] = model_inst
+                    results.append({'model': name, 'mae': mae, 'rmse': rmse, 'r2': r2})
                     self.update_progress(name, "Finished", metrics=metrics)
 
                 except Exception as e:
@@ -176,13 +195,6 @@ class ElectionTrainer:
                     traceback.print_exc()
                     self.update_progress(name, "Failed", message=f"ERROR: {str(e)[:100]}...")
                     continue # Keep moving through the suite
-                    results.append({'model': name, 'mae': mae, 'rmse': rmse, 'r2': r2})
-                    
-                    self.update_progress(name, "Finished", metrics=metrics, message=f"Success! R2 Score: {r2:.4f}")
-
-                except Exception as e:
-                    self.update_progress(name, "Failed", message=str(e))
-                    print(f"Error training {name}: {str(e)}")
 
             session.commit()
             session.close()
