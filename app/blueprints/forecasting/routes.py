@@ -18,13 +18,13 @@ MODEL_MAP = {
     'elasticnet': PolyElasticNetModel
 }
 
-# 2028 Archetype Mapping - Exact Training Strings
+# 2028 Archetype Mapping - Standartizuoti pavadinimai (sutampa su processor.py)
 ARCHETYPES = {
-    "conservative": "Tėvynės sąjunga - Lietuvos krikščionys demokratai",
-    "social_democrat": "Lietuvos socialdemokratų partija",
-    "liberal": "Lietuvos Respublikos liberalų sąjūdis",
-    "populist": "Lietuvos valstiečių ir žaliųjų sąjunga",
-    "independent": "AVERAGE" 
+    "conservative": "TS-LKD",
+    "social_democrat": "LSDP",
+    "liberal": "Liberalų sąjūdis",
+    "populist": "LVŽS",
+    "independent": "Nepriklausomas" 
 }
 
 def load_ensemble():
@@ -64,6 +64,9 @@ def predict_2028():
     data = request.json
     contestants = data.get('contestants', []) 
     turnout_adj = data.get('turnout_adj', 0) / 100
+    
+    # Ištraukiame vartotojo pasirinktą modelį (numatytasis - catboost)
+    selected_model = data.get('model', 'catboost')
 
     processor = DataProcessor()
     template = processor.prepare_2028_template()
@@ -71,8 +74,17 @@ def predict_2028():
         return jsonify({"error": "No 2024 template found."}), 400
 
     ensemble, _ = load_ensemble()
-    if not ensemble or 'catboost' not in ensemble.models:
-        return jsonify({"error": "CatBoost model required for Oracle."}), 400
+    if not ensemble or selected_model not in ensemble.models:
+        return jsonify({"error": f"Modelis '{selected_model.upper()}' nerastas. Pirmiausia apmokykite jį."}), 400
+
+    # Jei tai ne CatBoost, mums būtinai reikia transformatoriaus (OneHotEncoder)
+    preprocessor = None
+    if selected_model != 'catboost':
+        preprocessor_path = 'app/ml/models/preprocessor.joblib'
+        if os.path.exists(preprocessor_path):
+            preprocessor = joblib.load(preprocessor_path)
+        else:
+            return jsonify({"error": "Nerastas preprocessor.joblib failas. Apmokykite modelius iš naujo."}), 400
 
     # Ensure numeric for template
     template['VISO_DALYVAVO'] = pd.to_numeric(template['VISO_DALYVAVO'], errors='coerce').fillna(0)
@@ -80,27 +92,35 @@ def predict_2028():
     template['VISO_DALYVAVO'] = template['VISO_DALYVAVO'] * (1 + turnout_adj)
 
     results = []
-    # Variety baseline
-    avg_preds_base = np.random.uniform(0.045, 0.08, len(template))
+    # PATAISYTA: Bazė nepriklausomiems (4.5% - 8.0%), nes skalė yra 0-100
+    avg_preds_base = np.random.uniform(4.5, 8.0, len(template))
 
     for cont in contestants:
         name = cont['name']
         profile = cont['profile']
         if profile == 'independent':
-            # Unique noise for each independent
-            preds = avg_preds_base + np.random.normal(0, 0.005, len(template))
+            # PATAISYTA: Triukšmas pritaikytas 0-100 skalei
+            preds = avg_preds_base + np.random.normal(0, 0.5, len(template))
         else:
             archetype = ARCHETYPES.get(profile, ARCHETYPES['populist'])
-            # IMPORTANT: Column order must exactly match the Training Set used by CatBoost
-            X_raw = template[['SARASO_PAVADINIMAS', 'APYGARDOS_PAVADINIMAS', 'RINKEJU_SKAICIUS']].copy()
+            
+            X_raw = template[['APYGARDOS_PAVADINIMAS', 'RINKEJU_SKAICIUS']].copy()
             X_raw['SARASO_PAVADINIMAS'] = archetype
             X_raw = X_raw[['SARASO_PAVADINIMAS', 'APYGARDOS_PAVADINIMAS', 'RINKEJU_SKAICIUS']]
             
-            # Predict
-            preds = ensemble.models['catboost'].predict(X_raw)
-            # Add stochastic variety noise
-            preds = preds + np.random.normal(0, 0.003, len(template))
-            preds = np.clip(preds, 0, 1)
+            # --- MODELIO INFERENCIJOS LOGIKA ---
+            if selected_model == 'catboost':
+                X_raw['SARASO_PAVADINIMAS'] = X_raw['SARASO_PAVADINIMAS'].astype(str)
+                X_raw['APYGARDOS_PAVADINIMAS'] = X_raw['APYGARDOS_PAVADINIMAS'].astype(str)
+                preds = ensemble.models[selected_model].predict(X_raw)
+            else:
+                # Scikit-Learn ir XGBoost modeliams naudojame užkoduotą matricą
+                X_encoded = preprocessor.transform(X_raw)
+                preds = ensemble.models[selected_model].predict(X_encoded)
+            
+            # PATAISYTA: Triukšmas pritaikytas 0-100 skalei (0.3% svyravimas)
+            preds = preds + np.random.normal(0, 0.3, len(template))
+            preds = np.clip(preds, 0, 100)
 
         cont_df = template[['APYGARDOS_PAVADINIMAS']].copy()
         cont_df['PRED_SHARE'] = preds
@@ -113,10 +133,7 @@ def predict_2028():
     chart_data = []
     for dist in final_df['APYGARDOS_PAVADINIMAS'].unique():
         dist_p = final_df[final_df['APYGARDOS_PAVADINIMAS'] == dist].copy()
-        
-        # Mean share across all precincts in district for each party
         summary = dist_p.groupby('PARTY')['PRED_SHARE'].mean().reset_index()
-        # Scale to 100% relative base
         total_p = summary['PRED_SHARE'].sum()
         summary['PRED_SHARE'] = (summary['PRED_SHARE'] / (total_p if total_p > 0 else 1)) * 100
         

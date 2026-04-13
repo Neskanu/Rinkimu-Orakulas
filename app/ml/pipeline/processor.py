@@ -1,3 +1,7 @@
+import os
+import joblib
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 import pandas as pd
 import numpy as np
 from app.data.repositories import ElectionRepository
@@ -15,6 +19,7 @@ class DataProcessor:
         for y in years:
             df = self.repo.get_dataframe_for_ml(y)
             if not df.empty:
+                df['YEAR'] = y
                 dfs.append(df)
         
         if not dfs:
@@ -28,6 +33,25 @@ class DataProcessor:
             if col in full_df.columns:
                 full_df[col] = full_df[col].astype(str).str.replace('ā€“', '-', regex=False)
                 full_df[col] = full_df[col].str.replace('SÅ«duvos', 'Sūduvos', regex=False)
+
+        # Partijų pavadinimų normalizavimas (Standartizacija)
+        # Naudojame (?i) - case-insensitive, ir .* - bet koks tekstas prieš ar po.
+        party_replacements = {
+            r'(?i).*Tėvynės sąjunga.*': 'TS-LKD',
+            r'(?i).*liberalų sąjūdis.*': 'Liberalų sąjūdis',
+            r'(?i).*socialdemokratų partija.*': 'LSDP',
+            r'(?i).*valstiečių.*': 'LVŽS',  # Apima ir "valstiečių liaudininkų" ir "valstiečių ir žaliųjų"
+            r'(?i)^Darbo partija.*': 'Darbo partija', # Pradedame nuo ^ kad nesumaišytume su koalicijomis
+            r'(?i).*lenkų rinkimų akcija.*': 'LLRA-KŠS',
+            r'(?i).*Tvarka ir teisingumas.*': 'Tvarka ir teisingumas',
+            r'(?i).*Vardan Lietuvos.*': 'Demokratai Vardan Lietuvos',
+            r'(?i).*Laisvės partija.*': 'Laisvės partija',
+            r'(?i).*Nemuno aušra.*': 'Nemuno aušra',
+            r'(?i).*Regionų partija.*': 'Lietuvos regionų partija'
+        }
+        
+        if 'SARASO_PAVADINIMAS' in full_df.columns:
+            full_df['SARASO_PAVADINIMAS'] = full_df['SARASO_PAVADINIMAS'].replace(party_replacements, regex=True)
         
         # Force numeric types before math to prevent 'garbage' training targets
         full_df['BALSU_VISO'] = pd.to_numeric(full_df['BALSU_VISO'], errors='coerce').fillna(0)
@@ -62,21 +86,57 @@ class DataProcessor:
         if df_2024.empty:
             return None
             
-        template = df_2024[['APYGARDOS_NR', 'APYGARDOS_PAVADINIMAS', 'APYLINKES_NR', 'APYLINKES_PAVADINIMAS', 'RINKEJU_SKAICIUS', 'VISO_DALYVAVO']].drop_duplicates()
+        template = df_2024[['APYGARDOS_PAVADINIMAS', 'APYLINKES_PAVADINIMAS', 'RINKEJU_SKAICIUS', 'VISO_DALYVAVO']].drop_duplicates()
         return template
 
-    def encode_features(self, df):
-        """One-hot encodes categorical features using sparse matrices for efficiency."""
-        df = df.copy()
-        categorical_cols = ['SARASO_PAVADINIMAS', 'APYGARDOS_PAVADINIMAS']
+    def fit_and_save_preprocessor(self, train_df, save_path='app/ml/models/preprocessor.joblib'):
+        """
+        Sukuria, apmoko ir išsaugo produkcinį scikit-learn transformatorių.
+        Jį iškviesime vieną kartą per treniravimo ciklą (trainer.py).
+        """
+        cat_features = ['SARASO_PAVADINIMAS', 'APYGARDOS_PAVADINIMAS']
+        num_features = ['RINKEJU_SKAICIUS']
         
-        # Convert to category type first (speeds up get_dummies)
-        for col in categorical_cols:
-            if col in df.columns:
-                df[col] = df[col].astype('category')
+        # ColumnTransformer automatiškai pritaiko skirtingas taisykles stulpeliams
+        preprocessor = ColumnTransformer(
+            transformers=[
+                ('num', StandardScaler(), num_features),
+                ('cat', OneHotEncoder(handle_unknown='ignore', sparse_output=False), cat_features)
+            ],
+            remainder='drop' # Ignoruojame visus kitus stulpelius (pvz., ID, datos)
+        )
+        
+        # Apmokome transformatorių su istoriniais duomenimis
+        preprocessor.fit(train_df)
+        
+        # Užtikriname, kad direktorija egzistuoja, ir išsaugome
+        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+        joblib.dump(preprocessor, save_path)
+        
+        return preprocessor
+
+    def encode_features_prod(self, df, preprocessor_path='app/ml/models/preprocessor.joblib'):
+        """Transforms data using the saved preprocessor for inference."""
+        if not os.path.exists(preprocessor_path):
+            raise FileNotFoundError(f"Transformatorius nerastas: {preprocessor_path}. Pirmiausia apmokykite modelį.")
+            
+        preprocessor = joblib.load(preprocessor_path)
+        # Transform grąžina NumPy masyvą, idealiai tinkantį XGBoost, Random Forest, NN
+        encoded_data = preprocessor.transform(df)
+        return encoded_data
+
+    # def encode_features(self, df):
+    #     """One-hot encodes categorical features using sparse matrices for efficiency."""
+    #     df = df.copy()
+    #     categorical_cols = ['SARASO_PAVADINIMAS', 'APYGARDOS_PAVADINIMAS']
+        
+    #     # Convert to category type first (speeds up get_dummies)
+    #     for col in categorical_cols:
+    #         if col in df.columns:
+    #             df[col] = df[col].astype('category')
                 
-        encoded_df = pd.get_dummies(df, columns=categorical_cols, drop_first=True, sparse=True)
-        return encoded_df
+    #     encoded_df = pd.get_dummies(df, columns=categorical_cols, drop_first=True, sparse=True)
+    #     return encoded_df
 
     def close(self):
         """Explicitly close the database session."""

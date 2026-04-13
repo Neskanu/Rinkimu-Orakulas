@@ -24,25 +24,25 @@ class BaseModel:
 
 class TreeModel(BaseModel):
     def __init__(self, **params):
-        params.setdefault('n_estimators', 100)
-        params.setdefault('random_state', 42)
-        params.setdefault('n_jobs', 2)
+        params.setdefault('n_estimators', 100) # Kiek medziu bus sukurta
+        params.setdefault('random_state', 42) # Atsitiktinumo sėkla, kad modelis nesikeistų
+        params.setdefault('n_jobs', 2) # Kiek procesoriaus branduoliu bus naudojama
         self.model = RandomForestRegressor(**params)
     
-    def train(self, X, y, **kwargs):
-        self.model.fit(X, y)
+    def train(self, X, y, **kwargs): # Gauname kintamuosius X ir y, juose yra informacija apie apylinkes ir balsu skaicius
+        self.model.fit(X, y) # Apmokome modeli
     
-    def predict(self, X):
-        return self.model.predict(X)
+    def predict(self, X): 
+        return self.model.predict(X) # Gražiname prognozes
 
 class NNModel(BaseModel):
     def __init__(self, **params):
-        params.setdefault('hidden_layer_sizes', (64, 32))
-        params.setdefault('max_iter', 500)
-        params.setdefault('random_state', 42)
+        params.setdefault('hidden_layer_sizes', (64, 32)) # 2 sluoksniai po 64 ir 32 neuronus
+        params.setdefault('max_iter', 500) # Maksimalus epochų skaičius, po tiek iteracijų modelis sustos
+        params.setdefault('random_state', 42) # Atsitiktinumo sėkla, kad modelis nesikeistų
         self.model = Pipeline([
-            ('scaler', StandardScaler(with_mean=False)),
-            ('mlp', MLPRegressor(**params))
+            ('scaler', StandardScaler(with_mean=False)), # Standartizuoja duomenis, kad modelis galetu geriau ismokti daryti prognozes
+            ('mlp', MLPRegressor(**params)) # Neuroninis tinklas, jį naudoju nes jis gerai apdoroja kompleksinius ryšius tarp savybiu, bet jis yra gana letai apmokomas 
         ])
     
     def train(self, X, y, **kwargs):
@@ -141,90 +141,72 @@ class PolyElasticNetModel(BaseModel):
 
 class EnsembleModel:
     def __init__(self, models=None, weights=None):
-        """
-        models: dict of name -> model_instance
-        weights: dict of name -> weight (summing to 1 or handled by normalization)
-        """
         self.models = models or {}
         self.weights = weights or {
-            'rf': 0.20,
-            'nn': 0.20,
-            'catboost': 0.20,
-            'xgboost': 0.15,
-            'lgbm': 0.15,
-            'elasticnet': 0.10
+            'rf': 0.20, 'nn': 0.20, 'catboost': 0.20,
+            'xgboost': 0.15, 'lgbm': 0.15, 'elasticnet': 0.10
         }
 
     def predict(self, X):
         if not self.models:
             return np.zeros(len(X))
         
-        # Load the feature encoder for non-CatBoost models
+        import joblib
         import os
-        import pickle
-        from scipy.sparse import hstack
         
-        encoder_path = 'app/ml/models/feature_encoder.pkl'
-        encoder = None
-        if os.path.exists(encoder_path):
-            with open(encoder_path, 'rb') as f:
-                encoder = pickle.load(f)
+        # 1. Užkrauname produkcinį transformatorių
+        preprocessor_path = 'app/ml/models/preprocessor.joblib'
+        preprocessor = None
+        if os.path.exists(preprocessor_path):
+            preprocessor = joblib.load(preprocessor_path)
         
-        # Prepare both data formats
+        # 2. Pasiruošiame bazinius duomenis (CatBoost modeliui reikia tiesiog tekstų ir skaičių)
         cat_features = ['SARASO_PAVADINIMAS', 'APYGARDOS_PAVADINIMAS']
         num_features = ['RINKEJU_SKAICIUS']
         
-        X_enc = None
-        if encoder:
-            # Explicitly force types before transform to prevent alignment errors
-            X_prep = X[cat_features].astype(str)
-            X_cat = encoder.transform(X_prep)
-            X_num = pd.to_numeric(X[num_features].iloc[:, 0], errors='coerce').fillna(0).values.reshape(-1, 1)
-            X_enc = hstack([X_num, X_cat])
-        
-        # Ensure raw X for CatBoost also has aligned types/columns
-        X_raw = X[cat_features + num_features].copy()
+        X_base = X[cat_features + num_features].copy()
+        X_base[cat_features] = X_base[cat_features].astype(str).fillna('Unknown')
         for col in num_features:
-            X_raw[col] = pd.to_numeric(X_raw[col], errors='coerce').fillna(0)
+            X_base[col] = pd.to_numeric(X_base[col], errors='coerce').fillna(0)
         
-        # Normalize weights using lowercase keys for matching
+        # 3. Sukuriame užkoduotą matricą (Skirta Scikit-Learn ir XGBoost)
+        X_encoded = preprocessor.transform(X_base) if preprocessor else None
+
+        # Susinormalizuojame svorius
         total_w = sum(self.weights.values())
         norm_weights = {k.lower(): v/total_w for k, v in self.weights.items()}
         
-        final_preds = np.zeros(len(X))
-        # Match available models to weights (case-insensitive)
         available_models = [m for m in self.models.keys() if m.lower() in norm_weights]
-        
         if not available_models: return np.zeros(len(X))
 
         actual_total_w = sum(norm_weights[m.lower()] for m in available_models)
-        redist_weights = {m: norm_weights[m.lower()]/actual_total_w if actual_total_w > 0 else 1.0/len(available_models) for m in available_models}
+        redist_weights = {m: norm_weights[m.lower()]/actual_total_w for m in available_models}
 
+        final_preds = np.zeros(len(X))
+
+        # 4. Generuojame prognozes
         for name in available_models:
-            # FORCE column alignment and types by position: [0:SARASO, 1:APYGARDA, 2:RINKEJU]
             is_catboost = 'catboost' in name.lower()
+            
             if is_catboost:
-                # NUCLEAR OPTION: Reconstruct fresh DataFrame to force Dtypes and alignment
-                # Column 0: List Name (str), Column 1: District Name (str), Column 2: Voter Count (float)
-                data_to_use = pd.DataFrame({
-                    'SARASO_PAVADINIMAS': X_raw.iloc[:, 0].astype(str).values,
-                    'APYGARDOS_PAVADINIMAS': X_raw.iloc[:, 1].astype(str).values,
-                    'RINKEJU_SKAICIUS': pd.to_numeric(X_raw.iloc[:, 2], errors='coerce').fillna(0).astype(float).values
-                })
+                # CatBoost naudoja natyvius tekstinius laukus
+                preds = self.models[name].predict(X_base)
             else:
-                data_to_use = X_enc
-
-            if data_to_use is None: data_to_use = X
+                # Visi kiti modeliai naudoja transformatoriaus paruoštą matricą
+                if X_encoded is None:
+                    continue # Praleidžiame, jei transformatorius dingo
+                preds = self.models[name].predict(X_encoded)
                 
-            preds = self.models[name].predict(data_to_use)
             preds = np.clip(preds, 0, 100)
             final_preds += preds * redist_weights[name]
         
         return np.clip(final_preds, 0, 100)
 
     def save(self, path):
+        import joblib
         joblib.dump(self, path)
 
     @staticmethod
     def load(path):
+        import joblib
         return joblib.load(path)
