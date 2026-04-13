@@ -364,10 +364,19 @@ def backtest():
                             prec_parties = prec_df.groupby('SARASO_PAVADINIMAS').agg(
                                 ACTUAL=('VOTE_SHARE', 'mean'),
                                 PREDICTED=('PREDICTED', 'mean')
-                            ).reset_index().sort_values('ACTUAL', ascending=False).head(8)
+                            ).reset_index().sort_values('ACTUAL', ascending=False)
+                            
+                            # Get winners for the precinct
+                            top_act_prec = prec_parties.iloc[0]['SARASO_PAVADINIMAS'] if not prec_parties.empty else '-'
+                            top_prd_prec = prec_parties.sort_values('PREDICTED', ascending=False).iloc[0]['SARASO_PAVADINIMAS'] if not prec_parties.empty else '-'
+                            winner_match_prec = top_act_prec == top_prd_prec
+
                             precincts_data.append({
                                 'name': prec,
-                                'parties': prec_parties.to_dict('records')
+                                'top_actual': top_act_prec,
+                                'top_predicted': top_prd_prec,
+                                'winner_match': winner_match_prec,
+                                'parties': prec_parties.head(10).to_dict('records') # Show top 10 for detail
                             })
 
                         district_data.append({
