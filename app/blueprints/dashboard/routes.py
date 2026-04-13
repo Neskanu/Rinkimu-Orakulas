@@ -1,7 +1,8 @@
+import joblib
 from flask import Blueprint, render_template, request, jsonify
 from app.data.database import SessionLocal
 from app.data.repositories import ElectionRepository
-from app.data.models import MLModelRegistry
+from app.data.models import MLModelRegistry, EnsembleConfig
 from app.ml.pipeline.processor import DataProcessor
 from sqlalchemy import select
 import json
@@ -39,86 +40,79 @@ def load_model_by_id(model_id=None):
         model_entry = session.execute(
             select(MLModelRegistry).order_by(MLModelRegistry.mae.asc())
         ).scalars().first()
-
+    
     if not model_entry:
         session.close()
         return None, None, None
-
+    
     path = model_entry.file_path
     model_type = model_entry.model_type
     session.close()
-
+    
     if not os.path.exists(path):
         return None, None, None
-
+        
     try:
         if model_type == 'catboost':
-            from catboost import CatBoostRegressor
-            m = CatBoostRegressor()
+            # Naudojame mūsų Wrapper klasę iš naujosios architektūros
+            from app.ml.pipeline.models import CatBoostModel
+            m = CatBoostModel()
             m.load_model(path)
             return m, 'catboost', model_entry.id
         else:
-            with open(path, 'rb') as f:
-                m = pickle.load(f)
+            # Naudojame joblib visiems kitiems scikit-learn/xgboost modeliams
+            m = joblib.load(path)
             return m, model_type, model_entry.id
-    except Exception:
+    except Exception as e:
+        print(f"KLAIDA KRAUNANT MODELĮ: {e}") # Pridedame klaidų spausdinimą diagnozei
         return None, None, None
 
 def run_inference_on_2024(test_df, model_id=None):
-    """Run inference using the specified model."""
+    """Run inference using the specified model and ColumnTransformer."""
     model, model_type, actual_id = load_model_by_id(model_id)
-
+    
     if model is None:
         return None, "No valid model found", None
 
     cat_features = ['SARASO_PAVADINIMAS', 'APYGARDOS_PAVADINIMAS']
     num_features = ['RINKEJU_SKAICIUS']
     features = cat_features + num_features
-
+    
     for col in num_features:
-        # Strictly avoid the pandas DataFrame downcasting FutureWarning
         test_df[col] = pd.to_numeric(test_df[col], errors='coerce').replace({np.nan: 0})
 
-    # Ensure categorical features are strings (critical for CatBoost)
     for col in cat_features:
         test_df[col] = test_df[col].astype(str).replace('nan', 'Unknown')
-
+    
     X = test_df[features].copy()
 
-    if model_type == 'catboost':
-        # CatBoost expects categorical features to be strings
-        X[cat_features] = X[cat_features].astype(str)
-        preds = model.predict(X)
-    else:
-        # Load the feature encoder that was saved during training
-        import pickle
-        from scipy.sparse import hstack
-
-        encoder_path = 'app/ml/models/feature_encoder.pkl'
-        encoder = None
-        if os.path.exists(encoder_path):
-            with open(encoder_path, 'rb') as f:
-                encoder = pickle.load(f)
-
-        if encoder is not None:
-            # Use the same encoding as during training
-            X_cat = encoder.transform(X[cat_features])
-            X_num = X[num_features].values
-            X_enc = hstack([X_num, X_cat])
-            preds = model.predict(X_enc)
+    try:
+        if model_type == 'catboost':
+            X[cat_features] = X[cat_features].astype(str)
+            preds = model.predict(X)
         else:
-            # Fallback if encoder not found (should not happen if model was trained properly)
-            all_enc = pd.get_dummies(X, drop_first=True)
-            if hasattr(model, 'feature_names_in_'):
-                expected_cols = model.feature_names_in_
-                all_enc = all_enc.reindex(columns=expected_cols, fill_value=0)
-            preds = model.predict(all_enc.values.astype(np.float32))
+            # NAUJA LOGIKA: Naudojame išsaugotą transformatorių vietoj pd.get_dummies
+            preprocessor_path = 'app/ml/models/preprocessor.joblib'
+            if not os.path.exists(preprocessor_path):
+                return None, "Nerastas preprocessor.joblib failas", None
+                
+            preprocessor = joblib.load(preprocessor_path)
+            X_encoded = preprocessor.transform(X)
+            
+            # Mūsų Wrapper klasių .predict() metodai dabar gaus teisingo formato matricą
+            preds = model.predict(X_encoded)
 
-    result_df = test_df[['APYGARDOS_PAVADINIMAS', 'APYLINKES_PAVADINIMAS',
-                         'SARASO_PAVADINIMAS', 'VOTE_SHARE']].copy()
-
-    result_df['PREDICTED'] = np.clip(preds, 0, 100)
-    return result_df, model_type, actual_id
+        result_df = test_df[['APYGARDOS_PAVADINIMAS', 'APYLINKES_PAVADINIMAS',
+                             'SARASO_PAVADINIMAS', 'VOTE_SHARE']].copy()
+        
+        result_df['PREDICTED'] = np.clip(preds, 0, 100) 
+        return result_df, model_type, actual_id
+        
+    except Exception as e:
+        print(f"INFERENCE KLAIDA: {e}")
+        import traceback
+        traceback.print_exc()
+        return None, "Prediction failed", None
 
 
 @dashboard_bp.route('/')
@@ -164,42 +158,58 @@ def index():
 
     agg_df['SHARE_PCT'] = (agg_df[vote_col] / total_votes) * 100
 
-    # --- Bar Chart ---
-    top_10 = agg_df.sort_values(by='SHARE_PCT', ascending=True).tail(10).copy()
-    top_10['DISPLAY_NAME'] = top_10['SARASO_PAVADINIMAS'].apply(
-        lambda x: (x[:35] + '...') if len(x) > 38 else x)
+    # --- Unified Color Map & Truncation ---
+    premium_palette = px.colors.qualitative.Prism
+    def get_party_color_map(parties):
+        return {party: premium_palette[i % len(premium_palette)] for i, party in enumerate(parties)}
 
-    fig_bar = px.bar(top_10, x='SHARE_PCT', y='DISPLAY_NAME', orientation='h',
+    # Truncate names to 50 chars as requested
+    agg_df['DISPLAY_NAME_FULL'] = agg_df['SARASO_PAVADINIMAS'].apply(
+        lambda x: (x[:47] + '...') if len(x) > 50 else x)
+
+    chart_df = agg_df.sort_values(by='SHARE_PCT', ascending=False).head(15).copy()
+    color_map = get_party_color_map(chart_df['DISPLAY_NAME_FULL'].unique())
+
+    # --- Bar Chart ---
+    top_10 = chart_df.head(10).copy().iloc[::-1]
+    
+    fig_bar = px.bar(top_10, x='SHARE_PCT', y='DISPLAY_NAME_FULL', orientation='h',
                      title=f"Actual Results: Top 10 Parties ({year})",
-                     labels={'SHARE_PCT': 'Vote Share (%)', 'DISPLAY_NAME': 'Party'},
-                     color='SHARE_PCT', color_continuous_scale='Viridis',
+                     labels={'SHARE_PCT': 'Vote Share (%)', 'DISPLAY_NAME_FULL': 'Party'},
+                     color='DISPLAY_NAME_FULL', 
+                     color_discrete_map=color_map,
                      text=top_10['SHARE_PCT'].apply(lambda x: f"{x:.1f}%"),
                      custom_data=['SARASO_PAVADINIMAS', vote_col])
 
     fig_bar.update_traces(
         textposition='outside',
+        marker_line_width=0,
         hovertemplate='<b>%{customdata[0]}</b><br>Votes: %{customdata[1]:,.0f}<br>Share: %{x:.2f}%<extra></extra>'
     )
 
     max_share = top_10['SHARE_PCT'].max()
     fig_bar.update_layout(
         template='plotly_white',
-        margin=dict(l=250, r=50),
-        yaxis={'categoryorder': 'total ascending'},
-        xaxis=dict(range=[0, max_share * 1.15]),
-        coloraxis_showscale=False
+        margin=dict(l=10, r=40, t=50, b=20),
+        yaxis={'categoryorder': 'total ascending', 'showgrid': False},
+        xaxis=dict(range=[0, max_share * 1.25], showgrid=True, gridcolor='rgba(0,0,0,0.05)'),
+        showlegend=False,
+        font=dict(family="Outfit, sans-serif")
     )
     bar_json = json.dumps(fig_bar, cls=plotly.utils.PlotlyJSONEncoder)
 
-    # --- Improved Pie Chart (Safe Method) ---
+    # --- Optimized Pie Chart ---
     pie_data = []
     other_votes = 0.0
     other_share = 0.0
-
+    
+    top_party_names = chart_df['DISPLAY_NAME_FULL'].tolist()
+    
     for _, row in agg_df.iterrows():
-        if row['SHARE_PCT'] >= 1.5:
+        name = row['DISPLAY_NAME_FULL']
+        if name in top_party_names:
             pie_data.append({
-                'Party': str(row['SARASO_PAVADINIMAS']),
+                'Party': name,
                 'Votes': float(row[vote_col]),
                 'Share': float(row['SHARE_PCT'])
             })
@@ -209,65 +219,57 @@ def index():
 
     if other_share > 0:
         pie_data.append({
-            'Party': 'Kitos partijos',
+            'Party': 'Other Parties',
             'Votes': float(other_votes),
             'Share': float(other_share)
         })
+        color_map['Other Parties'] = '#cbd5e1'
 
-    clean_pie_df = pd.DataFrame(pie_data)
-
-    # 1. Sort: largest → smallest, "Kitos partijos" always last
-    main_df = clean_pie_df[clean_pie_df['Party'] != 'Kitos partijos'].sort_values('Share', ascending=False)
-    other_df = clean_pie_df[clean_pie_df['Party'] == 'Kitos partijos']
-    clean_pie_df = pd.concat([main_df, other_df], ignore_index=True)
-
-    # Calculate total for optional center text
-    total_votes = int(clean_pie_df['Votes'].sum())
+    clean_pie_df = pd.DataFrame(pie_data).sort_values('Share', ascending=False)
+    total_votes_int = int(clean_pie_df['Votes'].sum())
 
     fig_pie = px.pie(
         clean_pie_df,
         values='Share',
         names='Party',
-        title="National Vote Distribution",
-        hole=0.35,                    # slightly smaller hole = more space for labels
-        custom_data=['Votes'],
-        color_discrete_sequence=px.colors.qualitative.Bold  # high-contrast, colorblind-friendly
+        title="Vote Distribution",
+        hole=0.45,
+        color='Party',
+        color_discrete_map=color_map,
+        custom_data=['Votes']
     )
 
     fig_pie.update_traces(
-        textposition='auto',          # ← best readability: inside when it fits, outside otherwise
-        textinfo='label+percent',     # shows party name + % directly on the chart
-        textfont=dict(size=13, color='white'),   # bigger, white text (contrast)
+        textposition='inside',
+        textinfo='percent',
+        textfont=dict(size=12, color='white', family="Outfit"),
         hovertemplate='<b>%{label}</b><br>Votes: %{customdata[0]:,.0f}<br>Share: %{value:.2f}%<extra></extra>',
-        # nice visual separation between slices
-        marker=dict(line=dict(color='white', width=2.5))
+        marker=dict(line=dict(color='white', width=2))
     )
 
-    # Center annotation (total votes) – very useful for donut charts
     fig_pie.update_layout(
         annotations=[
             dict(
-                text=f"<b>Total votes</b><br>{total_votes:,}",
-                x=0.5, y=0.5,
-                font=dict(size=14, color="#333"),
-                showarrow=False,
-                xanchor="center",
-                yanchor="middle"
+                text=f"<span style='font-size:12px;color:#64748b'>TOTAL</span><br><b style='font-size:16px'>{total_votes_int:,}</b>",
+                x=0.5, y=0.5, showarrow=False, xanchor="center", yanchor="middle"
             )
         ],
         legend=dict(
-            orientation="h",
-            yanchor="top",
-            y=-0.12,               # slightly higher than before to avoid crowding
-            xanchor="center",
-            x=0.5,
-            font=dict(size=12),
-            title_text=""          # remove default "Party" title
+            orientation="v",
+            yanchor="middle",
+            y=0.5,
+            xanchor="left",
+            x=1.05,
+            font=dict(size=11, family="Outfit"),
+            itemclick=False,
+            itemdoubleclick=False
         ),
         template='plotly_white',
-        margin=dict(t=60, b=110, l=20, r=20),   # extra bottom margin for legend
-        title=dict(font=dict(size=18), x=0.5),
-        font=dict(family="Arial, sans-serif", size=13)  # global font improvement
+        # Push domains to the LEFT to ensure pie is on the left and legend has room on the right
+        grid=dict(rows=1, columns=1),
+        margin=dict(t=50, b=20, l=10, r=150),
+        title=dict(font=dict(size=18, family="Outfit"), x=0.05),
+        font=dict(family="Outfit, sans-serif")
     )
 
     pie_json = json.dumps(fig_pie, cls=plotly.utils.PlotlyJSONEncoder)
@@ -278,24 +280,11 @@ def index():
 
 @dashboard_bp.route('/backtest')
 def backtest():
-    session = SessionLocal()
     district_filter = request.args.get('district')
     precinct_filter = request.args.get('precinct')
     model_id = request.args.get('model', type=int)
 
-    repo = ElectionRepository(session)
-    districts = repo.get_districts(2024)
-    precincts = repo.get_precincts(2024, district_filter) if district_filter else []
-
-    models = session.execute(
-        select(MLModelRegistry).order_by(MLModelRegistry.training_date.desc())
-    ).scalars().all()
-    session.close()
-
-    # Add labels for the template dropdown
-    for m in models:
-        m.label = f"{m.model_type.upper()} ({m.training_date.strftime('%H:%M')})"
-
+    # 1. Duomenų paruošimas (Nereikalauja pagrindinės sesijos)
     processor = DataProcessor()
     _, test_df = processor.prepare_training_data()
 
@@ -306,7 +295,9 @@ def backtest():
     error_msg = None
 
     if test_df is not None and not test_df.empty:
-        result_df, model_type_label, model_id = run_inference_on_2024(test_df, model_id)
+        # 2. Vykdome prognozes
+        result_df, model_type_label, actual_id = run_inference_on_2024(test_df, model_id)
+        model_id = actual_id # Atnaujiname ID į tą, kuris realiai buvo panaudotas
 
         if result_df is not None:
             if district_filter:
@@ -315,7 +306,6 @@ def backtest():
                 result_df = result_df[result_df['APYLINKES_PAVADINIMAS'] == precinct_filter]
 
             if not result_df.empty:
-                # Optimized aggregation for the visualization logic
                 party_agg = result_df.groupby('SARASO_PAVADINIMAS').agg(
                     ACTUAL=('VOTE_SHARE', 'mean'),
                     PREDICTED=('PREDICTED', 'mean')
@@ -326,6 +316,7 @@ def backtest():
                     import plotly.utils
                     import json
 
+                    # Scatter grafikas
                     fig_scatter = px.scatter(
                         party_agg, x='ACTUAL', y='PREDICTED',
                         hover_name='SARASO_PAVADINIMAS',
@@ -339,6 +330,7 @@ def backtest():
                     fig_scatter.update_layout(template='plotly_white')
                     scatter_json = json.dumps(fig_scatter, cls=plotly.utils.PlotlyJSONEncoder)
 
+                    # Bar grafikas
                     comp_df = party_agg.sort_values('ACTUAL', ascending=False).head(15).copy()
                     comp_df = comp_df.melt(id_vars=['SARASO_PAVADINIMAS'],
                                             value_vars=['ACTUAL', 'PREDICTED'],
@@ -353,6 +345,7 @@ def backtest():
                     fig_comp.update_layout(template='plotly_white', margin=dict(l=200))
                     comp_json = json.dumps(fig_comp, cls=plotly.utils.PlotlyJSONEncoder)
 
+                    # Detalūs apygardų rezultatai
                     for dist in sorted(result_df['APYGARDOS_PAVADINIMAS'].unique()):
                         dist_df = result_df[result_df['APYGARDOS_PAVADINIMAS'] == dist]
 
@@ -390,17 +383,35 @@ def backtest():
     else:
         error_msg = "No 2024 test data available."
 
-    return render_template(
-        'dashboard/backtest.html',
-        scatter_json=scatter_json,
-        comp_json=comp_json,
-        available_models=models,
-        selected_model=model_id,
-        districts=districts,
-        precincts=precincts,
-        district_data=district_data,
-        model_type_label=model_type_label,
-        selected_district=district_filter,
-        selected_precinct=precinct_filter,
-        error_msg=error_msg
-    )
+    # 3. Traukiame DB informaciją TIK PRIEŠ PAT renderinant HTML
+    with SessionLocal() as session:
+        repo = ElectionRepository(session)
+        districts = repo.get_districts(2024)
+        precincts = repo.get_precincts(2024, district_filter) if district_filter else []
+
+        models = session.execute(
+            select(MLModelRegistry).order_by(MLModelRegistry.training_date.desc())
+        ).scalars().all()
+        
+        # PRIDĖTA: Ansamblio konfigūracijos užkrovimas
+        config = session.query(EnsembleConfig).first()
+
+        for m in models:
+            m.label = f"{m.model_type.upper()} ({m.training_date.strftime('%H:%M')})"
+
+        # Šablonas generuojamas kol sesija atidaryta
+        return render_template(
+            'dashboard/backtest.html',
+            scatter_json=scatter_json,
+            comp_json=comp_json,
+            available_models=models,
+            config=config,             # PRIDĖTA: Perduodame ansamblį į naršyklę
+            selected_model=model_id,
+            districts=districts,
+            precincts=precincts,
+            district_data=district_data,
+            model_type_label=model_type_label,
+            selected_district=district_filter,
+            selected_precinct=precinct_filter,
+            error_msg=error_msg
+        )

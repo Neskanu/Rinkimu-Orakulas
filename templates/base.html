@@ -54,6 +54,80 @@
             &copy; 2026 Rinkimų Orakulas. Advanced Election Analytics for Lithuania.
         </div>
     </footer>
+
+    <div id="global-toast-container" class="fixed bottom-5 right-5 flex flex-col gap-3 z-50"></div>
+
+    <script>
+        // 1. Ištraukiame jau praneštų modelių sąrašą iš sesijos (kad nespamintų po puslapio perkrovimo)
+        let notifiedModels = JSON.parse(sessionStorage.getItem('notifiedModels') || '[]');
+
+        function showToast(message, isError = false) {
+            const container = document.getElementById('global-toast-container');
+            const toast = document.createElement('div');
+
+            // Tailwind CSS stiliai gražiam pranešimui
+            const bgColor = isError ? 'bg-red-600' : 'bg-green-600';
+            toast.className = `transform transition-all duration-500 translate-x-full ${bgColor} text-white px-6 py-4 rounded shadow-lg flex items-center justify-between min-w-[300px]`;
+            toast.innerHTML = `
+        <span class="font-medium">${message}</span>
+        <button onclick="this.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">&times;</button>
+    `;
+
+            container.appendChild(toast);
+
+            // Animacija įvažiavimui
+            setTimeout(() => toast.classList.remove('translate-x-full'), 50);
+            // Automatinis išnykimas po 5 sekundžių
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 500);
+            }, 5000);
+        }
+
+        // 2. Pagrindinė klausymosi (Polling) funkcija
+        async function checkTrainingStatus() {
+            try {
+                const response = await fetch('/training/status');
+                if (!response.ok) return;
+
+                const data = await response.json();
+
+                // Jei matome, kad startavo naujas procesas, išvalome seną atmintį
+                if (data['SYSTEM'] && data['SYSTEM'].current_stage === 'Initializing' && notifiedModels.length > 0) {
+                    notifiedModels = [];
+                    sessionStorage.setItem('notifiedModels', JSON.stringify([]));
+                }
+
+                // Tikriname kiekvieno modelio statusą
+                for (const [modelName, info] of Object.entries(data)) {
+                    // Praleidžiame sisteminius raktus
+                    if (modelName === 'SYSTEM' || modelName === 'suite_history') continue;
+
+                    // Jei modelis baigė apmokymą ir dar nebuvo parodytas pranešimas
+                    if (info.current_stage === 'Finished' && !notifiedModels.includes(modelName)) {
+                        let r2Score = info.metrics?.r2 ? info.metrics.r2.toFixed(3) : 'N/A';
+                        showToast(`🚀 ${modelName.toUpperCase()} modelis sėkmingai apmokytas! (R²: ${r2Score})`);
+
+                        // Įrašome į atmintį, kad nebekartotų
+                        notifiedModels.push(modelName);
+                        sessionStorage.setItem('notifiedModels', JSON.stringify(notifiedModels));
+                    }
+
+                    // Atliekame tą patį klaidų (Failed) gaudymui
+                    if (info.current_stage === 'Failed' && !notifiedModels.includes(modelName)) {
+                        showToast(`❌ Klaida apmokant ${modelName.toUpperCase()}.`, true);
+                        notifiedModels.push(modelName);
+                        sessionStorage.setItem('notifiedModels', JSON.stringify(notifiedModels));
+                    }
+                }
+            } catch (e) {
+                // Ignoruojame tyliai, kad netrukdytų jei serveris persikrauna
+            }
+        }
+
+        // 3. Tikriname serverio būseną kas 3 sekundes
+        setInterval(checkTrainingStatus, 3000);
+    </script>
 </body>
 
 </html>

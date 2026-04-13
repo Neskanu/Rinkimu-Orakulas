@@ -38,16 +38,21 @@
 
     {% if plot_json %}
     <div class="flex flex-col space-y-8 w-full">
-        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm w-full">
-            <div id="pie-chart" class="w-full h-[550px]"></div>
+        <!-- Bar Chart -->
+        <div
+            class="glass p-8 rounded-[2rem] border border-white/20 shadow-xl shadow-indigo-100/20 flex flex-col w-full">
+            <div id="bar-chart" class="w-full h-[500px]"></div>
         </div>
-        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm w-full">
-            <div id="bar-chart" class="w-full h-[600px]"></div>
+
+        <!-- Pie Chart -->
+        <div
+            class="glass p-8 rounded-[2rem] border border-white/20 shadow-xl shadow-indigo-100/20 flex flex-col w-full">
+            <div id="pie-chart" class="w-full h-[550px]"></div>
         </div>
     </div>
 
     <!-- Model Stats -->
-    <div>
+    <!-- <div class="mt-8">
         <h2 class="text-2xl font-bold text-slate-900 mb-4">Model Performance</h2>
         {% if metrics %}
         <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -66,10 +71,10 @@
         {% endif %}
     </div>
     {% else %}
-    <div class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl p-20 text-center">
+    <div class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl p-20 text-center w-full">
         <p class="text-slate-400">No data found for the selected filters. Please try another year or district.</p>
     </div>
-    {% endif %}
+    {% endif %} -->
 </div>
 
 {% if plot_json %}

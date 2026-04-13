@@ -17,10 +17,17 @@
                 <div id="party-list" class="space-y-4">
                     <div class="flex flex-col space-y-2 party-row bg-slate-50 p-3 rounded-2xl border border-slate-100">
                         <div class="flex items-center space-x-2">
-                            <input type="text" value="Socialdemokratai (Sim)" class="flex-1 rounded-xl border-slate-200 text-sm focus:ring-indigo-500 party-name">
-                            <button onclick="removeParty(this)" class="text-slate-300 hover:text-red-500"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd" /></svg></button>
+                            <input type="text" value="Socialdemokratai (Sim)"
+                                class="flex-1 rounded-xl border-slate-200 text-sm focus:ring-indigo-500 party-name">
+                            <button onclick="removeParty(this)" class="text-slate-300 hover:text-red-500"><svg
+                                    class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z"
+                                        clip-rule="evenodd" />
+                                </svg></button>
                         </div>
-                        <select class="rounded-xl border-slate-200 text-[10px] py-1 uppercase font-black text-slate-500 bg-white party-profile">
+                        <select
+                            class="rounded-xl border-slate-200 text-[10px] py-1 uppercase font-black text-slate-500 bg-white party-profile">
                             <option value="social_democrat" selected>Social Democrat Profile</option>
                             <option value="conservative">Conservative Profile</option>
                             <option value="liberal">Liberal Profile</option>
@@ -30,10 +37,17 @@
                     </div>
                     <div class="flex flex-col space-y-2 party-row bg-slate-50 p-3 rounded-2xl border border-slate-100">
                         <div class="flex items-center space-x-2">
-                            <input type="text" value="Konservatoriai (Sim)" class="flex-1 rounded-xl border-slate-200 text-sm focus:ring-indigo-500 party-name">
-                            <button onclick="removeParty(this)" class="text-slate-300 hover:text-red-500"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd" /></svg></button>
+                            <input type="text" value="Konservatoriai (Sim)"
+                                class="flex-1 rounded-xl border-slate-200 text-sm focus:ring-indigo-500 party-name">
+                            <button onclick="removeParty(this)" class="text-slate-300 hover:text-red-500"><svg
+                                    class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z"
+                                        clip-rule="evenodd" />
+                                </svg></button>
                         </div>
-                        <select class="rounded-xl border-slate-200 text-[10px] py-1 uppercase font-black text-slate-500 bg-white party-profile">
+                        <select
+                            class="rounded-xl border-slate-200 text-[10px] py-1 uppercase font-black text-slate-500 bg-white party-profile">
                             <option value="social_democrat">Social Democrat Profile</option>
                             <option value="conservative" selected>Conservative Profile</option>
                             <option value="liberal">Liberal Profile</option>
@@ -42,15 +56,30 @@
                         </select>
                     </div>
                 </div>
-                <button onclick="addParty()" class="w-full py-2 border-2 border-dashed border-slate-200 rounded-xl text-slate-400 text-sm font-bold hover:border-indigo-300 hover:text-indigo-500 transition-all">
+                <button onclick="addParty()"
+                    class="w-full py-2 border-2 border-dashed border-slate-200 rounded-xl text-slate-400 text-sm font-bold hover:border-indigo-300 hover:text-indigo-500 transition-all">
                     + Add New Party
                 </button>
 
                 <hr class="border-slate-100">
 
-                <h2 class="text-xl font-bold text-slate-900">2. Turnout Scenario</h2>
+                <h2 class="text-xl font-bold text-slate-900">2. Select Prediction Model</h2>
+                <select id="model-selector"
+                    class="w-full rounded-xl border-slate-200 text-sm py-2 px-3 focus:ring-indigo-500 bg-white">
+                    <option value="catboost" selected>CatBoost (Recommended)</option>
+                    <option value="xgboost">XGBoost</option>
+                    <option value="rf">Random Forest</option>
+                    <option value="lgbm">LightGBM</option>
+                    <option value="elasticnet">ElasticNet</option>
+                </select>
+
+                <hr class="border-slate-100 my-6">
+
+                <h2 class="text-xl font-bold text-slate-900">3. Turnout Scenario</h2>
+
                 <div class="space-y-4">
-                    <input type="range" id="turnout-slider" min="-20" max="20" value="0" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                    <input type="range" id="turnout-slider" min="-20" max="20" value="0"
+                        class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
                     <div class="flex justify-between text-xs font-bold text-slate-400">
                         <span>-20% (Apathy)</span>
                         <span id="turnout-val" class="text-indigo-600 text-lg">0%</span>
@@ -58,7 +87,8 @@
                     </div>
                 </div>
 
-                <button onclick="runOracle()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-lg hover:bg-black transition-all shadow-xl shadow-slate-200">
+                <button onclick="runOracle()"
+                    class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-lg hover:bg-black transition-all shadow-xl shadow-slate-200">
                     Run 2028 Oracle
                 </button>
             </div>
@@ -66,20 +96,28 @@
 
         <!-- Results Panel -->
         <div class="lg:col-span-2 space-y-6">
-            <div id="oracle-loader" class="hidden bg-white p-12 rounded-3xl border border-slate-100 shadow-sm text-center space-y-6">
+            <div id="oracle-loader"
+                class="hidden bg-white p-12 rounded-3xl border border-slate-100 shadow-sm text-center space-y-6">
                 <h2 class="text-xl font-bold text-slate-700">Oracle is simulating 2028...</h2>
                 <div class="w-full bg-slate-100 h-4 rounded-full overflow-hidden">
-                    <div id="oracle-progress" class="bg-indigo-600 h-full w-0 transition-all duration-300 ease-out"></div>
+                    <div id="oracle-progress" class="bg-indigo-600 h-full w-0 transition-all duration-300 ease-out">
+                    </div>
                 </div>
-                <p id="oracle-status" class="text-slate-400 text-sm animate-pulse">Analyzing district demographics...</p>
+                <p id="oracle-status" class="text-slate-400 text-sm animate-pulse">Analyzing district demographics...
+                </p>
             </div>
 
-            <div id="results-placeholder" class="bg-white p-12 rounded-3xl border border-slate-100 shadow-sm text-center space-y-4">
+            <div id="results-placeholder"
+                class="bg-white p-12 rounded-3xl border border-slate-100 shadow-sm text-center space-y-4">
                 <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto">
-                    <svg class="w-10 h-10 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                    <svg class="w-10 h-10 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
                 </div>
                 <h2 class="text-xl font-bold text-slate-400">Waiting for Configuration</h2>
-                <p class="text-slate-300 text-sm max-w-xs mx-auto">Configure your 2028 contestants and turnout scenario on the left to see the prediction.</p>
+                <p class="text-slate-300 text-sm max-w-xs mx-auto">Configure your 2028 contestants and turnout scenario
+                    on the left to see the prediction.</p>
             </div>
 
             <div id="results-container" class="hidden space-y-6">
@@ -113,7 +151,7 @@
 
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <script>
-    document.getElementById('turnout-slider').oninput = function() {
+    document.getElementById('turnout-slider').oninput = function () {
         document.getElementById('turnout-val').innerText = (this.value > 0 ? "+" : "") + this.value + "%";
     };
 
@@ -145,8 +183,10 @@
             name: row.querySelector('.party-name').value,
             profile: row.querySelector('.party-profile').value
         })).filter(c => c.name);
-        
+
         const turnoutAdj = document.getElementById('turnout-slider').value;
+        // Paimame vartotojo pasirinktą modelį
+        const selectedModel = document.getElementById('model-selector').value;
 
         if (contestants.length < 1) {
             alert("Please add at least one party.");
@@ -156,50 +196,58 @@
         document.getElementById('results-placeholder').classList.add('hidden');
         document.getElementById('results-container').classList.add('hidden');
         document.getElementById('oracle-loader').classList.remove('hidden');
-        
+
         const progBar = document.getElementById('oracle-progress');
         const statusText = document.getElementById('oracle-status');
-        
-        // Fake progress for UX
+
         let prog = 0;
         const interval = setInterval(() => {
             prog += Math.random() * 15;
             if (prog > 90) clearInterval(interval);
             progBar.style.width = Math.min(prog, 90) + '%';
-            if (prog > 30) statusText.innerText = "Applying turnout adjustments...";
-            if (prog > 60) statusText.innerText = "Mapping ideological archetypes...";
+            if (prog > 30) statusText.innerText = `Applying turnout adjustments...`;
+            if (prog > 60) statusText.innerText = `Running inference with ${selectedModel.toUpperCase()}...`;
         }, 300);
 
-        const resp = await fetch('/forecast/predict_2028', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ contestants: contestants, turnout_adj: parseInt(turnoutAdj) })
-        });
-        
-        const data = await resp.json();
-        clearInterval(interval);
-        
-        if (data.error) {
-            alert(data.error);
-            document.getElementById('oracle-loader').classList.add('hidden');
-            document.getElementById('results-placeholder').classList.remove('hidden');
-            return;
-        }
+        try {
+            const resp = await fetch('/forecast/predict_2028', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contestants: contestants,
+                    turnout_adj: parseInt(turnoutAdj),
+                    model: selectedModel  // Siunčiame modelį į Python
+                })
+            });
 
-        progBar.style.width = '100%';
-        setTimeout(() => {
-            document.getElementById('oracle-loader').classList.add('hidden');
-            document.getElementById('results-container').classList.remove('hidden');
-            renderNationalSummary(data, contestants.map(c => c.name));
-            renderDistrictTable(data);
-        }, 500);
+            if (!resp.ok) throw new Error("Server error");
+            const data = await resp.json();
+            clearInterval(interval);
+
+            if (data.error) {
+                alert(data.error);
+                document.getElementById('oracle-loader').classList.add('hidden');
+                document.getElementById('results-placeholder').classList.remove('hidden');
+                return;
+            }
+
+            progBar.style.width = '100%';
+            setTimeout(() => {
+                document.getElementById('oracle-loader').classList.add('hidden');
+                document.getElementById('results-container').classList.remove('hidden');
+                renderNationalSummary(data, contestants.map(c => c.name));
+                renderDistrictTable(data);
+            }, 500);
+        } catch (error) {
+            clearInterval(interval);
+            alert("Įvyko klaida.");
+        }
     }
 
     function renderNationalSummary(data, parties) {
-        // Average across districts for summary
         const totals = {};
         parties.forEach(p => totals[p] = 0);
-        
+
         data.forEach(d => {
             d.predictions.forEach(p => {
                 totals[p.PARTY] += p.PRED_SHARE;
@@ -207,7 +255,8 @@
         });
 
         const x = parties;
-        const y = parties.map(p => (totals[p] / data.length) * 100);
+        // PATAISYTA: Pašalintas "* 100", nes 'totals' jau yra procentai!
+        const y = parties.map(p => totals[p] / data.length);
 
         const plotData = [{
             x: x, y: y, type: 'bar',
@@ -215,7 +264,7 @@
             text: y.map(v => v.toFixed(2) + '%'),
             textposition: 'auto'
         }];
-        
+
         const layout = {
             title: '2028 Simulated National Support (Avg across Districts)',
             xaxis: { title: 'Party' },
@@ -224,20 +273,20 @@
             margin: { t: 50, b: 50, l: 50, r: 20 }
         };
 
-        Plotly.newPlot('national-chart', plotData, layout, {responsive: true});
+        Plotly.newPlot('national-chart', plotData, layout, { responsive: true });
     }
 
     function renderDistrictTable(data) {
         const body = document.getElementById('district-table-body');
         body.innerHTML = '';
-        
+
         data.forEach(d => {
             const winner = d.predictions.reduce((prev, current) => (prev.PRED_SHARE > current.PRED_SHARE) ? prev : current);
             const row = `
                 <tr class="hover:bg-slate-50 transition-colors">
                     <td class="px-4 py-3 font-medium">${d.district}</td>
                     <td class="px-4 py-3"><span class="bg-indigo-50 text-indigo-700 px-2 py-1 rounded-lg text-xs font-bold">${winner.PARTY}</span></td>
-                    <td class="px-4 py-3 font-mono font-bold">${(winner.PRED_SHARE * 100).toFixed(2)}%</td>
+                    <td class="px-4 py-3 font-mono font-bold">${winner.PRED_SHARE.toFixed(2)}%</td>
                 </tr>
             `;
             body.insertAdjacentHTML('beforeend', row);
