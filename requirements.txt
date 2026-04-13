@@ -1,0 +1,9 @@
+flask
+flask-sqlalchemy
+alembic
+pandas
+scikit-learn
+torch
+plotly
+python-dotenv
+numpy

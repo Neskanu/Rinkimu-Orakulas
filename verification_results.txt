@@ -1,0 +1,13 @@
+Running: SELECT SARASO_PAVADINIMAS FROM daugiamandates_2024 WHERE SARASO_PAVADINIMAS LIKE '%Krikšč%' LIMIT 5
+  Found: Taikos koalicija (Darbo partija, Lietuvos krikščioniškosios demokratijos partija, Žemaičių partija)
+  Found: Lietuvos lenkų rinkimų akcija-Krikščioniškų Šeimų sąjunga
+  Found: Tėvynės sąjunga-Lietuvos krikščionys demokratai
+  Found: Taikos koalicija (Darbo partija, Lietuvos krikščioniškosios demokratijos partija, Žemaičių partija)
+  Found: Lietuvos lenkų rinkimų akcija-Krikščioniškų Šeimų sąjunga
+Running: SELECT SARASO_PAVADINIMAS FROM daugiamandates_2024 WHERE SARASO_PAVADINIMAS LIKE '%Sąjunga%' LIMIT 5
+  Found: Demokratų sąjunga „Vardan Lietuvos“
+  Found: Lietuvos lenkų rinkimų akcija-Krikščioniškų Šeimų sąjunga
+  Found: Lietuvos valstiečių ir žaliųjų sąjunga
+  Found: Tautos ir teisingumo sąjunga (centristai, tautininkai)
+  Found: Tėvynės sąjunga-Lietuvos krikščionys demokratai
+Running: SELECT APYGARDOS_PAVADINIMAS FROM daugiamandates_2024 WHERE APYGARDOS_PAVADINIMAS LIKE '%Anykščių%' LIMIT 5

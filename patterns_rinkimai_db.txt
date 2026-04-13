@@ -1,0 +1,480 @@
+Count: 6573 | Pattern: Ä(U+00C4) ¨(U+00A8) | Hex: c384c2a8
+Count: 2784 | Pattern:  (U+0020) k(U+006B) r(U+0072) i(U+0069) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: 206b72696bc385efbfbd
+Count: 2546 | Pattern: n(U+006E) ė(U+0117) s(U+0073)  (U+0020) s(U+0073) Ä(U+00C4) …(U+2026) | Hex: 6ec497732073c384e280a6
+Count: 2259 | Pattern: A(U+0041) n(U+006E) y(U+0079) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: 416e796bc385efbfbd
+Count: 2008 | Pattern: J(U+004A) o(U+006F) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4a6f6e69c385efbfbd
+Count: 1840 | Pattern: T(U+0054) e(U+0065) l(U+006C) Å(U+00C5) �(U+FFFD) | Hex: 54656cc385efbfbd
+Count: 1762 | Pattern: l(U+006C) k(U+006B) a(U+0061) v(U+0076) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6c6b617669c385efbfbd
+Count: 1727 | Pattern: R(U+0052) o(U+006F) k(U+006B) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 526f6b69c385efbfbd
+Count: 1399 | Pattern: K(U+004B) a(U+0061) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4b6169c385efbfbd
+Count: 1297 | Pattern: d(U+0064) v(U+0076) i(U+0069) l(U+006C) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6476696c69c385efbfbd
+Count: 1226 | Pattern: i(U+0069) o(U+006F) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 696f6e69c385efbfbd
+Count: 1016 | Pattern: a(U+0061) t(U+0074) ų(U+0173)  (U+0020) s(U+0073) Ä(U+00C4) …(U+2026) | Hex: 6174c5b32073c384e280a6
+Count: 988 | Pattern: k(U+006B) ų(U+0173)  (U+0020) Å(U+00C5) �(U+FFFD) | Hex: 6bc5b320c385efbfbd
+Count: 988 | Pattern: i(U+0069) m(U+006D) ų(U+0173)  (U+0020) s(U+0073) Ä(U+00C4) …(U+2026) | Hex: 696dc5b32073c384e280a6
+Count: 857 | Pattern: K(U+004B) Ä(U+00C4) �(U+FFFD) | Hex: 4bc384efbfbd
+Count: 789 | Pattern: K(U+004B) u(U+0075) p(U+0070) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4b757069c385efbfbd
+Count: 694 | Pattern: a(U+0061) m(U+006D) i(U+0069) e(U+0065) s(U+0073) Ä(U+00C4) ¨(U+00A8) | Hex: 616d696573c384c2a8
+Count: 688 | Pattern: A(U+0041) R(U+0052) T(U+0054) Å(U+00C5) Ŗ(U+0156) | Hex: 415254c385c596
+Count: 596 | Pattern:  (U+0020) K(U+004B) r(U+0072) i(U+0069) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: 204b72696bc385efbfbd
+Count: 434 | Pattern: K(U+004B) r(U+0072) i(U+0069) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: 4b72696bc385efbfbd
+Count: 425 | Pattern: n(U+006E) i(U+0069) ų(U+0173)  (U+0020) s(U+0073) Ä(U+00C4) …(U+2026) | Hex: 6e69c5b32073c384e280a6
+Count: 387 | Pattern: Ä(U+00C4) �(U+FFFD) | Hex: c384efbfbd
+Count: 377 | Pattern: -(U+002D) K(U+004B) r(U+0072) i(U+0069) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: 2d4b72696bc385efbfbd
+Count: 333 | Pattern: u(U+0075) s(U+0073) i(U+0069) g(U+0067) r(U+0072) Ä(U+00C4) …(U+2026) | Hex: 7573696772c384e280a6
+Count: 324 | Pattern: a(U+0061) m(U+006D) a(U+0061) s(U+0073)  (U+0020) Å(U+00C5) �(U+FFFD) | Hex: 616d617320c385efbfbd
+Count: 306 | Pattern:  (U+0020) T(U+0054) o(U+006F) m(U+006D) a(U+0061) Å(U+00C5) �(U+FFFD) | Hex: 20546f6d61c385efbfbd
+Count: 284 | Pattern: i(U+0069) j(U+006A) o(U+006F) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 696a6f6e69c385efbfbd
+Count: 279 | Pattern: ų(U+0173)  (U+0020) k(U+006B) r(U+0072) a(U+0061) Å(U+00C5) �(U+FFFD) | Hex: c5b3206b7261c385efbfbd
+Count: 275 | Pattern: R(U+0052) A(U+0041) M(U+004D) Å(U+00C5) Ŗ(U+0156) | Hex: 52414dc385c596
+Count: 258 | Pattern: ā(U+0101) €(U+20AC) ˛(U+02DB) A(U+0041) u(U+0075) Å(U+00C5) �(U+FFFD) | Hex: c481e282accb9b4175c385efbfbd
+Count: 256 | Pattern: P(U+0050) a(U+0061) Å(U+00C5) �(U+FFFD) | Hex: 5061c385efbfbd
+Count: 243 | Pattern: B(U+0042) i(U+0069) r(U+0072) Å(U+00C5) �(U+FFFD) | Hex: 426972c385efbfbd
+Count: 243 | Pattern: N(U+004E) K(U+004B) E(U+0045) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 4e4b455649c384efbfbd
+Count: 241 | Pattern: R(U+0052) Å(U+00C5) Ŗ(U+0156) | Hex: 52c385c596
+Count: 214 | Pattern: A(U+0041) u(U+0075) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: 41756bc385efbfbd
+Count: 206 | Pattern: Š(U+0160) e(U+0065) Å(U+00C5) �(U+FFFD) | Hex: c5a065c385efbfbd
+Count: 205 | Pattern: I(U+0049) Å(U+00C5) Ŗ(U+0156) | Hex: 49c385c596
+Count: 199 | Pattern: Ž(U+017D) e(U+0065) m(U+006D) a(U+0061) i(U+0069) Ä(U+00C4) ¨(U+00A8) | Hex: c5bd656d6169c384c2a8
+Count: 185 | Pattern: E(U+0045) L(U+004C) E(U+0045) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 454c455649c384efbfbd
+Count: 179 | Pattern: n(U+006E) o(U+006F)  (U+0020) A(U+0041) u(U+0075) Å(U+00C5) �(U+FFFD) | Hex: 6e6f204175c385efbfbd
+Count: 176 | Pattern: A(U+0041) R(U+0052) Å(U+00C5) Ŗ(U+0156) | Hex: 4152c385c596
+Count: 154 | Pattern: A(U+0041) u(U+0075) Å(U+00C5) �(U+FFFD) | Hex: 4175c385efbfbd
+Count: 145 | Pattern: ā(U+0101) €(U+20AC) ˛(U+02DB) D(U+0044) r(U+0072) Ä(U+00C4) …(U+2026) | Hex: c481e282accb9b4472c384e280a6
+Count: 138 | Pattern: B(U+0042) A(U+0041) L(U+004C) Ä(U+00C4) �(U+FFFD) | Hex: 42414cc384efbfbd
+Count: 136 | Pattern: R(U+0052) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 5249c384efbfbd
+Count: 134 | Pattern: Š(U+0160) n(U+006E) i(U+0069) p(U+0070) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: c5a06e697069c385efbfbd
+Count: 130 | Pattern: u(U+0075) v(U+0076) o(U+006F) s(U+0073)  (U+0020) Å(U+00C5) �(U+FFFD) | Hex: 75766f7320c385efbfbd
+Count: 125 | Pattern: R(U+0052) A(U+0041) Ä(U+00C4) �(U+FFFD) | Hex: 5241c384efbfbd
+Count: 122 | Pattern: t(U+0074) Ä(U+00C4) …(U+2026) | Hex: 74c384e280a6
+Count: 122 | Pattern: N(U+004E) a(U+0061) l(U+006C) Å(U+00C5) �(U+FFFD) | Hex: 4e616cc385efbfbd
+Count: 121 | Pattern: K(U+004B) u(U+0075) r(U+0072) Å(U+00C5) �(U+FFFD) | Hex: 4b7572c385efbfbd
+Count: 111 | Pattern: P(U+0050) u(U+0075) Å(U+00C5) �(U+FFFD) | Hex: 5075c385efbfbd
+Count: 110 | Pattern: Ž(U+017D) Y(U+0059) D(U+0044) R(U+0052) Å(U+00C5) Ŗ(U+0156) | Hex: c5bd594452c385c596
+Count: 108 | Pattern: Å(U+00C5) Ŗ(U+0156) | Hex: c385c596
+Count: 107 | Pattern: J(U+004A) Å(U+00C5) Ŗ(U+0156) | Hex: 4ac385c596
+Count: 102 | Pattern: Š(U+0160) K(U+004B) E(U+0045) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: c5a04b455649c384efbfbd
+Count: 97 | Pattern: V(U+0056) i(U+0069) e(U+0065) Å(U+00C5) �(U+FFFD) | Hex: 566965c385efbfbd
+Count: 97 | Pattern: a(U+0061) i(U+0069) Ä(U+00C4) ¨(U+00A8) | Hex: 6169c384c2a8
+Count: 95 | Pattern: a(U+0061) t(U+0074) a(U+0061) s(U+0073)  (U+0020) Ä(U+00C4) �(U+FFFD) | Hex: 6174617320c384efbfbd
+Count: 93 | Pattern: U(U+0055) L(U+004C) E(U+0045) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 554c455649c384efbfbd
+Count: 93 | Pattern: A(U+0041) C(U+0043) E(U+0045) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 4143455649c384efbfbd
+Count: 92 | Pattern: o(U+006F)  (U+0020) k(U+006B) r(U+0072) a(U+0061) Å(U+00C5) �(U+FFFD) | Hex: 6f206b7261c385efbfbd
+Count: 90 | Pattern: K(U+004B) a(U+0061) z(U+007A) l(U+006C) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4b617a6c69c385efbfbd
+Count: 90 | Pattern: k(U+006B) a(U+0061) i(U+0069) m(U+006D) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6b61696d69c385efbfbd
+Count: 90 | Pattern: R(U+0052) i(U+0069) e(U+0065) Å(U+00C5) �(U+FFFD) | Hex: 526965c385efbfbd
+Count: 90 | Pattern: r(U+0072) a(U+0061) Å(U+00C5) �(U+FFFD) | Hex: 7261c385efbfbd
+Count: 85 | Pattern: n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6e69c385efbfbd
+Count: 84 | Pattern: s(U+0073) a(U+0061) d(U+0064) a(U+0061)  (U+0020) Ä(U+00C4) �(U+FFFD) | Hex: 7361646120c384efbfbd
+Count: 82 | Pattern: D(U+0044) Å(U+00C5) «(U+00AB) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: 44c385c2ab6bc385efbfbd
+Count: 80 | Pattern: V(U+0056) I(U+0049) L(U+004C) I(U+0049) Å(U+00C5) Ŗ(U+0156) | Hex: 56494c49c385c596
+Count: 79 | Pattern: s(U+0073)  (U+0020) k(U+006B) r(U+0072) a(U+0061) Å(U+00C5) �(U+FFFD) | Hex: 73206b7261c385efbfbd
+Count: 73 | Pattern: C(U+0043) K(U+004B) E(U+0045) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 434b455649c384efbfbd
+Count: 72 | Pattern: D(U+0044) a(U+0061) u(U+0075) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: 4461756bc385efbfbd
+Count: 72 | Pattern: S(U+0053) Å(U+00C5) «(U+00AB) | Hex: 53c385c2ab
+Count: 71 | Pattern: i(U+0069) Å(U+00C5) «(U+00AB) | Hex: 69c385c2ab
+Count: 70 | Pattern: K(U+004B) N(U+004E) A(U+0041) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 4b4e415649c384efbfbd
+Count: 70 | Pattern: K(U+004B) Ę(U+0118) s(U+0073) t(U+0074) u(U+0075) Ä(U+00C4) ¨(U+00A8) | Hex: 4bc498737475c384c2a8
+Count: 70 | Pattern: b(U+0062) i(U+0069) o(U+006F)  (U+0020) s(U+0073) Ä(U+00C4) …(U+2026) | Hex: 62696f2073c384e280a6
+Count: 70 | Pattern: ˛(U+02DB) A(U+0041) n(U+006E) y(U+0079) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: cb9b416e796bc385efbfbd
+Count: 67 | Pattern: I(U+0049) N(U+004E) E(U+0045) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 494e455649c384efbfbd
+Count: 65 | Pattern: S(U+0053) K(U+004B) E(U+0045) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 534b455649c384efbfbd
+Count: 64 | Pattern: a(U+0061) l(U+006C) t(U+0074) r(U+0072) u(U+0075) Å(U+00C5) �(U+FFFD) | Hex: 616c747275c385efbfbd
+Count: 63 | Pattern: Š(U+0160) A(U+0041) R(U+0052) Å(U+00C5) Ŗ(U+0156) | Hex: c5a04152c385c596
+Count: 63 | Pattern: i(U+0069) j(U+006A) o(U+006F) s(U+0073)  (U+0020) Å(U+00C5) �(U+FFFD) | Hex: 696a6f7320c385efbfbd
+Count: 61 | Pattern: V(U+0056) e(U+0065) r(U+0072) Å(U+00C5) �(U+FFFD) | Hex: 566572c385efbfbd
+Count: 60 | Pattern: Š(U+0160) A(U+0041) B(U+0042) Å(U+00C5) Ŗ(U+0156) | Hex: c5a04142c385c596
+Count: 60 | Pattern: I(U+0049) D(U+0044) A(U+0041) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 4944415649c384efbfbd
+Count: 58 | Pattern: i(U+0069) o(U+006F) s(U+0073)  (U+0020) Å(U+00C5) �(U+FFFD) | Hex: 696f7320c385efbfbd
+Count: 56 | Pattern: D(U+0044) Z(U+005A) E(U+0045) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 445a455649c384efbfbd
+Count: 55 | Pattern: i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 69c385efbfbd
+Count: 55 | Pattern: A(U+0041) R(U+0052) A(U+0041) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 4152415649c384efbfbd
+Count: 55 | Pattern: K(U+004B) a(U+0061) r(U+0072) Å(U+00C5) �(U+FFFD) | Hex: 4b6172c385efbfbd
+Count: 54 | Pattern: M(U+004D) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4d69c385efbfbd
+Count: 54 | Pattern: u(U+0075) l(U+006C) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 756c69c385efbfbd
+Count: 53 | Pattern: L(U+004C) a(U+0061) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: 4c616bc385efbfbd
+Count: 53 | Pattern: Š(U+0160) a(U+0061) l(U+006C) Ä(U+00C4) ¨(U+00A8) | Hex: c5a0616cc384c2a8
+Count: 52 | Pattern: J(U+004A) u(U+0075) r(U+0072) g(U+0067) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4a75726769c385efbfbd
+Count: 52 | Pattern: i(U+0069) l(U+006C) a(U+0061) i(U+0069) Ä(U+00C4) ¨(U+00A8) | Hex: 696c6169c384c2a8
+Count: 52 | Pattern: ā(U+0101) €(U+20AC) “(U+201C)  (U+0020) m(U+006D) Å(U+00C5) «(U+00AB) | Hex: c481e282ace2809c206dc385c2ab
+Count: 51 | Pattern: u(U+0075) n(U+006E) i(U+0069) g(U+0067) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 756e696769c385efbfbd
+Count: 49 | Pattern: l(U+006C) t(U+0074) o(U+006F) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6c746f6e69c385efbfbd
+Count: 48 | Pattern: e(U+0065) t(U+0074) a(U+0061) v(U+0076) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6574617669c385efbfbd
+Count: 48 | Pattern: K(U+004B) a(U+0061) Å(U+00C5) �(U+FFFD) | Hex: 4b61c385efbfbd
+Count: 46 | Pattern: A(U+0041) M(U+004D) O(U+004F) Š(U+0160) I(U+0049) Å(U+00C5) Ŗ(U+0156) | Hex: 414d4fc5a049c385c596
+Count: 46 | Pattern: T(U+0054) K(U+004B) E(U+0045) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 544b455649c384efbfbd
+Count: 45 | Pattern: V(U+0056) i(U+0069) d(U+0064) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 56696469c385efbfbd
+Count: 45 | Pattern: s(U+0073) i(U+0069) e(U+0065) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 7369656e69c385efbfbd
+Count: 45 | Pattern: i(U+0069) o(U+006F) b(U+0062) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 696f6269c385efbfbd
+Count: 45 | Pattern: s(U+0073) t(U+0074) i(U+0069) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 7374696e69c385efbfbd
+Count: 45 | Pattern: L(U+004C) i(U+0069) k(U+006B) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4c696b69c385efbfbd
+Count: 45 | Pattern: U(U+0055) C(U+0043) A(U+0041) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 5543415649c384efbfbd
+Count: 45 | Pattern: T(U+0054) R(U+0052) A(U+0041) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 5452415649c384efbfbd
+Count: 44 | Pattern: V(U+0056) i(U+0069) r(U+0072) Å(U+00C5) �(U+FFFD) | Hex: 566972c385efbfbd
+Count: 43 | Pattern: R(U+0052) y(U+0079) l(U+006C) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 52796c69c385efbfbd
+Count: 43 | Pattern: j(U+006A) Å(U+00C5) «(U+00AB) | Hex: 6ac385c2ab
+Count: 41 | Pattern: a(U+0061) b(U+0062) a(U+0061) r(U+0072) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6162617269c385efbfbd
+Count: 41 | Pattern: L(U+004C) y(U+0079) b(U+0062) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4c796269c385efbfbd
+Count: 41 | Pattern: r(U+0072) m(U+006D) e(U+0065) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 726d656e69c385efbfbd
+Count: 41 | Pattern:  (U+0020) D(U+0044) a(U+0061) u(U+0075) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: 204461756bc385efbfbd
+Count: 41 | Pattern: R(U+0052) u(U+0075) t(U+0074) k(U+006B) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 5275746b69c385efbfbd
+Count: 41 | Pattern: u(U+0075) g(U+0067) ė(U+0117) l(U+006C) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 7567c4976c69c385efbfbd
+Count: 41 | Pattern: V(U+0056) A(U+0041) L(U+004C) I(U+0049) Å(U+00C5) Ŗ(U+0156) | Hex: 56414c49c385c596
+Count: 40 | Pattern: i(U+0069) k(U+006B) o(U+006F) l(U+006C) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 696b6f6c69c385efbfbd
+Count: 40 | Pattern: e(U+0065) v(U+0076) a(U+0061) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6576616e69c385efbfbd
+Count: 40 | Pattern: K(U+004B) l(U+006C) o(U+006F) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4b6c6f6e69c385efbfbd
+Count: 40 | Pattern: G(U+0047) e(U+0065) r(U+0072) v(U+0076) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4765727669c385efbfbd
+Count: 38 | Pattern: M(U+004D) e(U+0065) Å(U+00C5) �(U+FFFD) | Hex: 4d65c385efbfbd
+Count: 38 | Pattern: .(U+002E)  (U+0020) U(U+0055) r(U+0072) b(U+0062) Å(U+00C5) �(U+FFFD) | Hex: 2e20557262c385efbfbd
+Count: 38 | Pattern: l(U+006C) c(U+0063) e(U+0065) r(U+0072) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6c63657269c385efbfbd
+Count: 37 | Pattern: V(U+0056) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 5669c385efbfbd
+Count: 37 | Pattern: T(U+0054) r(U+0072) o(U+006F) Å(U+00C5) �(U+FFFD) | Hex: 54726fc385efbfbd
+Count: 37 | Pattern: k(U+006B) Å(U+00C5) «(U+00AB) | Hex: 6bc385c2ab
+Count: 36 | Pattern: V(U+0056) a(U+0061) n(U+006E) k(U+006B) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 56616e6b69c385efbfbd
+Count: 36 | Pattern: n(U+006E) y(U+0079) g(U+0067) n(U+006E) e(U+0065) Å(U+00C5) �(U+FFFD) | Hex: 6e79676e65c385efbfbd
+Count: 36 | Pattern: R(U+0052) u(U+0075) m(U+006D) Å(U+00C5) �(U+FFFD) | Hex: 52756dc385efbfbd
+Count: 36 | Pattern: i(U+0069) a(U+0061) u(U+0075) d(U+0064) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6961756469c385efbfbd
+Count: 36 | Pattern: S(U+0053) t(U+0074) a(U+0061) Å(U+00C5) �(U+FFFD) | Hex: 537461c385efbfbd
+Count: 36 | Pattern: k(U+006B) Å(U+00C5) «(U+00AB) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6bc385c2ab6e69c385efbfbd
+Count: 36 | Pattern: K(U+004B) a(U+0061) l(U+006C) v(U+0076) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4b616c7669c385efbfbd
+Count: 36 | Pattern: P(U+0050) a(U+0061) Ä(U+00C4) ¨(U+00A8) | Hex: 5061c384c2a8
+Count: 36 | Pattern: r(U+0072) i(U+0069) a(U+0061) u(U+0075) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: 726961756bc385efbfbd
+Count: 36 | Pattern: K(U+004B) r(U+0072) a(U+0061) t(U+0074) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4b72617469c385efbfbd
+Count: 36 | Pattern: Š(U+0160) i(U+0069) m(U+006D) Å(U+00C5) �(U+FFFD) | Hex: c5a0696dc385efbfbd
+Count: 36 | Pattern: T(U+0054) a(U+0061) m(U+006D) o(U+006F) Å(U+00C5) �(U+FFFD) | Hex: 54616d6fc385efbfbd
+Count: 36 | Pattern: A(U+0041) K(U+004B) A(U+0041) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 414b415649c384efbfbd
+Count: 36 | Pattern: M(U+004D) I(U+0049) S(U+0053) I(U+0049) Å(U+00C5) Ŗ(U+0156) | Hex: 4d495349c385c596
+Count: 36 | Pattern: M(U+004D) E(U+0045) Ä(U+00C4) �(U+FFFD) | Hex: 4d45c384efbfbd
+Count: 35 | Pattern: j(U+006A) a(U+0061) u(U+0075) t(U+0074) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6a61757469c385efbfbd
+Count: 35 | Pattern: j(U+006A) i(U+0069) n(U+006E) a(U+0061) n(U+006E) Ä(U+00C4) ¨(U+00A8) | Hex: 6a696e616ec384c2a8
+Count: 35 | Pattern: I(U+0049) N(U+004E) A(U+0041) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 494e415649c384efbfbd
+Count: 35 | Pattern: S(U+0053) A(U+0041) R(U+0052) G(U+0047) Å(U+00C5) Ŗ(U+0156) | Hex: 53415247c385c596
+Count: 34 | Pattern: i(U+0069) k(U+006B) u(U+0075) t(U+0074) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 696b757469c385efbfbd
+Count: 34 | Pattern: R(U+0052) u(U+0075) m(U+006D) p(U+0070) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 52756d7069c385efbfbd
+Count: 34 | Pattern: P(U+0050) i(U+0069) v(U+0076) a(U+0061) Å(U+00C5) �(U+FFFD) | Hex: 50697661c385efbfbd
+Count: 34 | Pattern: Ä(U+00C4) �(U+FFFD) i(U+0069) Ä(U+00C4) ¨(U+00A8) | Hex: c384efbfbd69c384c2a8
+Count: 34 | Pattern: b(U+0062) i(U+0069) n(U+006E) t(U+0074) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 62696e7469c385efbfbd
+Count: 34 | Pattern: r(U+0072) k(U+006B) i(U+0069) l(U+006C) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 726b696c69c385efbfbd
+Count: 34 | Pattern: V(U+0056) a(U+0061) Å(U+00C5) �(U+FFFD) | Hex: 5661c385efbfbd
+Count: 34 | Pattern: M(U+004D) O(U+004F) R(U+0052) K(U+004B) Å(U+00C5) Ŗ(U+0156) | Hex: 4d4f524bc385c596
+Count: 33 | Pattern: a(U+0061) z(U+007A) o(U+006F) k(U+006B) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 617a6f6b69c385efbfbd
+Count: 33 | Pattern: P(U+0050) o(U+006F) Å(U+00C5) �(U+FFFD) | Hex: 506fc385efbfbd
+Count: 33 | Pattern: v(U+0076) a(U+0061) i(U+0069) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 7661696e69c385efbfbd
+Count: 33 | Pattern: U(U+0055) ž(U+017E) u(U+0075) Å(U+00C5) �(U+FFFD) | Hex: 55c5be75c385efbfbd
+Count: 32 | Pattern: p(U+0070) r(U+0072) e(U+0065) l(U+006C) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 7072656c69c385efbfbd
+Count: 32 | Pattern: k(U+006B) u(U+0075) Ä(U+00C4) ¨(U+00A8) | Hex: 6b75c384c2a8
+Count: 32 | Pattern: L(U+004C) a(U+0061) i(U+0069) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: 4c61696bc385efbfbd
+Count: 32 | Pattern: o(U+006F)  (U+0020) B(U+0042) o(U+006F) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: 6f20426f6bc385efbfbd
+Count: 32 | Pattern: Z(U+005A) Å(U+00C5) «(U+00AB) b(U+0062) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 5ac385c2ab6269c385efbfbd
+Count: 32 | Pattern: B(U+0042) u(U+0075) k(U+006B) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 42756b69c385efbfbd
+Count: 32 | Pattern: s(U+0073) i(U+0069) u(U+0075) l(U+006C) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 7369756c69c385efbfbd
+Count: 32 | Pattern: e(U+0065) m(U+006D) e(U+0065) l(U+006C) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 656d656c69c385efbfbd
+Count: 32 | Pattern: R(U+0052) i(U+0069) n(U+006E) k(U+006B) u(U+0075) Å(U+00C5) �(U+FFFD) | Hex: 52696e6b75c385efbfbd
+Count: 32 | Pattern: L(U+004C) A(U+0041) I(U+0049) S(U+0053) V(U+0056) Ä(U+00C4) �(U+FFFD) | Hex: 4c41495356c384efbfbd
+Count: 32 | Pattern: u(U+0075)  (U+0020) R(U+0052) a(U+0061) m(U+006D) Å(U+00C5) «(U+00AB) | Hex: 752052616dc385c2ab
+Count: 32 | Pattern: a(U+0061) z(U+007A) i(U+0069) t(U+0074) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 617a697469c385efbfbd
+Count: 32 | Pattern: V(U+0056) A(U+0041) L(U+004C) K(U+004B) I(U+0049) Å(U+00C5) Ŗ(U+0156) | Hex: 56414c4b49c385c596
+Count: 32 | Pattern: B(U+0042) o(U+006F) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: 426f6bc385efbfbd
+Count: 32 | Pattern: I(U+0049) K(U+004B) E(U+0045) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 494b455649c384efbfbd
+Count: 32 | Pattern: N(U+004E) D(U+0044) A(U+0041) R(U+0052) I(U+0049) Å(U+00C5) Ŗ(U+0156) | Hex: 4e44415249c385c596
+Count: 31 | Pattern: R(U+0052) i(U+0069) m(U+006D) Å(U+00C5) �(U+FFFD) | Hex: 52696dc385efbfbd
+Count: 31 | Pattern: r(U+0072) m(U+006D) a(U+0061) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 726d616e69c385efbfbd
+Count: 31 | Pattern: D(U+0044) a(U+0061) u(U+0075) b(U+0062) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4461756269c385efbfbd
+Count: 31 | Pattern: U(U+0055) C(U+0043) E(U+0045) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 5543455649c384efbfbd
+Count: 31 | Pattern: e(U+0065) r(U+0072) m(U+006D) u(U+0075) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: 65726d756bc385efbfbd
+Count: 31 | Pattern: B(U+0042) i(U+0069) r(U+0072) ž(U+017E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 426972c5be69c385efbfbd
+Count: 30 | Pattern: N(U+004E) e(U+0065) m(U+006D) a(U+0061) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: 4e656d616bc385efbfbd
+Count: 30 | Pattern: v(U+0076) i(U+0069) e(U+0065) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 7669656e69c385efbfbd
+Count: 30 | Pattern: L(U+004C) u(U+0075) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: 4c756bc385efbfbd
+Count: 30 | Pattern: P(U+0050) l(U+006C) i(U+0069) k(U+006B) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 506c696b69c385efbfbd
+Count: 30 | Pattern: M(U+004D) i(U+0069) l(U+006C) a(U+0061) Å(U+00C5) �(U+FFFD) | Hex: 4d696c61c385efbfbd
+Count: 30 | Pattern: .(U+002E)  (U+0020) L(U+004C) u(U+0075) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: 2e204c756bc385efbfbd
+Count: 30 | Pattern: D(U+0044) a(U+0061) r(U+0072) s(U+0073) Å(U+00C5) «(U+00AB) | Hex: 44617273c385c2ab
+Count: 30 | Pattern: o(U+006F) t(U+0074) ų(U+0173)  (U+0020) s(U+0073) Ä(U+00C4) …(U+2026) | Hex: 6f74c5b32073c384e280a6
+Count: 30 | Pattern: N(U+004E) y(U+0079) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: 4e796bc385efbfbd
+Count: 29 | Pattern: R(U+0052) y(U+0079) Å(U+00C5) �(U+FFFD) | Hex: 5279c385efbfbd
+Count: 29 | Pattern: K(U+004B) a(U+0061) l(U+006C) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4b616c6e69c385efbfbd
+Count: 29 | Pattern: A(U+0041) n(U+006E) Ä(U+00C4) ¨(U+00A8) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 416ec384c2a869c385efbfbd
+Count: 29 | Pattern: m(U+006D) i(U+0069) e(U+0065) s(U+0073) t(U+0074) Ä(U+00C4) …(U+2026) | Hex: 6d69657374c384e280a6
+Count: 28 | Pattern: u(U+0075) n(U+006E) o(U+006F) r(U+0072) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 756e6f7269c385efbfbd
+Count: 28 | Pattern: b(U+0062) i(U+0069) e(U+0065) r(U+0072) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6269657269c385efbfbd
+Count: 28 | Pattern: r(U+0072) u(U+0075) z(U+007A) d(U+0064) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 72757a6469c385efbfbd
+Count: 28 | Pattern: a(U+0061) m(U+006D) o(U+006F) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 616d6f6e69c385efbfbd
+Count: 28 | Pattern: G(U+0047) a(U+0061) b(U+0062) Å(U+00C5) �(U+FFFD) | Hex: 476162c385efbfbd
+Count: 28 | Pattern: R(U+0052) o(U+006F) t(U+0074) u(U+0075) Å(U+00C5) �(U+FFFD) | Hex: 526f7475c385efbfbd
+Count: 28 | Pattern: G(U+0047) e(U+0065) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 476569c385efbfbd
+Count: 28 | Pattern: Ž(U+017D) i(U+0069) o(U+006F) b(U+0062) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: c5bd696f6269c385efbfbd
+Count: 28 | Pattern: A(U+0041) n(U+006E) t(U+0074) a(U+0061) Å(U+00C5) �(U+FFFD) | Hex: 416e7461c385efbfbd
+Count: 28 | Pattern: r(U+0072) i(U+0069) o(U+006F) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 72696f6e69c385efbfbd
+Count: 28 | Pattern: ˛(U+02DB) K(U+004B) r(U+0072) i(U+0069) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: cb9b4b72696bc385efbfbd
+Count: 28 | Pattern: a(U+0061) t(U+0074) e(U+0065) i(U+0069) t(U+0074) Ä(U+00C4) Æ(U+00C6) | Hex: 6174656974c384c386
+Count: 28 | Pattern: s(U+0073) t(U+0074) i(U+0069) n(U+006E) t(U+0074) Ä(U+00C4) Æ(U+00C6) | Hex: 7374696e74c384c386
+Count: 28 | Pattern: Ė(U+0116) -(U+002D) M(U+004D) I(U+0049) L(U+004C) Ä(U+00C4) �(U+FFFD) | Hex: c4962d4d494cc384efbfbd
+Count: 28 | Pattern: S(U+0053) T(U+0054) A(U+0041) N(U+004E) K(U+004B) Å(U+00C5) Ŗ(U+0156) | Hex: 5354414e4bc385c596
+Count: 27 | Pattern: R(U+0052) u(U+0075) d(U+0064) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 52756469c385efbfbd
+Count: 27 | Pattern: L(U+004C) i(U+0069) u(U+0075) d(U+0064) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4c69756469c385efbfbd
+Count: 27 | Pattern: D(U+0044) a(U+0061) u(U+0075) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4461756e69c385efbfbd
+Count: 27 | Pattern: P(U+0050) a(U+0061) Å(U+00C5) �(U+FFFD) u(U+0075) Å(U+00C5) �(U+FFFD) | Hex: 5061c385efbfbd75c385efbfbd
+Count: 27 | Pattern: V(U+0056) i(U+0069) e(U+0065) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: 5669656bc385efbfbd
+Count: 27 | Pattern: P(U+0050) r(U+0072) y(U+0079) Å(U+00C5) �(U+FFFD) | Hex: 507279c385efbfbd
+Count: 27 | Pattern: m(U+006D) a(U+0061) n(U+006E) Ä(U+00C4) ¨(U+00A8) | Hex: 6d616ec384c2a8
+Count: 27 | Pattern: V(U+0056) a(U+0061) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 566169c385efbfbd
+Count: 26 | Pattern: o(U+006F) v(U+0076) a(U+0061) r(U+0072) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6f76617269c385efbfbd
+Count: 26 | Pattern: g(U+0067) i(U+0069) r(U+0072) d(U+0064) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6769726469c385efbfbd
+Count: 26 | Pattern: K(U+004B) a(U+0061) i(U+0069) r(U+0072) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4b61697269c385efbfbd
+Count: 26 | Pattern: J(U+004A) u(U+0075) Å(U+00C5) �(U+FFFD) | Hex: 4a75c385efbfbd
+Count: 26 | Pattern: I(U+0049) M(U+004D) A(U+0041) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 494d415649c384efbfbd
+Count: 26 | Pattern: n(U+006E) k(U+006B) e(U+0065) v(U+0076) i(U+0069) Ä(U+00C4) ¨(U+00A8) | Hex: 6e6b657669c384c2a8
+Count: 26 | Pattern: P(U+0050) e(U+0065) t(U+0074) r(U+0072) a(U+0061) Å(U+00C5) �(U+FFFD) | Hex: 5065747261c385efbfbd
+Count: 26 | Pattern: €(U+20AC) “(U+201C) G(U+0047) r(U+0072) i(U+0069) Ä(U+00C4) ¨(U+00A8) | Hex: e282ace2809c477269c384c2a8
+Count: 26 | Pattern: K(U+004B) A(U+0041) Ä(U+00C4) �(U+FFFD) | Hex: 4b41c384efbfbd
+Count: 26 | Pattern: Š(U+0160) I(U+0049) M(U+004D) Ä(U+00C4) �(U+FFFD) | Hex: c5a0494dc384efbfbd
+Count: 25 | Pattern: B(U+0042) e(U+0065) r(U+0072) t(U+0074) e(U+0065) Å(U+00C5) �(U+FFFD) | Hex: 4265727465c385efbfbd
+Count: 25 | Pattern: B(U+0042) a(U+0061) r(U+0072) d(U+0064) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4261726469c385efbfbd
+Count: 25 | Pattern: V(U+0056) e(U+0065) r(U+0072) b(U+0062) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 5665726269c385efbfbd
+Count: 25 | Pattern: B(U+0042) a(U+0061) Ä(U+00C4) ¨(U+00A8) | Hex: 4261c384c2a8
+Count: 25 | Pattern: k(U+006B) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6b69c385efbfbd
+Count: 25 | Pattern: D(U+0044) v(U+0076) a(U+0061) r(U+0072) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4476617269c385efbfbd
+Count: 25 | Pattern: B(U+0042) u(U+0075) t(U+0074) k(U+006B) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4275746b69c385efbfbd
+Count: 25 | Pattern: E(U+0045) L(U+004C) A(U+0041) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 454c415649c384efbfbd
+Count: 25 | Pattern: O(U+004F) P(U+0050) O(U+004F) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 4f504f5649c384efbfbd
+Count: 24 | Pattern: t(U+0074) i(U+0069) r(U+0072) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 7469726e69c385efbfbd
+Count: 24 | Pattern: i(U+0069) r(U+0072) o(U+006F) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 69726f6e69c385efbfbd
+Count: 24 | Pattern: M(U+004D) e(U+0065) i(U+0069) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: 4d65696bc385efbfbd
+Count: 24 | Pattern: L(U+004C) a(U+0061) Å(U+00C5) �(U+FFFD) | Hex: 4c61c385efbfbd
+Count: 24 | Pattern: P(U+0050) a(U+0061) m(U+006D) Å(U+00C5) «(U+00AB) Å(U+00C5) �(U+FFFD) | Hex: 50616dc385c2abc385efbfbd
+Count: 24 | Pattern: J(U+004A) a(U+0061) n(U+006E) u(U+0075) Å(U+00C5) �(U+FFFD) | Hex: 4a616e75c385efbfbd
+Count: 23 | Pattern: t(U+0074) r(U+0072) a(U+0061) l(U+006C) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 7472616c69c385efbfbd
+Count: 23 | Pattern: J(U+004A) a(U+0061) k(U+006B) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4a616b69c385efbfbd
+Count: 23 | Pattern: B(U+0042) u(U+0075) r(U+0072) b(U+0062) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4275726269c385efbfbd
+Count: 23 | Pattern:  (U+0020) ā(U+0101) €(U+20AC) “(U+201C)  (U+0020) Ä(U+00C4) �(U+FFFD) | Hex: 20c481e282ace2809c20c384efbfbd
+Count: 23 | Pattern: p(U+0070) i(U+0069) l(U+006C) i(U+0069) e(U+0065) Ä(U+00C4) ¨(U+00A8) | Hex: 70696c6965c384c2a8
+Count: 22 | Pattern: A(U+0041) i(U+0069) s(U+0073) t(U+0074) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4169737469c385efbfbd
+Count: 22 | Pattern: D(U+0044) u(U+0075) o(U+006F) k(U+006B) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 44756f6b69c385efbfbd
+Count: 22 | Pattern: r(U+0072) i(U+0069) u(U+0075) b(U+0062) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 7269756269c385efbfbd
+Count: 22 | Pattern: t(U+0074) i(U+0069) e(U+0065) s(U+0073)  (U+0020) Å(U+00C5) �(U+FFFD) | Hex: 7469657320c385efbfbd
+Count: 22 | Pattern: A(U+0041) l(U+006C) k(U+006B) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 416c6b69c385efbfbd
+Count: 22 | Pattern:  (U+0020) t(U+0074) a(U+0061) u(U+0075) t(U+0074) Ä(U+00C4) …(U+2026) | Hex: 2074617574c384e280a6
+Count: 22 | Pattern: m(U+006D) a(U+0061) n(U+006E) t(U+0074) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6d616e7469c385efbfbd
+Count: 22 | Pattern: S(U+0053) V(U+0056) A(U+0041) J(U+004A) Å(U+00C5) Ŗ(U+0156) | Hex: 5356414ac385c596
+Count: 22 | Pattern: J(U+004A) U(U+0055) Ä(U+00C4) �(U+FFFD) | Hex: 4a55c384efbfbd
+Count: 21 | Pattern: U(U+0055) b(U+0062) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 556269c385efbfbd
+Count: 21 | Pattern: i(U+0069) g(U+0067) a(U+0061) l(U+006C) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6967616c69c385efbfbd
+Count: 21 | Pattern: V(U+0056) a(U+0061) i(U+0069) c(U+0063) k(U+006B) Å(U+00C5) «(U+00AB) | Hex: 566169636bc385c2ab
+Count: 21 | Pattern: k(U+006B) r(U+0072) e(U+0065) b(U+0062) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6b72656269c385efbfbd
+Count: 21 | Pattern: i(U+0069) a(U+0061) s(U+0073) d(U+0064) e(U+0065) Å(U+00C5) �(U+FFFD) | Hex: 6961736465c385efbfbd
+Count: 21 | Pattern: K(U+004B) U(U+0055) Ä(U+00C4) �(U+FFFD) | Hex: 4b55c384efbfbd
+Count: 20 | Pattern: t(U+0074) e(U+0065) i(U+0069) t(U+0074) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 7465697469c385efbfbd
+Count: 20 | Pattern: M(U+004D) .(U+002E) K(U+004B) .(U+002E) Ä(U+00C4) �(U+FFFD) | Hex: 4d2e4b2ec384efbfbd
+Count: 20 | Pattern: I(U+0049) Å(U+00C5) �(U+FFFD) | Hex: 49c385efbfbd
+Count: 20 | Pattern: S(U+0053) Ä(U+00C4) …(U+2026) n(U+006E) a(U+0061) Å(U+00C5) �(U+FFFD) | Hex: 53c384e280a66e61c385efbfbd
+Count: 20 | Pattern: k(U+006B) i(U+0069) o(U+006F)  (U+0020) R(U+0052) Å(U+00C5) «(U+00AB) | Hex: 6b696f2052c385c2ab
+Count: 20 | Pattern: O(U+004F) n(U+006E) u(U+0075) Å(U+00C5) �(U+FFFD) | Hex: 4f6e75c385efbfbd
+Count: 20 | Pattern: A(U+0041) N(U+004E) A(U+0041) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 414e415649c384efbfbd
+Count: 20 | Pattern: B(U+0042) R(U+0052) A(U+0041) Ž(U+017D) I(U+0049) Å(U+00C5) Ŗ(U+0156) | Hex: 425241c5bd49c385c596
+Count: 20 | Pattern: J(U+004A) A(U+0041) R(U+0052) O(U+004F) Š(U+0160) Ä(U+00C4) �(U+FFFD) | Hex: 4a41524fc5a0c384efbfbd
+Count: 19 | Pattern: P(U+0050) a(U+0061) t(U+0074) a(U+0061) Å(U+00C5) �(U+FFFD) | Hex: 50617461c385efbfbd
+Count: 19 | Pattern: D(U+0044) a(U+0061) p(U+0070) k(U+006B) Å(U+00C5) «(U+00AB) | Hex: 4461706bc385c2ab
+Count: 19 | Pattern: T(U+0054) r(U+0072) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 547269c385efbfbd
+Count: 19 | Pattern: u(U+0075) d(U+0064) i(U+0069) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 7564696e69c385efbfbd
+Count: 19 | Pattern: m(U+006D) i(U+0069) t(U+0074) r(U+0072) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6d69747269c385efbfbd
+Count: 19 | Pattern: t(U+0074) u(U+0075) Ä(U+00C4) ¨(U+00A8) | Hex: 7475c384c2a8
+Count: 19 | Pattern: o(U+006F) s(U+0073) i(U+0069) l(U+006C) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6f73696c69c385efbfbd
+Count: 19 | Pattern: P(U+0050) l(U+006C) a(U+0061) u(U+0075) Ä(U+00C4) ¨(U+00A8) | Hex: 506c6175c384c2a8
+Count: 19 | Pattern: o(U+006F) l(U+006C) i(U+0069) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6f6c696e69c385efbfbd
+Count: 18 | Pattern: Ä(U+00C4) �(U+FFFD) e(U+0065) k(U+006B) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: c384efbfbd656b69c385efbfbd
+Count: 18 | Pattern: i(U+0069) d(U+0064) e(U+0065) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6964656e69c385efbfbd
+Count: 18 | Pattern: R(U+0052) a(U+0061) d(U+0064) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 52616469c385efbfbd
+Count: 17 | Pattern: L(U+004C) a(U+0061) i(U+0069) p(U+0070) u(U+0075) Å(U+00C5) �(U+FFFD) | Hex: 4c61697075c385efbfbd
+Count: 17 | Pattern: G(U+0047) r(U+0072) a(U+0061) ž(U+017E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 477261c5be69c385efbfbd
+Count: 17 | Pattern: i(U+0069) r(U+0072) u(U+0075) t(U+0074) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6972757469c385efbfbd
+Count: 17 | Pattern: i(U+0069) j(U+006A) u(U+0075) t(U+0074) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 696a757469c385efbfbd
+Count: 17 | Pattern: k(U+006B) i(U+0069) o(U+006F)  (U+0020) Å(U+00C5) �(U+FFFD) | Hex: 6b696f20c385efbfbd
+Count: 17 | Pattern: r(U+0072) v(U+0076) i(U+0069) l(U+006C) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 7276696c69c385efbfbd
+Count: 17 | Pattern: t(U+0074) y(U+0079) Ä(U+00C4) ¨(U+00A8) | Hex: 7479c384c2a8
+Count: 17 | Pattern: r(U+0072) b(U+0062) a(U+0061) l(U+006C) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 7262616c69c385efbfbd
+Count: 17 | Pattern: O(U+004F) p(U+0070) Å(U+00C5) �(U+FFFD) r(U+0072) Å(U+00C5) «(U+00AB) | Hex: 4f70c385efbfbd72c385c2ab
+Count: 17 | Pattern: l(U+006C) d(U+0064) u(U+0075) t(U+0074) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6c64757469c385efbfbd
+Count: 17 | Pattern: J(U+004A) u(U+0075) o(U+006F) d(U+0064) Å(U+00C5) �(U+FFFD) | Hex: 4a756f64c385efbfbd
+Count: 16 | Pattern: J(U+004A) a(U+0061) Å(U+00C5) �(U+FFFD) i(U+0069) Å(U+00C5) «(U+00AB) | Hex: 4a61c385efbfbd69c385c2ab
+Count: 16 | Pattern: K(U+004B) a(U+0061) s(U+0073) Ä(U+00C4) ¨(U+00A8) | Hex: 4b6173c384c2a8
+Count: 16 | Pattern: i(U+0069) u(U+0075) k(U+006B) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 69756b69c385efbfbd
+Count: 16 | Pattern: G(U+0047) i(U+0069) r(U+0072) d(U+0064) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4769726469c385efbfbd
+Count: 16 | Pattern: P(U+0050) i(U+0069) l(U+006C) v(U+0076) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 50696c7669c385efbfbd
+Count: 16 | Pattern: r(U+0072) a(U+0061) s(U+0073) ų(U+0173)  (U+0020) Å(U+00C5) �(U+FFFD) | Hex: 726173c5b320c385efbfbd
+Count: 16 | Pattern: G(U+0047) l(U+006C) i(U+0069) t(U+0074) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 476c697469c385efbfbd
+Count: 16 | Pattern: s(U+0073)  (U+0020) R(U+0052) i(U+0069) e(U+0065) Å(U+00C5) �(U+FFFD) | Hex: 7320526965c385efbfbd
+Count: 16 | Pattern: v(U+0076) e(U+0065) d(U+0064) r(U+0072) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 7665647269c385efbfbd
+Count: 16 | Pattern: v(U+0076) i(U+0069) e(U+0065) t(U+0074) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 7669657469c385efbfbd
+Count: 15 | Pattern: G(U+0047) e(U+0065) i(U+0069) s(U+0073) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4765697369c385efbfbd
+Count: 15 | Pattern: K(U+004B) r(U+0072) e(U+0065) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: 4b72656bc385efbfbd
+Count: 15 | Pattern: P(U+0050) a(U+0061) j(U+006A) i(U+0069) e(U+0065) Å(U+00C5) �(U+FFFD) | Hex: 50616a6965c385efbfbd
+Count: 15 | Pattern: Ä(U+00C4) �(U+FFFD) i(U+0069) ž(U+017E) i(U+0069) Å(U+00C5) «(U+00AB) | Hex: c384efbfbd69c5be69c385c2ab
+Count: 15 | Pattern: P(U+0050) a(U+0061) l(U+006C) i(U+0069) Å(U+00C5) «(U+00AB) | Hex: 50616c69c385c2ab
+Count: 15 | Pattern: a(U+0061) v(U+0076) o(U+006F) r(U+0072) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 61766f7269c385efbfbd
+Count: 15 | Pattern: K(U+004B) r(U+0072) a(U+0061) Å(U+00C5) �(U+FFFD) | Hex: 4b7261c385efbfbd
+Count: 15 | Pattern: K(U+004B) u(U+0075) t(U+0074) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4b757469c385efbfbd
+Count: 15 | Pattern: V(U+0056) i(U+0069) l(U+006C) k(U+006B) y(U+0079) Å(U+00C5) �(U+FFFD) | Hex: 56696c6b79c385efbfbd
+Count: 15 | Pattern: V(U+0056) y(U+0079) Å(U+00C5) �(U+FFFD) | Hex: 5679c385efbfbd
+Count: 15 | Pattern: n(U+006E) i(U+0069) Å(U+00C5) «(U+00AB) | Hex: 6e69c385c2ab
+Count: 15 | Pattern: t(U+0074) a(U+0061) k(U+006B) l(U+006C) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 74616b6c69c385efbfbd
+Count: 15 | Pattern: Š(U+0160) v(U+0076) o(U+006F) b(U+0062) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: c5a0766f6269c385efbfbd
+Count: 15 | Pattern: P(U+0050) a(U+0061) Å(U+00C5) �(U+FFFD) y(U+0079) Å(U+00C5) �(U+FFFD) | Hex: 5061c385efbfbd79c385efbfbd
+Count: 15 | Pattern: v(U+0076) o(U+006F) s(U+0073)  (U+0020) s(U+0073) Ä(U+00C4) …(U+2026) | Hex: 766f732073c384e280a6
+Count: 15 | Pattern: J(U+004A) A(U+0041) N(U+004E) Ä(U+00C4) �(U+FFFD) | Hex: 4a414ec384efbfbd
+Count: 15 | Pattern: A(U+0041) N(U+004E) O(U+004F) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 414e4f5649c384efbfbd
+Count: 14 | Pattern: i(U+0069) b(U+0062) e(U+0065) r(U+0072) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6962657269c385efbfbd
+Count: 14 | Pattern: t(U+0074) m(U+006D) i(U+0069) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 746d696e69c385efbfbd
+Count: 14 | Pattern: a(U+0061) t(U+0074) i(U+0069) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6174696e69c385efbfbd
+Count: 14 | Pattern: b(U+0062) r(U+0072) u(U+0075) l(U+006C) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6272756c69c385efbfbd
+Count: 14 | Pattern: r(U+0072) i(U+0069) n(U+006E) k(U+006B) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 72696e6b69c385efbfbd
+Count: 14 | Pattern: P(U+0050) l(U+006C) i(U+0069) n(U+006E) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: 506c696e6bc385efbfbd
+Count: 14 | Pattern: Z(U+005A) a(U+0061) p(U+0070) y(U+0079) Å(U+00C5) �(U+FFFD) | Hex: 5a617079c385efbfbd
+Count: 14 | Pattern: I(U+0049) g(U+0067) l(U+006C) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 49676c69c385efbfbd
+Count: 14 | Pattern: A(U+0041) i(U+0069) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: 41696bc385efbfbd
+Count: 14 | Pattern: l(U+006C) e(U+0065) k(U+006B) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6c656b6e69c385efbfbd
+Count: 14 | Pattern: g(U+0067) a(U+0061) i(U+0069) l(U+006C) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6761696c69c385efbfbd
+Count: 14 | Pattern: K(U+004B) u(U+0075) k(U+006B) t(U+0074) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4b756b7469c385efbfbd
+Count: 14 | Pattern: a(U+0061) v(U+0076) o(U+006F) l(U+006C) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 61766f6c69c385efbfbd
+Count: 14 | Pattern: s(U+0073) u(U+0075)  (U+0020) R(U+0052) i(U+0069) Ä(U+00C4) ¨(U+00A8) | Hex: 7375205269c384c2a8
+Count: 14 | Pattern:  (U+0020) J(U+004A) a(U+0061) u(U+0075) n(U+006E) Ä(U+00C4) …(U+2026) | Hex: 204a61756ec384e280a6
+Count: 14 | Pattern: j(U+006A) Ä(U+00C4) …(U+2026)  (U+0020) S(U+0053) Å(U+00C5) «(U+00AB) | Hex: 6ac384e280a62053c385c2ab
+Count: 14 | Pattern: d(U+0064) u(U+0075) v(U+0076) Ä(U+00C4) …(U+2026) | Hex: 647576c384e280a6
+Count: 14 | Pattern: I(U+0049) M(U+004D) O(U+004F) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 494d4f5649c384efbfbd
+Count: 14 | Pattern: t(U+0074) a(U+0061) i(U+0069) Ä(U+00C4) ¨(U+00A8) | Hex: 746169c384c2a8
+Count: 13 | Pattern: Å(U+00C5) �(U+FFFD) | Hex: c385efbfbd
+Count: 13 | Pattern: K(U+004B) a(U+0061) Å(U+00C5) �(U+FFFD) u(U+0075) Ä(U+00C4) ¨(U+00A8) | Hex: 4b61c385efbfbd75c384c2a8
+Count: 13 | Pattern: K(U+004B) i(U+0069) b(U+0062) y(U+0079) Å(U+00C5) �(U+FFFD) | Hex: 4b696279c385efbfbd
+Count: 13 | Pattern: S(U+0053) t(U+0074) o(U+006F) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 53746f6e69c385efbfbd
+Count: 13 | Pattern: M(U+004D) .(U+002E) R(U+0052) Å(U+00C5) «(U+00AB) Å(U+00C5) �(U+FFFD) | Hex: 4d2e52c385c2abc385efbfbd
+Count: 13 | Pattern: n(U+006E) t(U+0074) a(U+0061) n(U+006E) a(U+0061) Å(U+00C5) �(U+FFFD) | Hex: 6e74616e61c385efbfbd
+Count: 13 | Pattern: k(U+006B) a(U+0061) i(U+0069) d(U+0064) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6b61696469c385efbfbd
+Count: 13 | Pattern: S(U+0053) k(U+006B) a(U+0061) p(U+0070) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 536b617069c385efbfbd
+Count: 13 | Pattern: u(U+0075) m(U+006D) i(U+0069) e(U+0065) s(U+0073) Ä(U+00C4) ¨(U+00A8) | Hex: 756d696573c384c2a8
+Count: 13 | Pattern: R(U+0052) Å(U+00C5) «(U+00AB) d(U+0064) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 52c385c2ab6469c385efbfbd
+Count: 13 | Pattern: u(U+0075) d(U+0064) u(U+0075) t(U+0074) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 7564757469c385efbfbd
+Count: 13 | Pattern: n(U+006E)  (U+0020) K(U+004B) a(U+0061) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6e204b6169c385efbfbd
+Count: 13 | Pattern: .(U+002E)  (U+0020) K(U+004B) .(U+002E)  (U+0020) Ä(U+00C4) �(U+FFFD) | Hex: 2e204b2e20c384efbfbd
+Count: 13 | Pattern: S(U+0053) T(U+0054) O(U+004F) N(U+004E) Ä(U+00C4) �(U+FFFD) | Hex: 53544f4ec384efbfbd
+Count: 13 | Pattern: V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 5649c384efbfbd
+Count: 13 | Pattern: u(U+0075) m(U+006D) o(U+006F)  (U+0020) s(U+0073) Ä(U+00C4) …(U+2026) | Hex: 756d6f2073c384e280a6
+Count: 13 | Pattern: a(U+0061) l(U+006C) ų(U+0173)  (U+0020) s(U+0073) Ä(U+00C4) …(U+2026) | Hex: 616cc5b32073c384e280a6
+Count: 13 | Pattern: A(U+0041) K(U+004B) E(U+0045) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 414b455649c384efbfbd
+Count: 13 | Pattern: P(U+0050) A(U+0041) B(U+0042) A(U+0041) R(U+0052) Ä(U+00C4) �(U+FFFD) | Hex: 5041424152c384efbfbd
+Count: 12 | Pattern: a(U+0061) p(U+0070) i(U+0069) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6170696e69c385efbfbd
+Count: 12 | Pattern: G(U+0047) r(U+0072) Å(U+00C5) «(U+00AB) Å(U+00C5) �(U+FFFD) | Hex: 4772c385c2abc385efbfbd
+Count: 12 | Pattern: P(U+0050) a(U+0061) k(U+006B) i(U+0069) r(U+0072) Å(U+00C5) �(U+FFFD) | Hex: 50616b6972c385efbfbd
+Count: 12 | Pattern: n(U+006E) t(U+0074) a(U+0061) l(U+006C) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6e74616c69c385efbfbd
+Count: 12 | Pattern: T(U+0054) r(U+0072) u(U+0075) Å(U+00C5) �(U+FFFD) | Hex: 547275c385efbfbd
+Count: 12 | Pattern: G(U+0047) r(U+0072) i(U+0069) g(U+0067) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4772696769c385efbfbd
+Count: 12 | Pattern: A(U+0041) I(U+0049) T(U+0054) E(U+0045) K(U+004B) Å(U+00C5) Ŗ(U+0156) | Hex: 414954454bc385c596
+Count: 12 | Pattern: V(U+0056) A(U+0041) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 564149c384efbfbd
+Count: 12 | Pattern: K(U+004B) A(U+0041) S(U+0053) Ä(U+00C4) �(U+FFFD) | Hex: 4b4153c384efbfbd
+Count: 12 | Pattern: O(U+004F) Š(U+0160) E(U+0045) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 4fc5a0455649c384efbfbd
+Count: 11 | Pattern: M(U+004D) u(U+0075) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4d756e69c385efbfbd
+Count: 11 | Pattern: n(U+006E) a(U+0061) m(U+006D) i(U+0069) e(U+0065) Å(U+00C5) �(U+FFFD) | Hex: 6e616d6965c385efbfbd
+Count: 11 | Pattern: Š(U+0160) n(U+006E) i(U+0069) u(U+0075) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: c5a06e69756bc385efbfbd
+Count: 11 | Pattern: T(U+0054) r(U+0072) a(U+0061) k(U+006B) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 5472616b69c385efbfbd
+Count: 11 | Pattern: Ė(U+0116) r(U+0072) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: c4967269c385efbfbd
+Count: 11 | Pattern: D(U+0044) .(U+002E) R(U+0052) Å(U+00C5) «(U+00AB) Å(U+00C5) �(U+FFFD) | Hex: 442e52c385c2abc385efbfbd
+Count: 11 | Pattern: r(U+0072) s(U+0073) a(U+0061) k(U+006B) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 7273616b69c385efbfbd
+Count: 11 | Pattern: a(U+0061) r(U+0072) v(U+0076) a(U+0061) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6172766169c385efbfbd
+Count: 11 | Pattern: M(U+004D) .(U+002E) T(U+0054) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4d2e5469c385efbfbd
+Count: 11 | Pattern: k(U+006B) e(U+0065) v(U+0076) i(U+0069) Ä(U+00C4) ¨(U+00A8) | Hex: 6b657669c384c2a8
+Count: 11 | Pattern: A(U+0041) .(U+002E) V(U+0056) a(U+0061) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 412e566169c385efbfbd
+Count: 11 | Pattern: Š(U+0160) v(U+0076) ė(U+0117) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: c5a076c4976bc385efbfbd
+Count: 11 | Pattern: N(U+004E) a(U+0061) t(U+0074) k(U+006B) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4e61746b69c385efbfbd
+Count: 11 | Pattern: V(U+0056) Y(U+0059) D(U+0044) Å(U+00C5) Ŗ(U+0156) | Hex: 565944c385c596
+Count: 11 | Pattern: U(U+0055) L(U+004C) A(U+0041) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 554c415649c384efbfbd
+Count: 11 | Pattern: S(U+0053) T(U+0054) R(U+0052) E(U+0045) L(U+004C) Ä(U+00C4) �(U+FFFD) | Hex: 535452454cc384efbfbd
+Count: 11 | Pattern: B(U+0042) E(U+0045) R(U+0052) Ž(U+017D) I(U+0049) Å(U+00C5) Ŗ(U+0156) | Hex: 424552c5bd49c385c596
+Count: 11 | Pattern: A(U+0041) L(U+004C) A(U+0041) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 414c415649c384efbfbd
+Count: 11 | Pattern: K(U+004B) U(U+0055) R(U+0052) O(U+004F) Ä(U+00C4) �(U+FFFD) | Hex: 4b55524fc384efbfbd
+Count: 11 | Pattern: L(U+004C) E(U+0045) K(U+004B) S(U+0053) I(U+0049) Å(U+00C5) Ŗ(U+0156) | Hex: 4c454b5349c385c596
+Count: 11 | Pattern: V(U+0056) E(U+0045) N(U+004E) C(U+0043) K(U+004B) Å(U+00C5) Ŗ(U+0156) | Hex: 56454e434bc385c596
+Count: 11 | Pattern: O(U+004F) N(U+004E) E(U+0045) L(U+004C) I(U+0049) Å(U+00C5) Ŗ(U+0156) | Hex: 4f4e454c49c385c596
+Count: 10 | Pattern: r(U+0072) k(U+006B) a(U+0061) ž(U+017E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 726b61c5be69c385efbfbd
+Count: 10 | Pattern: N(U+004E) a(U+0061) m(U+006D) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4e616d69c385efbfbd
+Count: 10 | Pattern: V(U+0056) o(U+006F) Å(U+00C5) �(U+FFFD) | Hex: 566fc385efbfbd
+Count: 10 | Pattern: E(U+0045) i(U+0069) Å(U+00C5) �(U+FFFD) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4569c385efbfbd69c385efbfbd
+Count: 10 | Pattern: e(U+0065) l(U+006C) e(U+0065) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 656c656e69c385efbfbd
+Count: 10 | Pattern: B(U+0042) e(U+0065) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 426569c385efbfbd
+Count: 10 | Pattern: €(U+20AC) “(U+201C) V(U+0056) i(U+0069) r(U+0072) Å(U+00C5) �(U+FFFD) | Hex: e282ace2809c566972c385efbfbd
+Count: 10 | Pattern: K(U+004B) Š(U+0160) E(U+0045) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 4bc5a0455649c384efbfbd
+Count: 10 | Pattern: S(U+0053) L(U+004C) E(U+0045) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 534c455649c384efbfbd
+Count: 10 | Pattern: J(U+004A) O(U+004F) K(U+004B) Å(U+00C5) Ŗ(U+0156) | Hex: 4a4f4bc385c596
+Count: 10 | Pattern: A(U+0041) T(U+0054) A(U+0041) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 4154415649c384efbfbd
+Count: 10 | Pattern: N(U+004E) O(U+004F) R(U+0052) K(U+004B) Å(U+00C5) Ŗ(U+0156) | Hex: 4e4f524bc385c596
+Count: 10 | Pattern: V(U+0056) L(U+004C) O(U+004F) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 564c4f5649c384efbfbd
+Count: 10 | Pattern: M(U+004D) K(U+004B) E(U+0045) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 4d4b455649c384efbfbd
+Count: 9 | Pattern: A(U+0041) d(U+0064) u(U+0075) t(U+0074) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4164757469c385efbfbd
+Count: 9 | Pattern: e(U+0065) l(U+006C) e(U+0065) r(U+0072) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 656c657269c385efbfbd
+Count: 9 | Pattern: P(U+0050) e(U+0065) r(U+0072) e(U+0065) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: 506572656bc385efbfbd
+Count: 9 | Pattern: i(U+0069) k(U+006B) e(U+0065) l(U+006C) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 696b656c69c385efbfbd
+Count: 9 | Pattern: K(U+004B) a(U+0061) b(U+0062) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4b616269c385efbfbd
+Count: 9 | Pattern: a(U+0061) g(U+0067) u(U+0075) v(U+0076) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6167757669c385efbfbd
+Count: 9 | Pattern: s(U+0073) i(U+0069) o(U+006F) s(U+0073)  (U+0020) Å(U+00C5) Ŗ(U+0156) | Hex: 73696f7320c385c596
+Count: 9 | Pattern: D(U+0044) a(U+0061) p(U+0070) k(U+006B) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4461706b69c385efbfbd
+Count: 9 | Pattern: E(U+0045) R(U+0052) O(U+004F) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 45524f5649c384efbfbd
+Count: 9 | Pattern: D(U+0044) K(U+004B) E(U+0045) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 444b455649c384efbfbd
+Count: 9 | Pattern: B(U+0042) L(U+004C) E(U+0045) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 424c455649c384efbfbd
+Count: 8 | Pattern: P(U+0050) e(U+0065) m(U+006D) p(U+0070) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 50656d7069c385efbfbd
+Count: 8 | Pattern: i(U+0069) a(U+0061) u(U+0075) Å(U+00C5) �(U+FFFD) | Hex: 696175c385efbfbd
+Count: 8 | Pattern: J(U+004A) u(U+0075) o(U+006F) d(U+0064) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4a756f6469c385efbfbd
+Count: 8 | Pattern: M(U+004D) i(U+0069) l(U+006C) k(U+006B) u(U+0075) Å(U+00C5) �(U+FFFD) | Hex: 4d696c6b75c385efbfbd
+Count: 8 | Pattern: K(U+004B) y(U+0079) v(U+0076) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4b797669c385efbfbd
+Count: 8 | Pattern: t(U+0074) l(U+006C) y(U+0079) b(U+0062) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 746c796269c385efbfbd
+Count: 7 | Pattern: i(U+0069) l(U+006C) p(U+0070) a(U+0061) m(U+006D) Å(U+00C5) «(U+00AB) | Hex: 696c70616dc385c2ab
+Count: 7 | Pattern: T(U+0054) i(U+0069) r(U+0072) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: 5469726bc385efbfbd
+Count: 7 | Pattern: N(U+004E) a(U+0061) k(U+006B) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4e616b69c385efbfbd
+Count: 7 | Pattern: i(U+0069) v(U+0076) y(U+0079) d(U+0064) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6976796469c385efbfbd
+Count: 7 | Pattern: G(U+0047) r(U+0072) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 477269c385efbfbd
+Count: 7 | Pattern: k(U+006B) a(U+0061) b(U+0062) Å(U+00C5) «(U+00AB) | Hex: 6b6162c385c2ab
+Count: 7 | Pattern: P(U+0050) l(U+006C) u(U+0075) t(U+0074) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 506c757469c385efbfbd
+Count: 7 | Pattern: a(U+0061) r(U+0072) t(U+0074) k(U+006B) u(U+0075) Å(U+00C5) �(U+FFFD) | Hex: 6172746b75c385efbfbd
+Count: 7 | Pattern: V(U+0056) e(U+0065) r(U+0072) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 56657269c385efbfbd
+Count: 7 | Pattern: R(U+0052) e(U+0065) Å(U+00C5) �(U+FFFD) | Hex: 5265c385efbfbd
+Count: 7 | Pattern: M(U+004D) i(U+0069) e(U+0065) ž(U+017E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4d6965c5be69c385efbfbd
+Count: 7 | Pattern: K(U+004B) l(U+006C) e(U+0065) b(U+0062) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4b6c656269c385efbfbd
+Count: 7 | Pattern: T(U+0054) r(U+0072) y(U+0079) Å(U+00C5) �(U+FFFD) | Hex: 547279c385efbfbd
+Count: 7 | Pattern: M(U+004D) a(U+0061) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4d6169c385efbfbd
+Count: 7 | Pattern: v(U+0076) o(U+006F) r(U+0072) y(U+0079) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: 766f72796bc385efbfbd
+Count: 6 | Pattern: P(U+0050) i(U+0069) e(U+0065) Å(U+00C5) �(U+FFFD) | Hex: 506965c385efbfbd
+Count: 6 | Pattern: B(U+0042) a(U+0061) u(U+0075) Å(U+00C5) �(U+FFFD) | Hex: 426175c385efbfbd
+Count: 6 | Pattern: e(U+0065) k(U+006B) o(U+006F) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 656b6f6e69c385efbfbd
+Count: 6 | Pattern: g(U+0067) a(U+0061) u(U+0075) d(U+0064) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6761756469c385efbfbd
+Count: 6 | Pattern: I(U+0049) R(U+0052) G(U+0047) I(U+0049) N(U+004E) Ä(U+00C4) �(U+FFFD) | Hex: 495247494ec384efbfbd
+Count: 6 | Pattern: t(U+0074) v(U+0076) i(U+0069) l(U+006C) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 7476696c69c385efbfbd
+Count: 6 | Pattern: A(U+0041) Å(U+00C5) �(U+FFFD) | Hex: 41c385efbfbd
+Count: 6 | Pattern: P(U+0050) l(U+006C) o(U+006F) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: 506c6f6bc385efbfbd
+Count: 6 | Pattern: i(U+0069) r(U+0072) k(U+006B) l(U+006C) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 69726b6c69c385efbfbd
+Count: 6 | Pattern: r(U+0072) o(U+006F)  (U+0020) d(U+0064) e(U+0065) Å(U+00C5) �(U+FFFD) | Hex: 726f206465c385efbfbd
+Count: 6 | Pattern: l(U+006C) e(U+0065) i(U+0069) k(U+006B) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6c65696b69c385efbfbd
+Count: 5 | Pattern: Z(U+005A) a(U+0061) v(U+0076) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 5a617669c385efbfbd
+Count: 5 | Pattern: P(U+0050) e(U+0065) t(U+0074) r(U+0072) o(U+006F) Å(U+00C5) �(U+FFFD) | Hex: 506574726fc385efbfbd
+Count: 5 | Pattern: Š(U+0160) e(U+0065) r(U+0072) k(U+006B) Å(U+00C5) �(U+FFFD) | Hex: c5a065726bc385efbfbd
+Count: 5 | Pattern: P(U+0050) a(U+0061) Ä(U+00C4) Æ(U+00C6) | Hex: 5061c384c386
+Count: 5 | Pattern: i(U+0069) b(U+0062) a(U+0061) r(U+0072) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6962617269c385efbfbd
+Count: 5 | Pattern: k(U+006B) u(U+0075) i(U+0069) Ä(U+00C4) ¨(U+00A8) | Hex: 6b7569c384c2a8
+Count: 5 | Pattern: n(U+006E) i(U+0069) s(U+0073)  (U+0020) s(U+0073) Ä(U+00C4) …(U+2026) | Hex: 6e69732073c384e280a6
+Count: 4 | Pattern: V(U+0056) i(U+0069) l(U+006C) e(U+0065) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 56696c6569c385efbfbd
+Count: 4 | Pattern: M(U+004D) o(U+006F) s(U+0073) t(U+0074) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 4d6f737469c385efbfbd
+Count: 4 | Pattern: V(U+0056) ė(U+0117) r(U+0072) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 56c4977269c385efbfbd
+Count: 4 | Pattern: k(U+006B) u(U+0075) m(U+006D) u(U+0075) l(U+006C) Å(U+00C5) �(U+FFFD) | Hex: 6b756d756cc385efbfbd
+Count: 4 | Pattern:  (U+0020) ā(U+0101) €(U+20AC) ˛(U+02DB) M(U+004D) Å(U+00C5) «(U+00AB) | Hex: 20c481e282accb9b4dc385c2ab
+Count: 4 | Pattern: ,(U+002C)  (U+0020) k(U+006B) r(U+0072) a(U+0061) Å(U+00C5) �(U+FFFD) | Hex: 2c206b7261c385efbfbd
+Count: 4 | Pattern: k(U+006B) i(U+0069) m(U+006D) e(U+0065)  (U+0020) Ä(U+00C4) Æ(U+00C6) | Hex: 6b696d6520c384c386
+Count: 4 | Pattern: €(U+20AC) ˛(U+02DB) U(U+0055) ž(U+017E)  (U+0020) Å(U+00C5) �(U+FFFD) | Hex: e282accb9b55c5be20c385efbfbd
+Count: 4 | Pattern: v(U+0076) i(U+0069) e(U+0065) s(U+0073) i(U+0069) Ä(U+00C4) …(U+2026) | Hex: 7669657369c384e280a6
+Count: 4 | Pattern: e(U+0065) t(U+0074) i(U+0069) n(U+006E) g(U+0067) Ä(U+00C4) …(U+2026) | Hex: 6574696e67c384e280a6
+Count: 3 | Pattern: D(U+0044) R(U+0052) A(U+0041) V(U+0056) I(U+0049) Ä(U+00C4) �(U+FFFD) | Hex: 4452415649c384efbfbd
+Count: 3 | Pattern: s(U+0073)  (U+0020) B(U+0042) i(U+0069) r(U+0072) Å(U+00C5) �(U+FFFD) | Hex: 7320426972c385efbfbd
+Count: 3 | Pattern: D(U+0044) .(U+002E)  (U+0020) R(U+0052) Å(U+00C5) «(U+00AB) | Hex: 442e2052c385c2ab
+Count: 3 | Pattern: s(U+0073) t(U+0074) a(U+0061) j(U+006A) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 7374616a69c385efbfbd
+Count: 3 | Pattern: e(U+0065) v(U+0076) e(U+0065) n(U+006E) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6576656e69c385efbfbd
+Count: 3 | Pattern: M(U+004D) .(U+002E)  (U+0020) R(U+0052) Å(U+00C5) «(U+00AB) | Hex: 4d2e2052c385c2ab
+Count: 2 | Pattern: L(U+004C) Å(U+00C5) «(U+00AB) Å(U+00C5) �(U+FFFD) | Hex: 4cc385c2abc385efbfbd
+Count: 2 | Pattern: t(U+0074) a(U+0061) s(U+0073)  (U+0020) I(U+0049) Å(U+00C5) �(U+FFFD) | Hex: 7461732049c385efbfbd
+Count: 2 | Pattern: o(U+006F) v(U+0076) e(U+0065) r(U+0072) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 6f76657269c385efbfbd
+Count: 1 | Pattern: g(U+0067) i(U+0069) n(U+006E) i(U+0069) e(U+0065) Ä(U+00C4) ¨(U+00A8) | Hex: 67696e6965c384c2a8
+Count: 1 | Pattern: s(U+0073) l(U+006C) a(U+0061) v(U+0076) i(U+0069) Å(U+00C5) �(U+FFFD) | Hex: 736c617669c385efbfbd

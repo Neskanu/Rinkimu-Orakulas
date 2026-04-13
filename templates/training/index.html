@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex flex-col space-y-8">
+    <div class="flex justify-between items-start">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-900">Model Management & Training</h1>
+            <p class="text-slate-500">Configure your model ensemble and trigger automated hyperparameter tuning.</p>
+        </div>
+        <div class="bg-indigo-50 border border-indigo-100 p-6 rounded-2xl flex flex-col space-y-4 shadow-sm w-full md:w-auto">
+            <div class="flex items-center space-x-4">
+                <div class="flex flex-col">
+                    <span class="text-xs text-indigo-400 uppercase font-bold">Training Timeout (s)</span>
+                    <input type="number" id="timeout" value="60" class="w-16 bg-transparent border-0 p-0 text-xl font-black text-indigo-700 focus:ring-0">
+                </div>
+                <button onclick="startTraining()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg shadow-indigo-200">
+                    Retrain Selected Models
+                </button>
+            </div>
+            
+            <div class="flex flex-wrap gap-4 pt-4 border-t border-indigo-100">
+                <label class="flex items-center space-x-2 text-sm font-bold text-indigo-900 cursor-pointer">
+                    <input type="checkbox" name="models" value="rf" checked class="rounded border-indigo-300 text-indigo-600 focus:ring-indigo-500">
+                    <span>RF</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm font-bold text-indigo-900 cursor-pointer">
+                    <input type="checkbox" name="models" value="nn" checked class="rounded border-indigo-300 text-indigo-600 focus:ring-indigo-500">
+                    <span>NN</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm font-bold text-indigo-900 cursor-pointer">
+                    <input type="checkbox" name="models" value="catboost" checked class="rounded border-indigo-300 text-indigo-600 focus:ring-indigo-500">
+                    <span>CatBoost</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm font-bold text-indigo-900 cursor-pointer">
+                    <input type="checkbox" name="models" value="xgboost" class="rounded border-indigo-300 text-indigo-600 focus:ring-indigo-500">
+                    <span>XGB</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm font-bold text-indigo-900 cursor-pointer">
+                    <input type="checkbox" name="models" value="lgbm" class="rounded border-indigo-300 text-indigo-600 focus:ring-indigo-500">
+                    <span>LGBM</span>
+                </label>
+                <label class="flex items-center space-x-2 text-sm font-bold text-indigo-900 cursor-pointer">
+                    <input type="checkbox" name="models" value="elasticnet" class="rounded border-indigo-300 text-indigo-600 focus:ring-indigo-500">
+                    <span>ElasticPoly</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Training / Progress -->
+    <div id="training-status" class="hidden bg-white p-8 rounded-3xl border-2 border-indigo-100 shadow-sm space-y-6">
+        <div class="flex justify-between items-center">
+            <h2 class="text-xl font-bold text-slate-900 flex items-center">
+                <span class="animate-pulse w-3 h-3 bg-indigo-500 rounded-full mr-3"></span>
+                Training in Progress...
+            </h2>
+            <p id="current-stage" class="text-indigo-600 font-mono text-sm"></p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div id="progress-graph" class="w-full h-[300px]"></div>
+            <div class="flex flex-col justify-center space-y-4">
+                <div class="bg-slate-50 p-4 rounded-2xl">
+                    <span class="text-xs text-slate-400 uppercase font-bold">Latest Metric</span>
+                    <span id="latest-metric" class="text-3xl font-black text-slate-700">--</span>
+                </div>
+                <div id="training-message" class="text-sm text-slate-500 italic"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ensemble Mixing Sliders -->
+    <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm space-y-8">
+        <div class="flex justify-between items-center">
+            <div>
+                <h2 class="text-2xl font-bold text-slate-900">Ensemble Mixing</h2>
+                <p class="text-slate-500 text-sm">Balanced ensemble: <span id="mix-total" class="font-bold">100%</span></p>
+            </div>
+            <button onclick="saveWeights()" class="bg-slate-900 text-white px-6 py-2 rounded-xl text-sm font-bold hover:bg-black transition-all">
+                Save & Deploy Mix
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <!-- RF Slider -->
+            <div class="space-y-4">
+                <div class="flex justify-between items-center text-sm">
+                    <span class="font-bold text-slate-700">Random Forest</span>
+                    <button onclick="toggleLock('rf')" id="lock-rf" class="p-1 text-slate-400 hover:text-indigo-600 transition-colors">
+                        <svg id="icon-rf-unlocked" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 00-2 2z" /></svg>
+                        <svg id="icon-rf-locked" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" /></svg>
+                    </button>
+                </div>
+                <input type="range" id="slider-rf" min="0" max="100" value="{{ config.rf_weight * 100 }}" oninput="onSliderChange('rf')" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                <div class="text-3xl font-black text-slate-900"><span id="val-rf">{{ (config.rf_weight * 100)|round|int }}</span>%</div>
+            </div>
+
+            <!-- NN Slider -->
+            <div class="space-y-4">
+                <div class="flex justify-between items-center text-sm">
+                    <span class="font-bold text-slate-700">Neural Network</span>
+                    <button onclick="toggleLock('nn')" id="lock-nn" class="p-1 text-slate-400 hover:text-indigo-600 transition-colors">
+                        <svg id="icon-nn-unlocked" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 00-2 2z" /></svg>
+                        <svg id="icon-nn-locked" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" /></svg>
+                    </button>
+                </div>
+                <input type="range" id="slider-nn" min="0" max="100" value="{{ config.nn_weight * 100 }}" oninput="onSliderChange('nn')" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                <div class="text-3xl font-black text-slate-900"><span id="val-nn">{{ (config.nn_weight * 100)|round|int }}</span>%</div>
+            </div>
+
+            <!-- CatBoost Slider -->
+            <div class="space-y-4">
+                <div class="flex justify-between items-center text-sm">
+                    <span class="font-bold text-slate-700">CatBoost</span>
+                    <button onclick="toggleLock('catboost')" id="lock-catboost" class="p-1 text-slate-400 hover:text-indigo-600 transition-colors">
+                        <svg id="icon-catboost-unlocked" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 00-2 2z" /></svg>
+                        <svg id="icon-catboost-locked" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" /></svg>
+                    </button>
+                </div>
+                <input type="range" id="slider-catboost" min="0" max="100" value="{{ config.catboost_weight * 100 }}" oninput="onSliderChange('catboost')" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                <div class="text-3xl font-black text-slate-900"><span id="val-catboost">{{ (config.catboost_weight * 100)|round|int }}</span>%</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+    let isTraining = false;
+    let locks = { rf: false, nn: false, catboost: false };
+
+    function toggleLock(id) {
+        locks[id] = !locks[id];
+        document.getElementById(`icon-${id}-locked`).classList.toggle('hidden', !locks[id]);
+        document.getElementById(`icon-${id}-unlocked`).classList.toggle('hidden', locks[id]);
+        document.getElementById(`slider-${id}`).disabled = locks[id];
+    }
+
+    function onSliderChange(changedId) {
+        const ids = ['rf', 'nn', 'catboost'];
+        let sliders = {
+            rf: parseFloat(document.getElementById('slider-rf').value),
+            nn: parseFloat(document.getElementById('slider-nn').value),
+            catboost: parseFloat(document.getElementById('slider-catboost').value)
+        };
+
+        const changedVal = sliders[changedId];
+        const unlockedIds = ids.filter(id => id !== changedId && !locks[id]);
+        
+        if (unlockedIds.length > 0) {
+            const currentOtherSum = unlockedIds.reduce((sum, id) => sum + sliders[id], 0);
+            const remaining = 100 - changedVal - ids.filter(id => id !== changedId && locks[id]).reduce((sum, id) => sum + sliders[id], 0);
+            
+            if (currentOtherSum === 0) {
+                // If others were zero, distribute equally
+                unlockedIds.forEach(id => {
+                    sliders[id] = remaining / unlockedIds.length;
+                });
+            } else {
+                // Distribute proportionally
+                unlockedIds.forEach(id => {
+                    sliders[id] = (sliders[id] / currentOtherSum) * remaining;
+                });
+            }
+        } else {
+             // If no one to distribute to, snap back or allow if sum is 100
+             // For now we just allow it but it might not sum to 100
+        }
+
+        // Update UI
+        ids.forEach(id => {
+            const val = Math.max(0, Math.min(100, Math.round(sliders[id])));
+            document.getElementById(`slider-${id}`).value = val;
+            document.getElementById(`val-${id}`).innerText = val;
+        });
+        
+        const total = Math.round(Object.values(sliders).reduce((a,b) => a+b, 0));
+        document.getElementById('mix-total').innerText = total + "%";
+    }
+
+    async function saveWeights() {
+        const data = {
+            rf: parseFloat(document.getElementById('slider-rf').value) / 100,
+            nn: parseFloat(document.getElementById('slider-nn').value) / 100,
+            catboost: parseFloat(document.getElementById('slider-catboost').value) / 100
+        };
+        await fetch('/training/update_weights', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        alert('Ensemble weights locked and deployed!');
+    }
+
+    async function startTraining() {
+        const timeout = document.getElementById('timeout').value;
+        const selectedModels = Array.from(document.querySelectorAll('input[name="models"]:checked')).map(cb => cb.value);
+        
+        if (selectedModels.length === 0) {
+            alert("Please select at least one model to train.");
+            return;
+        }
+
+        const resp = await fetch('/training/start', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ timeout: parseInt(timeout), models: selectedModels })
+        });
+        if (resp.ok) {
+            isTraining = true;
+            document.getElementById('training-status').classList.remove('hidden');
+            pollMetrics();
+        }
+    }
+
+    async function pollMetrics() {
+        if (!isTraining) return;
+        try {
+            const resp = await fetch('/training/metrics');
+            const data = await resp.json();
+            
+            // Show the first one that is currently in training/optuna
+            const activeModelKey = Object.keys(data).find(k => data[k].current_stage != 'Finished');
+            const displayKey = activeModelKey || Object.keys(data)[0];
+            
+            if (displayKey) {
+                const modelData = data[displayKey];
+                document.getElementById('current-stage').innerHTML = `<span class="bg-indigo-600 text-white px-3 py-1 rounded-full text-xs mr-2 font-black">${displayKey.toUpperCase()}</span> ${modelData.current_stage}`;
+                document.getElementById('latest-metric').innerText = parseFloat(modelData.current_value).toFixed(4);
+                document.getElementById('training-message').innerText = modelData.message || "";
+                
+                const y = modelData.history.map(h => h.value);
+                const x = modelData.history.map((_, i) => i);
+                
+                const trace = { x: x, y: y, type: 'scatter', mode: 'lines+markers', line: {color: '#6366f1'} };
+                const layout = { 
+                    margin: { t: 0, r: 0, b: 20, l: 30 },
+                    paper_bgcolor: 'rgba(0,0,0,0)',
+                    plot_bgcolor: 'rgba(0,0,0,0)',
+                    xaxis: { showgrid: false },
+                    yaxis: { showgrid: true, gridcolor: '#f1f5f9' }
+                };
+                Plotly.newPlot('progress-graph', [trace], layout, {responsive: true, displayModeBar: false});
+            }
+        } finally {
+            setTimeout(pollMetrics, 2000);
+        }
+    }
+</script>
+{% endblock %}
