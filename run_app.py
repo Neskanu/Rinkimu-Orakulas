@@ -24,4 +24,7 @@ def create_app():
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(debug=True, port=5000, use_reloader=False)
+    print("\n" + "="*50)
+    print("--- STARTING ELECTION ORACLE V2 (PORT 5001) ---")
+    print("="*50 + "\n")
+    app.run(debug=True, port=5001, use_reloader=True)

@@ -216,3 +216,4 @@ def train_suite(models, params=None, timeout=60):
     except Exception as e:
         print(f"Thread Failure: {str(e)}")
         return str(e)
+        return str(e)

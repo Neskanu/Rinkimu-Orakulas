@@ -32,9 +32,19 @@ class DataProcessor:
         # Force numeric types before math to prevent 'garbage' training targets
         full_df['BALSU_VISO'] = pd.to_numeric(full_df['BALSU_VISO'], errors='coerce').fillna(0)
         full_df['VISO_DALYVAVO'] = pd.to_numeric(full_df['VISO_DALYVAVO'], errors='coerce').fillna(0)
+        full_df['RINKEJU_SKAICIUS'] = pd.to_numeric(full_df['RINKEJU_SKAICIUS'], errors='coerce').fillna(0)
         
-        # Calculate Vote Share (0-100 scale)
-        full_df['VOTE_SHARE'] = (full_df['BALSU_VISO'] / full_df['VISO_DALYVAVO'].replace(0, 1)) * 100
+        # Drop rows where VISO_DALYVAVO is 0 — we cannot calculate a meaningful
+        # vote share without a valid total-participants count. This removes the
+        # entire 2012 dataset (which has all-zero VISO_DALYVAVO) and any broken
+        # precinct rows in other years.
+        full_df = full_df[full_df['VISO_DALYVAVO'] > 0].copy()
+        
+        # Calculate Vote Share (0-100 scale) — safe now that denominator > 0
+        full_df['VOTE_SHARE'] = (full_df['BALSU_VISO'] / full_df['VISO_DALYVAVO']) * 100
+        
+        # Safety clamp: vote share must be 0-100%
+        full_df['VOTE_SHARE'] = full_df['VOTE_SHARE'].clip(0, 100)
         
         # Train-Test Split: Strictly enforce 2024 as hold-out
         train_df = full_df[full_df['YEAR'] < 2024].copy()

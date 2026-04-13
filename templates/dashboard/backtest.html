@@ -9,56 +9,61 @@
             <h1 class="text-3xl font-bold text-slate-900">Backtest Analysis</h1>
             <p class="text-slate-500 mt-1">Model predictions vs. actual 2024 election results.</p>
             {% if model_type_label and model_type_label != 'None' %}
-            <span class="inline-flex items-center mt-2 px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700">
+            <span
+                class="inline-flex items-center mt-2 px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700">
                 Active model: {{ model_type_label | upper }}
             </span>
             {% endif %}
         </div>
 
-        <form id="filter-form" class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-wrap items-end gap-4">
+        <form id="filter-form"
+            class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-wrap items-end gap-4">
             <div class="flex flex-col">
                 <span class="text-[10px] text-slate-400 uppercase font-black mb-1">Model Selection</span>
-                <select name="model" onchange="this.form.submit()" class="rounded-xl border-slate-200 text-sm focus:ring-indigo-500 min-w-[150px]">
+                <select name="model" onchange="this.form.submit()"
+                    class="rounded-xl border-slate-200 text-sm focus:ring-indigo-500 min-w-[150px]">
                     {% for m in available_models %}
-                        {% if m is string %}
-                            {% set m_id, m_label = m, m %}
-                        {% elif m is mapping %}
-                            {% set m_id, m_label = m.id, m.label %}
-                        {% else %}
-                            {% set m_id, m_label = m[0], m[1] %}
-                        {% endif %}
-                        <option value="{{ m_id }}" {% if m_id == selected_model %}selected{% endif %}>{{ m_label }}</option>
+                    <option value="{{ m.id }}" {% if m.id == selected_model %}selected{% endif %}>
+                        {{ m.label }}
+                    </option>
                     {% endfor %}
                 </select>
             </div>
 
             <div class="flex flex-col">
                 <span class="text-[10px] text-slate-400 uppercase font-black mb-1">District (Apygarda)</span>
-                <select name="district" onchange="this.form.submit()" class="rounded-xl border-slate-200 text-sm focus:ring-indigo-500 min-w-[200px]">
+                <select name="district" onchange="this.form.submit()"
+                    class="rounded-xl border-slate-200 text-sm focus:ring-indigo-500 min-w-[200px]">
                     <option value="">National (All)</option>
                     {% for d in districts %}
-                    <option value="{{ d }}" {% if d == selected_district %}selected{% endif %}>{{ d }}</option>
+                    <option value="{{ d }}" {% if d==selected_district %}selected{% endif %}>{{ d }}</option>
                     {% endfor %}
                 </select>
             </div>
             {% if selected_district %}
             <div class="flex flex-col">
                 <span class="text-[10px] text-slate-400 uppercase font-black mb-1">Precinct (Apylinkė)</span>
-                <select name="precinct" onchange="this.form.submit()" class="rounded-xl border-slate-200 text-sm focus:ring-indigo-500 min-w-[200px]">
+                <select name="precinct" onchange="this.form.submit()"
+                    class="rounded-xl border-slate-200 text-sm focus:ring-indigo-500 min-w-[200px]">
                     <option value="">All Precincts</option>
                     {% for p in precincts %}
-                    <option value="{{ p }}" {% if p == selected_precinct %}selected{% endif %}>{{ p }}</option>
+                    <option value="{{ p }}" {% if p==selected_precinct %}selected{% endif %}>{{ p }}</option>
                     {% endfor %}
                 </select>
             </div>
             {% endif %}
-            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-black text-sm transition-all shadow-lg shadow-indigo-100 flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <button type="submit"
+                class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-black text-sm transition-all shadow-lg shadow-indigo-100 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
                 Run Analysis
             </button>
             <a href="/dashboard/backtest" class="text-slate-400 hover:text-indigo-600 p-2 mb-1" title="Reset filters">
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
             </a>
         </form>
@@ -66,7 +71,8 @@
 
     {% if error_msg %}
     <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-amber-800 font-medium">
-        ⚠️ {{ error_msg }} — Go to <a href="/training/" class="text-indigo-600 font-bold hover:underline">Models</a> to train.
+        ⚠️ {{ error_msg }} — Go to <a href="/training/" class="text-indigo-600 font-bold hover:underline">Models</a> to
+        train.
     </div>
     {% endif %}
 
@@ -88,12 +94,15 @@
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-2xl font-bold text-slate-900">District Breakdown</h2>
             <div class="flex items-center gap-4 text-xs font-bold">
-                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-indigo-600 inline-block"></span> Actual</span>
-                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-400 inline-block"></span> Predicted</span>
+                <span class="flex items-center gap-1.5"><span
+                        class="w-3 h-3 rounded-full bg-indigo-600 inline-block"></span> Actual</span>
+                <span class="flex items-center gap-1.5"><span
+                        class="w-3 h-3 rounded-full bg-amber-400 inline-block"></span> Predicted</span>
             </div>
         </div>
         <div class="space-y-3" id="district-list">
             {% for dist in district_data %}
+            {% set dist_idx = loop.index %}
             <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
                 <!-- District Header (clickable) -->
                 <button onclick="toggleDistrict('dist-{{ loop.index }}')"
@@ -103,11 +112,13 @@
                         <div>
                             <h3 class="font-bold text-slate-900">{{ dist.name }}</h3>
                             <div class="flex gap-4 mt-0.5">
-                                <span class="text-xs text-slate-500">Top Party: <strong class="text-indigo-700">{{ dist.parties[0].SARASO_PAVADINIMAS }}</strong></span>
+                                <span class="text-xs text-slate-500">Top Party: <strong class="text-indigo-700">{{
+                                        dist.parties[0].SARASO_PAVADINIMAS if dist.parties else 'N/A' }}</strong></span>
                             </div>
                         </div>
                     </div>
-                    <svg class="w-5 h-5 text-slate-400 transform transition-transform" id="arrow-dist-{{ loop.index }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-5 h-5 text-slate-400 transform transition-transform" id="arrow-dist-{{ loop.index }}"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
                 </button>
@@ -116,7 +127,8 @@
                 <div id="dist-{{ loop.index }}" class="hidden border-t border-slate-50">
                     <!-- District Level Party Comparison Table -->
                     <div class="p-5 pb-3">
-                        <h4 class="text-xs uppercase font-black text-slate-400 tracking-wider mb-3">District-Level Results</h4>
+                        <h4 class="text-xs uppercase font-black text-slate-400 tracking-wider mb-3">District-Level
+                            Results</h4>
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm">
                                 <thead>
@@ -130,18 +142,28 @@
                                 </thead>
                                 <tbody class="divide-y divide-slate-50">
                                     {% for p in dist.parties %}
-                                    {% set err = (p.PREDICTED - p.VOTE_SHARE) %}
+                                    {% set err = (p.PREDICTED - p.ACTUAL) %}
                                     <tr class="hover:bg-slate-50">
-                                        <td class="py-2 pr-4 font-medium text-slate-800 max-w-[200px] truncate">{{ p.SARASO_PAVADINIMAS }}</td>
-                                        <td class="py-2 text-right text-indigo-600 font-bold">{{ "%.1f"|format(p.VOTE_SHARE) }}%</td>
-                                        <td class="py-2 text-right text-amber-600 font-bold">{{ "%.1f"|format(p.PREDICTED) }}%</td>
-                                        <td class="py-2 text-right font-bold {% if err > 0 %}text-emerald-600{% else %}text-rose-500{% endif %}">
+                                        <td class="py-2 pr-4 font-medium text-slate-800 max-w-[200px] truncate">{{
+                                            p.SARASO_PAVADINIMAS }}</td>
+                                        <td class="py-2 text-right text-indigo-600 font-bold">{{
+                                            "%.1f"|format(p.ACTUAL) }}%</td>
+                                        <td class="py-2 text-right text-amber-600 font-bold">{{
+                                            "%.1f"|format(p.PREDICTED) }}%</td>
+                                        <td
+                                            class="py-2 text-right font-bold {% if err > 0 %}text-emerald-600{% else %}text-rose-500{% endif %}">
                                             {{ "%+.1f"|format(err) }}pp
                                         </td>
                                         <td class="py-2 pl-3">
                                             <div class="flex gap-0.5 items-center h-4">
-                                                <div class="bg-indigo-400 rounded-l h-3" style="width: {{ [p.VOTE_SHARE * 3, 120]|min|round|int }}px;"></div>
-                                                <div class="bg-amber-400 rounded-r h-3" style="width: {{ [p.PREDICTED * 3, 120]|min|round|int }}px;"></div>
+                                                {% set act_val = p.ACTUAL * 1.5 %}
+                                                {% if act_val > 100 %}{% set act_val = 100 %}{% endif %}
+                                                {% set prd_val = p.PREDICTED * 1.5 %}
+                                                {% if prd_val > 100 %}{% set prd_val = 100 %}{% endif %}
+                                                <div class="bg-indigo-400 rounded-l h-3"
+                                                    style="width: {{ act_val|int }}px;"></div>
+                                                <div class="bg-amber-400 rounded-r h-3"
+                                                    style="width: {{ prd_val|int }}px;"></div>
                                             </div>
                                         </td>
                                     </tr>
@@ -160,19 +182,21 @@
                         <div class="space-y-2">
                             {% for prec in dist.precincts %}
                             <div class="bg-slate-50 rounded-xl overflow-hidden">
-                                <button onclick="toggleDistrict('prec-{{ loop.index }}-{{ dist.name|replace(' ', '_') }}')"
+                                <button onclick="toggleDistrict('prec-{{ dist_idx }}-{{ loop.index }}')"
                                     class="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-100 transition-colors text-left text-xs">
                                     <span class="font-semibold text-slate-700">{{ prec.name }}</span>
                                     <svg class="w-3 h-3 text-slate-400 transform transition-transform"
-                                        id="arrow-prec-{{ loop.index }}-{{ dist.name|replace(' ', '_') }}"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                        id="arrow-prec-{{ dist_idx }}-{{ loop.index }}" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </button>
-                                <div id="prec-{{ loop.index }}-{{ dist.name|replace(' ', '_') }}" class="hidden px-4 pb-3">
+                                <div id="prec-{{ dist_idx }}-{{ loop.index }}" class="hidden px-4 pb-3">
                                     <table class="w-full text-xs">
                                         <thead>
-                                            <tr class="text-[10px] text-slate-400 uppercase font-black border-b border-slate-200">
+                                            <tr
+                                                class="text-[10px] text-slate-400 uppercase font-black border-b border-slate-200">
                                                 <th class="text-left pb-1.5">Party</th>
                                                 <th class="text-right pb-1.5">Actual</th>
                                                 <th class="text-right pb-1.5">Predicted</th>
@@ -181,12 +205,17 @@
                                         </thead>
                                         <tbody class="divide-y divide-slate-100">
                                             {% for p in prec.parties %}
-                                            {% set err = (p.PREDICTED - p.VOTE_SHARE) %}
+                                            {% set err = (p.PREDICTED - p.ACTUAL) %}
                                             <tr>
-                                                <td class="py-1.5 pr-3 font-medium text-slate-700 max-w-[180px] truncate">{{ p.SARASO_PAVADINIMAS }}</td>
-                                                <td class="py-1.5 text-right text-indigo-600 font-semibold">{{ "%.1f"|format(p.VOTE_SHARE) }}%</td>
-                                                <td class="py-1.5 text-right text-amber-600 font-semibold">{{ "%.1f"|format(p.PREDICTED) }}%</td>
-                                                <td class="py-1.5 text-right {% if err > 0 %}text-emerald-600{% else %}text-rose-500{% endif %} font-semibold">
+                                                <td
+                                                    class="py-1.5 pr-3 font-medium text-slate-700 max-w-[180px] truncate">
+                                                    {{ p.SARASO_PAVADINIMAS }}</td>
+                                                <td class="py-1.5 text-right text-indigo-600 font-semibold">{{
+                                                    "%.1f"|format(p.ACTUAL) }}%</td>
+                                                <td class="py-1.5 text-right text-amber-600 font-semibold">{{
+                                                    "%.1f"|format(p.PREDICTED) }}%</td>
+                                                <td
+                                                    class="py-1.5 text-right {% if err > 0 %}text-emerald-600{% else %}text-rose-500{% endif %} font-semibold">
                                                     {{ "%+.1f"|format(err) }}pp
                                                 </td>
                                             </tr>
@@ -216,18 +245,21 @@
                 <div class="flex justify-between items-start mb-3">
                     <div>
                         <h3 class="font-bold text-lg text-slate-900">{{ model_name }}</h3>
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-indigo-100 text-indigo-700">
+                        <span
+                            class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-indigo-100 text-indigo-700">
                             {{ stats.type | upper if stats.type else 'Active' }}
                         </span>
                     </div>
                 </div>
                 <div class="grid grid-cols-1 gap-3">
                     <div class="bg-indigo-50 p-3 rounded-xl text-center">
-                        <span class="block text-[10px] text-indigo-400 uppercase font-black mb-0.5">Mean Absolute Error (MAE)</span>
+                        <span class="block text-[10px] text-indigo-400 uppercase font-black mb-0.5">Mean Absolute Error
+                            (MAE)</span>
                         <span class="text-2xl font-black text-indigo-700">{{ "%.4f"|format(stats.mae) }}</span>
                     </div>
                 </div>
-                <p class="mt-3 text-[10px] text-slate-400 text-right">Trained: {{ stats.date.strftime('%Y-%m-%d %H:%M') }}</p>
+                <p class="mt-3 text-[10px] text-slate-400 text-right">Trained: {{ stats.date.strftime('%Y-%m-%d %H:%M')
+                    }}</p>
             </div>
             {% endfor %}
         </div>
@@ -252,13 +284,13 @@
 {% endif %}
 
 <script>
-function toggleDistrict(id) {
-    const el = document.getElementById(id);
-    const arrow = document.getElementById('arrow-' + id);
-    if (!el) return;
-    const isHidden = el.classList.contains('hidden');
-    el.classList.toggle('hidden');
-    if (arrow) arrow.classList.toggle('rotate-180');
-}
+    function toggleDistrict(id) {
+        const el = document.getElementById(id);
+        const arrow = document.getElementById('arrow-' + id);
+        if (!el) return;
+        const isHidden = el.classList.contains('hidden');
+        el.classList.toggle('hidden');
+        if (arrow) arrow.classList.toggle('rotate-180');
+    }
 </script>
 {% endblock %}
