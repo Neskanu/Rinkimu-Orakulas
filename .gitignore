@@ -22,6 +22,36 @@ app/ml/models/*.joblib
 app/data/training/*.csv
 app/data/training/*.xlsx
 
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+.env
+.env.local
+*.env.*
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Logs
+*.log
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+
+# Coverage
+.coverage
+coverage/
+htmlcov/
+
 # OS
 .DS_Store
 Thumbs.db

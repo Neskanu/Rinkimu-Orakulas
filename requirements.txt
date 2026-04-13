@@ -4,6 +4,6 @@ alembic
 pandas
 scikit-learn
 torch
-plotly
+plotly>=6.0.0
 python-dotenv
 numpy

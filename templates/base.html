@@ -1,29 +1,45 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rinkimų Orakulas - Lithuanian Election Predictions</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Outfit', sans-serif; background-color: #f8fafc; }
-        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
     </style>
 </head>
+
 <body class="text-slate-800 h-full flex flex-col min-h-screen">
     <nav class="bg-indigo-900 text-white shadow-lg sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center">
-                    <a href="/" class="text-xl font-bold tracking-tight">Rinkimų <span class="text-indigo-400">Orakulas</span></a>
-                <div class="hidden sm:ml-8 sm:flex sm:space-x-8">
-                    <a href="/dashboard/" class="text-indigo-200 hover:text-white inline-flex items-center px-1 pt-1 text-sm font-medium">Dashboard</a>
-                    <a href="/dashboard/backtest" class="text-indigo-200 hover:text-white inline-flex items-center px-1 pt-1 text-sm font-medium">Backtest</a>
-                    <a href="/training/" class="text-indigo-200 hover:text-white inline-flex items-center px-1 pt-1 text-sm font-medium">Models</a>
-                    <a href="/forecast/" class="text-white inline-flex items-center px-1 pt-1 text-sm font-bold border-b-2 border-white">2028 Oracle</a>
-                </div>
+                    <a href="/" class="text-xl font-bold tracking-tight">Rinkimų <span
+                            class="text-indigo-400">Orakulas</span></a>
+                    <div class="hidden sm:ml-8 sm:flex sm:space-x-8">
+                        <a href="/dashboard/"
+                            class="text-indigo-200 hover:text-white inline-flex items-center px-1 pt-1 text-sm font-medium">Dashboard</a>
+                        <a href="/dashboard/backtest"
+                            class="text-indigo-200 hover:text-white inline-flex items-center px-1 pt-1 text-sm font-medium">Backtest</a>
+                        <a href="/training/"
+                            class="text-indigo-200 hover:text-white inline-flex items-center px-1 pt-1 text-sm font-medium">Models</a>
+                        <a href="/forecast/"
+                            class="text-white inline-flex items-center px-1 pt-1 text-sm font-bold border-b-2 border-white">2028
+                            Oracle</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -39,4 +55,5 @@
         </div>
     </footer>
 </body>
+
 </html>
