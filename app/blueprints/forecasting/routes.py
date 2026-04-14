@@ -43,7 +43,8 @@ def load_ensemble():
     models_dict = {}
     
     # Pridėjome 'lightgbm' kaip galimą failo pavadinimą (kadangi lgbm kartais išsaugomas taip)
-    for mid in ['rf', 'xgboost', 'lgbm', 'lightgbm', 'elasticnet', 'nn']:
+    # Pridėjome visus neuroninius tinklus ir SVR
+    for mid in ['rf', 'xgboost', 'lgbm', 'lightgbm', 'elasticnet', 'nn', 'dnn', 'wnn', 'svr']:
         # Tikriname abu variantus
         path1 = f'app/ml/models/{mid}_tuned.pkl'
         path2 = f'app/ml/models/{mid}_model.pkl'
