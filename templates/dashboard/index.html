@@ -10,7 +10,7 @@
         <form action="/dashboard/" method="get" class="flex items-center space-x-4">
             <select name="year" onchange="this.form.submit()"
                 class="rounded-xl border-slate-200 text-sm focus:ring-indigo-500 focus:border-indigo-500">
-                <option value="2024" {% if year==2024 %}selected{% endif %}>2024 (Naujausi)</option>
+                <option value="2024" {% if year==2024 %}selected{% endif %}>2024 (Latest)</option>
                 <option value="2020" {% if year==2020 %}selected{% endif %}>2020</option>
                 <option value="2016" {% if year==2016 %}selected{% endif %}>2016</option>
                 <option value="2012" {% if year==2012 %}selected{% endif %}>2012</option>
@@ -18,16 +18,16 @@
 
             <select name="district" onchange="this.form.submit()"
                 class="rounded-xl border-slate-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 min-w-[200px]">
-                <option value="">Visos Apygardos</option>
+                <option value="">Full National Data</option>
                 {% for d in districts %}
-                <option value="{{ d }}" {% if d==selected_distric t %}selected{% endif %}>{{ d }}</option>
+                <option value="{{ d }}" {% if d==selected_district %}selected{% endif %}>{{ d }}</option>
                 {% endfor %}
             </select>
 
             {% if selected_district %}
             <select name="precinct" onchange="this.form.submit()"
                 class="rounded-xl border-slate-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 min-w-[200px]">
-                <option value="">Visos Apylinkės</option>
+                <option value="">All Precincts</option>
                 {% for p in precincts %}
                 <option value="{{ p }}" {% if p==selected_precinct %}selected{% endif %}>{{ p }}</option>
                 {% endfor %}
@@ -37,28 +37,28 @@
     </div>
 
     {% if plot_json %}
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full">
-        <!-- Pie Chart -->
-        <div class="glass p-8 rounded-[2rem] border border-white/20 shadow-xl shadow-indigo-100/20 flex flex-col">
-            <div id="pie-chart" class="w-full h-[500px]"></div>
+    <div class="flex flex-col space-y-8 w-full">
+        <!-- Bar Chart -->
+        <div
+            class="glass p-8 rounded-[2rem] border border-white/20 shadow-xl shadow-indigo-100/20 flex flex-col w-full">
+            <div id="bar-chart" class="w-full h-[500px]"></div>
         </div>
 
-        <!-- Bar Chart -->
-        <div class="glass p-8 rounded-[2rem] border border-white/20 shadow-xl shadow-indigo-100/20 flex flex-col">
-            <div id="bar-chart" class="w-full h-[500px]"></div>
+        <!-- Pie Chart -->
+        <div
+            class="glass p-8 rounded-[2rem] border border-white/20 shadow-xl shadow-indigo-100/20 flex flex-col w-full">
+            <div id="pie-chart" class="w-full h-[550px]"></div>
         </div>
     </div>
 
-
+    <!-- Modelių statistika išimta, nes ne iki galo veikia -->
     {% endif %}
 </div>
 
 {% if plot_json %}
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <script>
-    // Saugus modernus parsingo metodas (naudojame viengubas kabutes)
-    const barData = JSON.parse('{{ plot_json | safe }}');
-    const pieData = JSON.parse('{{ pie_json | safe }}');
+    const barData = {{ plot_json | safe }};
+    const pieData = {{ pie_json | safe }};
 
     const config = { responsive: true, displayModeBar: false };
 
