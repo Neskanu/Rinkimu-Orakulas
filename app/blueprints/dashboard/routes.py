@@ -14,6 +14,9 @@ import pickle
 import os
 
 dashboard_bp = Blueprint('dashboard', __name__)
+# NAUJA: In-memory kešas (atmintis) greitam krovimui
+TEST_DF_CACHE = None
+INFERENCE_CACHE = {}
 
 def get_vote_col(df):
     """Identify the specific party vote column, strictly avoiding precinct-level totals."""
@@ -282,94 +285,120 @@ def index():
 def backtest():
     district_filter = request.args.get('district')
     precinct_filter = request.args.get('precinct')
-    model_id = request.args.get('model', type=int)
+    
+    # 1. SAUGUS MODELIO ID GAVIMAS
+    raw_model_id = request.args.get('model')
+    model_id = int(raw_model_id) if raw_model_id and raw_model_id.isdigit() else None
 
-    # 1. Duomenų paruošimas (Nereikalauja pagrindinės sesijos)
-    processor = DataProcessor()
-    _, test_df = processor.prepare_training_data()
-
+    # Inicializuojame kintamuosius
     scatter_json = None
     comp_json = None
     district_data = []
     model_type_label = "None"
     error_msg = None
 
-    if test_df is not None and not test_df.empty:
-        # 2. Vykdome prognozes
-        result_df, model_type_label, actual_id = run_inference_on_2024(test_df, model_id)
-        model_id = actual_id # Atnaujiname ID į tą, kuris realiai buvo panaudotas
+    global TEST_DF_CACHE, INFERENCE_CACHE
 
-        if result_df is not None:
+    # 2. RANDAME GERIAUSIĄ MODELĮ
+    if not model_id:
+        with SessionLocal() as session:
+            best_model = session.execute(
+                select(MLModelRegistry).order_by(MLModelRegistry.mae.asc())
+            ).scalars().first()
+            if best_model:
+                model_id = best_model.id
+    
+    cache_key = str(model_id) if model_id else "unknown"
+
+    # 3. DUOMENŲ PARUOŠIMAS 
+    if TEST_DF_CACHE is None:
+        processor = DataProcessor()
+        prep_res = processor.prepare_training_data()
+        TEST_DF_CACHE = prep_res[1] if prep_res else None
+
+    test_df = TEST_DF_CACHE
+    base_result_df = None
+
+    if test_df is not None and not test_df.empty:
+        # 4. NAUJA KEŠO STRUKTŪRA (Saugome ne tik DataFrame, bet ir paruoštą HTML informaciją)
+        if cache_key in INFERENCE_CACHE:
+            cached = INFERENCE_CACHE[cache_key]
+            base_result_df = cached['df'].copy()
+            model_type_label = cached['label']
+            model_id = cached['id']
+        else:
+            base_result_df, model_type_label, actual_id = run_inference_on_2024(test_df, model_id)
+            model_id = actual_id
+            if base_result_df is not None:
+                INFERENCE_CACHE[cache_key] = {
+                    'df': base_result_df.copy(),
+                    'label': model_type_label,
+                    'id': actual_id,
+                    'national_data': None,
+                    'scatter_json': None,
+                    'comp_json': None
+                }
+
+        if base_result_df is not None:
+            result_df = base_result_df.copy()
+            
+            # Tikriname, ar pasirinkta visa Lietuva
+            is_national = not district_filter and not precinct_filter
+            
             if district_filter:
                 result_df = result_df[result_df['APYGARDOS_PAVADINIMAS'] == district_filter]
             if precinct_filter:
                 result_df = result_df[result_df['APYLINKES_PAVADINIMAS'] == precinct_filter]
 
             if not result_df.empty:
-                party_agg = result_df.groupby('SARASO_PAVADINIMAS').agg(
-                    ACTUAL=('VOTE_SHARE', 'mean'),
-                    PREDICTED=('PREDICTED', 'mean')
-                ).reset_index().sort_values('ACTUAL', ascending=False)
+                # SUPER GREITAS UŽKROVIMAS: Jei tai visa Lietuva ir jau skaičiavome - imam iš atminties!
+                if is_national and INFERENCE_CACHE[cache_key].get('national_data') is not None:
+                    district_data = INFERENCE_CACHE[cache_key]['national_data']
+                    scatter_json = INFERENCE_CACHE[cache_key]['scatter_json']
+                    comp_json = INFERENCE_CACHE[cache_key]['comp_json']
+                else:
+                    # Skaičiuojame iš naujo (Tai įvyks tik 1 kartą arba kai pasirenkamas konkretus miestas)
+                    party_agg = result_df.groupby('SARASO_PAVADINIMAS').agg(
+                        ACTUAL=('VOTE_SHARE', 'mean'),
+                        PREDICTED=('PREDICTED', 'mean')
+                    ).reset_index().sort_values('ACTUAL', ascending=False)
 
-                if not party_agg.empty:
-                    import plotly.express as px
-                    import plotly.utils
-                    import json
+                    if not party_agg.empty:
+                        import plotly.express as px
+                        import plotly.utils
+                        import json
 
-                    # Scatter grafikas
-                    fig_scatter = px.scatter(
-                        party_agg, x='ACTUAL', y='PREDICTED',
-                        hover_name='SARASO_PAVADINIMAS',
-                        title=f"Actual vs Predicted Vote Share — {model_type_label.upper()} model",
-                        labels={'ACTUAL': 'Actual Vote Share', 'PREDICTED': 'Predicted Vote Share'},
-                        color_discrete_sequence=['#6366f1']
-                    )
-                    max_val = max(party_agg['ACTUAL'].max(), party_agg['PREDICTED'].max())
-                    fig_scatter.add_shape(type='line', x0=0, y0=0, x1=max_val, y1=max_val,
-                                          line=dict(color='red', dash='dash', width=1))
-                    fig_scatter.update_layout(template='plotly_white')
-                    scatter_json = json.dumps(fig_scatter, cls=plotly.utils.PlotlyJSONEncoder)
+                        fig_scatter = px.scatter(
+                            party_agg, x='ACTUAL', y='PREDICTED',
+                            hover_name='SARASO_PAVADINIMAS',
+                            title=f"Actual vs Predicted Vote Share — {model_type_label.upper()} model",
+                            labels={'ACTUAL': 'Actual Vote Share', 'PREDICTED': 'Predicted Vote Share'},
+                            color_discrete_sequence=['#6366f1']
+                        )
+                        max_val = max(party_agg['ACTUAL'].max(), party_agg['PREDICTED'].max())
+                        fig_scatter.add_shape(type='line', x0=0, y0=0, x1=max_val, y1=max_val, line=dict(color='red', dash='dash', width=1))
+                        fig_scatter.update_layout(template='plotly_white')
+                        scatter_json = json.dumps(fig_scatter, cls=plotly.utils.PlotlyJSONEncoder)
 
-                    # Bar grafikas
-                    # 1. Pirmiausia sukuriame trumpus pavadinimus
-                    party_agg['SHORT_NAME'] = party_agg['SARASO_PAVADINIMAS'].apply(
-                        lambda x: x[:20] + '...' if len(str(x)) > 20 else x
-                    )
+                        party_agg['SHORT_NAME'] = party_agg['SARASO_PAVADINIMAS'].apply(lambda x: x[:20] + '...' if len(str(x)) > 20 else x)
+                        comp_df = party_agg.head(12).melt(id_vars=['SARASO_PAVADINIMAS', 'SHORT_NAME'], value_vars=['ACTUAL', 'PREDICTED'])
+                        fig_bar = px.bar(
+                            comp_df, x='value', y='SHORT_NAME', color='variable',
+                            hover_name='SARASO_PAVADINIMAS',
+                            barmode='group', orientation='h', title="Top 12 partijų palyginimas",
+                            template='plotly_white', color_discrete_map={'ACTUAL': '#6366f1', 'PREDICTED': '#f59e0b'}
+                        )
+                        fig_bar.update_layout(
+                            yaxis={'categoryorder':'total ascending', 'title': '', 'tickmode': 'linear', 'side': 'right'}, 
+                            xaxis={'title': 'Balsų dalis (%)'},
+                            legend=dict(title="", orientation="h", yanchor="top", y=-0.15, xanchor="center", x=0.5),
+                            margin=dict(l=10, r=150, t=50, b=0) 
+                        )
+                        comp_json = json.dumps(fig_bar, cls=plotly.utils.PlotlyJSONEncoder)
 
-                    # 2. Įtraukiame SHORT_NAME į melt ir Bar grafiką
-                    comp_df = party_agg.head(12).melt(id_vars=['SARASO_PAVADINIMAS', 'SHORT_NAME'], value_vars=['ACTUAL', 'PREDICTED'])
-                    fig_bar = px.bar(
-                        comp_df, x='value', y='SHORT_NAME', color='variable',
-                        hover_name='SARASO_PAVADINIMAS', # Iššokančiame lange rodysime pilną pavadinimą
-                        barmode='group', orientation='h', title="Top 12 partijų palyginimas",
-                        template='plotly_white', color_discrete_map={'ACTUAL': '#6366f1', 'PREDICTED': '#f59e0b'}
-                    )
-                    
-                    # 3. Padarome grafiko išvaizdą švaresnę ir perkeliame ašį
-                    fig_bar.update_layout(
-                        yaxis={
-                            'categoryorder':'total ascending', 
-                            'title': '',  
-                            'tickmode': 'linear',
-                            'side': 'right' # NAUJA: Perkeliame visus pavadinimus į dešinę
-                        }, 
-                        xaxis={'title': 'Balsų dalis (%)'},
-                        legend=dict(
-                            title="", 
-                            orientation="h", 
-                            yanchor="top", y=-0.15, 
-                            xanchor="center", x=0.5
-                        ),
-                        # NAUJA: Suteikiame daug vietos dešinėje (r=150), o kairėje sumažiname (l=10)
-                        margin=dict(l=10, r=150, t=50, b=0) 
-                    )
-                    
-                    comp_json = json.dumps(fig_bar, cls=plotly.utils.PlotlyJSONEncoder)
-
-                    # Detalūs apygardų rezultatai
+                    # SUNKUSIS CIKLAS (1900 Apylinkių)
                     for dist in sorted(result_df['APYGARDOS_PAVADINIMAS'].unique()):
                         dist_df = result_df[result_df['APYGARDOS_PAVADINIMAS'] == dist]
-
                         dist_party = dist_df.groupby('SARASO_PAVADINIMAS').agg(
                             ACTUAL=('VOTE_SHARE', 'mean'),
                             PREDICTED=('PREDICTED', 'mean')
@@ -387,7 +416,6 @@ def backtest():
                                 PREDICTED=('PREDICTED', 'mean')
                             ).reset_index().sort_values('ACTUAL', ascending=False)
                             
-                            # Get winners for the precinct
                             top_act_prec = prec_parties.iloc[0]['SARASO_PAVADINIMAS'] if not prec_parties.empty else '-'
                             top_prd_prec = prec_parties.sort_values('PREDICTED', ascending=False).iloc[0]['SARASO_PAVADINIMAS'] if not prec_parties.empty else '-'
                             winner_match_prec = top_act_prec == top_prd_prec
@@ -397,7 +425,7 @@ def backtest():
                                 'top_actual': top_act_prec,
                                 'top_predicted': top_prd_prec,
                                 'winner_match': winner_match_prec,
-                                'parties': prec_parties.head(10).to_dict('records') # Show top 10 for detail
+                                'parties': prec_parties.head(10).to_dict('records')
                             })
 
                         district_data.append({
@@ -408,12 +436,19 @@ def backtest():
                             'parties': dist_party.head(8).to_dict('records'),
                             'precincts': precincts_data
                         })
+
+                    # 5. IŠSAUGOME SUNKAUS CIKLO REZULTATUS KEŠE (Jei tai visos Lietuvos filtras)
+                    if is_national:
+                        INFERENCE_CACHE[cache_key]['national_data'] = district_data
+                        INFERENCE_CACHE[cache_key]['scatter_json'] = scatter_json
+                        INFERENCE_CACHE[cache_key]['comp_json'] = comp_json
         else:
             error_msg = "Model inference failed. Please train a model first."
     else:
         error_msg = "No 2024 test data available."
 
-    # 3. Traukiame DB informaciją TIK PRIEŠ PAT renderinant HTML
+    # 6. Traukiame DB informaciją TIK PRIEŠ PAT renderinant HTML
+    
     with SessionLocal() as session:
         repo = ElectionRepository(session)
         districts = repo.get_districts(2024)
