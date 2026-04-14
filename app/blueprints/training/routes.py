@@ -44,3 +44,33 @@ def start_training():
     thread.start()
     
     return jsonify({"message": "Apmokymas pradėtas fone!", "status": "started"}), 202
+
+@training_bp.route('/update_weights', methods=['POST'])
+def update_weights():
+    data = request.json  # Čia gausime pvz: {"rf": 0.1, "dnn": 0.2, ...}
+    
+    with SessionLocal() as session:
+        # Paimame pirmą (ir vienintelę) konfigūraciją
+        config = session.query(EnsembleConfig).first()
+        
+        if not config:
+            config = EnsembleConfig()
+            session.add(config)
+        
+        # Dinamiškai atnaujiname svorius
+        for model_id, weight in data.items():
+            # Sukonstruojame stulpelio pavadinimą, pvz., 'rf' -> 'rf_weight'
+            column_name = f"{model_id}_weight"
+            
+            # Patikriname, ar toks stulpelis egzistuoja duomenų modelyje
+            if hasattr(config, column_name):
+                setattr(config, column_name, weight)
+                print(f"Updating {column_name} to {weight}")
+        
+        try:
+            session.commit()
+            return jsonify({"status": "success", "message": "Weights updated"}), 200
+        except Exception as e:
+            session.rollback()
+            print(f"Database error while saving weights: {e}")
+            return jsonify({"status": "error", "message": str(e)}), 500

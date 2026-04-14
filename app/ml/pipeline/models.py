@@ -5,6 +5,7 @@ from sklearn.neural_network import MLPRegressor
 from sklearn.linear_model import ElasticNet
 from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 from sklearn.pipeline import Pipeline
+from sklearn.svm import SVR
 from catboost import CatBoostRegressor
 try:
     from xgboost import XGBRegressor
@@ -210,3 +211,68 @@ class EnsembleModel:
     def load(path):
         import joblib
         return joblib.load(path)
+
+class DeepNNModel(BaseModel):
+    """Gilusis neuroninis tinklas (daugiau sluoksnių)."""
+    def __init__(self, hidden_layer_sizes=(128, 64, 32), max_iter=500, **kwargs):
+        if isinstance(hidden_layer_sizes, str):
+            hidden_layer_sizes = tuple(int(x.strip()) for x in hidden_layer_sizes.split(','))
+        elif isinstance(hidden_layer_sizes, list):
+            hidden_layer_sizes = tuple(hidden_layer_sizes)
+            
+        self.model = Pipeline([
+            ('scaler', StandardScaler(with_mean=False)),
+            ('mlp', MLPRegressor(
+                hidden_layer_sizes=hidden_layer_sizes,
+                activation='relu',
+                solver='adam',
+                max_iter=int(max_iter),
+                early_stopping=True
+            ))
+        ])
+
+    def train(self, X, y, **kwargs):
+        self.model.fit(X, y)
+    
+    def predict(self, X):
+        return self.model.predict(X)
+
+
+class WideNNModel(BaseModel):
+    """Platusis neuroninis tinklas (vienas, bet labai platus sluoksnis)."""
+    def __init__(self, hidden_layer_sizes=(256,), max_iter=500, **kwargs):
+        if isinstance(hidden_layer_sizes, str):
+            hidden_layer_sizes = tuple(int(x.strip()) for x in hidden_layer_sizes.split(','))
+        elif isinstance(hidden_layer_sizes, list):
+            hidden_layer_sizes = tuple(hidden_layer_sizes)
+
+        self.model = Pipeline([
+            ('scaler', StandardScaler(with_mean=False)),
+            ('mlp', MLPRegressor(
+                hidden_layer_sizes=hidden_layer_sizes,
+                activation='tanh',
+                solver='adam',
+                max_iter=int(max_iter)
+            ))
+        ])
+
+    def train(self, X, y, **kwargs):
+        self.model.fit(X, y)
+    
+    def predict(self, X):
+        return self.model.predict(X)
+
+
+class SVRModel(BaseModel):
+    """Support Vector Regression - stabilus ir atsparus išskirtims."""
+    def __init__(self, C=1.0, epsilon=0.1, **kwargs):
+        self.model = Pipeline([
+            ('scaler', StandardScaler(with_mean=False)),
+            ('svr', SVR(kernel='rbf', C=float(C), epsilon=float(epsilon)))
+        ])
+
+    def train(self, X, y, **kwargs):
+        self.model.fit(X, y)
+    
+    def predict(self, X):
+        return self.model.predict(X)

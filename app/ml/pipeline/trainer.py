@@ -3,6 +3,7 @@ import joblib
 import json
 import pandas as pd
 import numpy as np
+import scipy.sparse
 import time
 import traceback
 from datetime import datetime
@@ -11,8 +12,11 @@ from app.data.database import SessionLocal
 from app.data.models import MLModelRegistry
 from app.ml.pipeline.processor import DataProcessor
 from app.ml.pipeline.models import (
-    TreeModel, NNModel, CatBoostModel, XGBModel, LGBMModel, ElasticNetModel
+    EnsembleModel, TreeModel, XGBModel, LGBMModel, 
+    ElasticNetModel, CatBoostModel, NNModel,
+    DeepNNModel, WideNNModel, SVRModel
 )
+from sklearn.model_selection import GridSearchCV
 
 PROGRESS_FILE = 'training_progress.json'
 
@@ -100,6 +104,15 @@ class ElectionTrainer:
             # 2. Transformuojame duomenis
             X_train_enc = preprocessor.transform(X_train)
             X_test_enc = preprocessor.transform(X_test)
+
+            # 3. Paverčiame į sparse matricas (svarbu atminties taupymui)
+            if scipy.sparse.issparse(X_train_enc):
+                X_train_enc = X_train_enc.toarray()
+                X_test_enc = X_test_enc.toarray()
+            else:
+                X_train_enc = np.asarray(X_train_enc)
+                X_test_enc = np.asarray(X_test_enc)
+                
             print(f"[*] Preprocessing complete. Encoded shape: {X_train_enc.shape}")
 
             model_configs = {
@@ -108,7 +121,10 @@ class ElectionTrainer:
                 'catboost': {'class': CatBoostModel, 'filename': 'catboost_tuned.cbm', 'label': 'CatBoost'},
                 'xgboost': {'class': XGBModel, 'filename': 'xgboost_tuned.pkl', 'label': 'XGBoost'},
                 'lgbm': {'class': LGBMModel, 'filename': 'lgbm_tuned.pkl', 'label': 'LightGBM'},
-                'elasticnet': {'class': ElasticNetModel, 'filename': 'elasticnet_tuned.pkl', 'label': 'ElasticNet'}
+                'elasticnet': {'class': ElasticNetModel, 'filename': 'elasticnet_tuned.pkl', 'label': 'ElasticNet'},
+                'dnn': {'class': DeepNNModel, 'filename': 'dnn_model.pkl', 'label': 'Deep NN'},
+                'wnn': {'class': WideNNModel, 'filename': 'wnn_model.pkl', 'label': 'Wide NN'},
+                'svr': {'class': SVRModel, 'filename': 'svr_model.pkl', 'label': 'SVR (Stable)'}
             }
 
             results = []
@@ -192,3 +208,38 @@ def train_suite(models, params=None, timeout=60):
     except Exception as e:
         print(f"Thread Failure: {str(e)}")
         return str(e)
+
+def get_best_model(self, model_key, X_train, y_train, user_params=None):
+    """
+    Jei vartotojas nurodo parametrus - naudojame juos. 
+    Jei ne - paleidžiame automatinį derinimo (tuning) variklį.
+    """
+    
+    # Pavyzdys su Random Forest
+    if model_key == 'rf':
+        if user_params:
+            return TreeModel(**user_params).fit(X_train, y_train)
+        
+        # Automatinis derinimas
+        param_grid = {
+            'n_estimators': [50, 100, 200],
+            'max_depth': [10, 20, None],
+            'min_samples_split': [2, 5]
+        }
+        grid = GridSearchCV(RandomForestRegressor(), param_grid, cv=3, scoring='neg_mean_absolute_error')
+        grid.fit(X_train, y_train)
+        return TreeModel(**grid.best_params_).fit(X_train, y_train)
+
+    # Pavyzdys su SVR (Support Vector Regression)
+    elif model_key == 'svr':
+        if user_params:
+            return SVRModel(**user_params).fit(X_train, y_train)
+            
+        param_grid = {
+            'C': [0.1, 1, 10],
+            'epsilon': [0.01, 0.1, 0.2],
+            'kernel': ['rbf', 'poly']
+        }
+        grid = GridSearchCV(SVR(), param_grid, cv=3, scoring='neg_mean_absolute_error')
+        grid.fit(X_train, y_train)
+        return SVRModel(**grid.best_params_).fit(X_train, y_train)
