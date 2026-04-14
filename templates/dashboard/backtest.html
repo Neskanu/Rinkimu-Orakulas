@@ -79,7 +79,7 @@
             <form id="filter-form"
                 class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-wrap items-end gap-4">
                 <div class="flex flex-col">
-                    <span class="text-[10px] text-slate-400 uppercase font-black mb-1">Model Selection</span>
+                    <span class="text-[10px] text-slate-400 uppercase font-black mb-1">Modelis</span>
                     <select name="model" onchange="this.form.submit()"
                         class="rounded-xl border-slate-200 text-sm focus:ring-indigo-500 min-w-[150px]">
                         {% for m in available_models %}
@@ -91,10 +91,10 @@
                 </div>
 
                 <div class="flex flex-col">
-                    <span class="text-[10px] text-slate-400 uppercase font-black mb-1">District (Apygarda)</span>
+                    <span class="text-[10px] text-slate-400 uppercase font-black mb-1">Apygarda</span>
                     <select name="district" onchange="this.form.submit()"
                         class="rounded-xl border-slate-200 text-sm focus:ring-indigo-500 min-w-[200px]">
-                        <option value="">National (All)</option>
+                        <option value="">Visos apygardos</option>
                         {% for d in districts %}
                         <option value="{{ d }}" {% if d==selected_district %}selected{% endif %}>{{ d }}</option>
                         {% endfor %}
@@ -105,7 +105,7 @@
                     <span class="text-[10px] text-slate-400 uppercase font-black mb-1">Precinct (Apylinkė)</span>
                     <select name="precinct" onchange="this.form.submit()"
                         class="rounded-xl border-slate-200 text-sm focus:ring-indigo-500 min-w-[200px]">
-                        <option value="">All Precincts</option>
+                        <option value="">Visos apylinkės</option>
                         {% for p in precincts %}
                         <option value="{{ p }}" {% if p==selected_precinct %}selected{% endif %}>{{ p }}</option>
                         {% endfor %}
@@ -118,7 +118,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
-                    Run Analysis
+                    Analizuoti
                 </button>
                 <a href="/dashboard/backtest" class="text-slate-400 hover:text-indigo-600 p-2 mb-1"
                     title="Reset filters">

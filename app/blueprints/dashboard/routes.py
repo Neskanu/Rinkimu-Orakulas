@@ -194,14 +194,14 @@ def index():
 
     top_10 = chart_df.head(10).copy().iloc[::-1]
     fig_bar = px.bar(top_10, x='SHARE_PCT', y='DISPLAY_NAME_FULL', orientation='h',
-                     title=f"Actual Results: Top 10 Parties ({year})",
-                     labels={'SHARE_PCT': 'Vote Share (%)', 'DISPLAY_NAME_FULL': 'Party'},
+                     title=f"Top 10 {year} partijų",
+                     labels={'SHARE_PCT': 'Balsų dalis (%)', 'DISPLAY_NAME_FULL': 'Partija'},
                      color='DISPLAY_NAME_FULL', color_discrete_map=color_map,
                      text=top_10['SHARE_PCT'].apply(lambda x: f"{x:.1f}%"),
                      custom_data=['SARASO_PAVADINIMAS', vote_col])
 
     fig_bar.update_traces(textposition='outside', marker_line_width=0,
-        hovertemplate='<b>%{customdata[0]}</b><br>Votes: %{customdata[1]:,.0f}<br>Share: %{x:.2f}%<extra></extra>')
+        hovertemplate='<b>%{customdata[0]}</b><br>Balsai: %{customdata[1]:,.0f}<br>Dalis: %{x:.2f}%<extra></extra>')
 
     max_share = top_10['SHARE_PCT'].max()
     fig_bar.update_layout(
@@ -231,11 +231,11 @@ def index():
     clean_pie_df = pd.DataFrame(pie_data).sort_values('Share', ascending=False)
     total_votes_int = int(clean_pie_df['Votes'].sum())
 
-    fig_pie = px.pie(clean_pie_df, values='Share', names='Party', title="Vote Distribution",
+    fig_pie = px.pie(clean_pie_df, values='Share', names='Party', title="Balsų pasiskirstymas",
                      hole=0.45, color='Party', color_discrete_map=color_map, custom_data=['Votes'])
 
     fig_pie.update_traces(textposition='inside', textinfo='percent', textfont=dict(size=12, color='white', family="Outfit"),
-        hovertemplate='<b>%{label}</b><br>Votes: %{customdata[0]:,.0f}<br>Share: %{value:.2f}%<extra></extra>',
+        hovertemplate='<b>%{label}</b><br>Balsai: %{customdata[0]:,.0f}<br>Dalis: %{value:.2f}%<extra></extra>',
         marker=dict(line=dict(color='white', width=2)))
 
     fig_pie.update_layout(
@@ -318,8 +318,8 @@ def backtest():
                     if not party_agg.empty:
                         fig_scatter = px.scatter(
                             party_agg, x='ACTUAL', y='PREDICTED', hover_name='SARASO_PAVADINIMAS',
-                            title=f"Actual vs Predicted Vote Share — {model_type_label.upper()} model",
-                            labels={'ACTUAL': 'Actual Vote Share', 'PREDICTED': 'Predicted Vote Share'},
+                            title=f"Tikros vs Prognozuotos balsų dalys — {model_type_label.upper()} model",
+                            labels={'ACTUAL': 'Tikra balsų dalis', 'PREDICTED': 'Prognozuota balsų dalis'},
                             color_discrete_sequence=['#6366f1']
                         )
                         max_val = max(party_agg['ACTUAL'].max(), party_agg['PREDICTED'].max())

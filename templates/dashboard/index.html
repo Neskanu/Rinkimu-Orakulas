@@ -64,13 +64,13 @@
     <div class="flex flex-col space-y-8">
         <div class="flex justify-between items-center">
             <div>
-                <h1 class="text-3xl font-bold text-slate-900">Election Dashboard</h1>
-                <p class="text-slate-500">Analyze Lithuanian election results with deep drill-down capabilities.</p>
+                <h1 class="text-3xl font-bold text-slate-900">Rinkimų analizė</h1>
+                <p class="text-slate-500">Analizuokite Lietuvos rinkimų rezultatus.</p>
             </div>
             <form action="/dashboard/" method="get" class="flex items-center space-x-4">
                 <select name="year" onchange="this.form.submit()"
                     class="rounded-xl border-slate-200 text-sm focus:ring-indigo-500 focus:border-indigo-500">
-                    <option value="2024" {% if year==2024 %}selected{% endif %}>2024 (Latest)</option>
+                    <option value="2024" {% if year==2024 %}selected{% endif %}>2024 (Naujausi)</option>
                     <option value="2020" {% if year==2020 %}selected{% endif %}>2020</option>
                     <option value="2016" {% if year==2016 %}selected{% endif %}>2016</option>
                     <option value="2012" {% if year==2012 %}selected{% endif %}>2012</option>
@@ -78,7 +78,7 @@
 
                 <select name="district" onchange="this.form.submit()"
                     class="rounded-xl border-slate-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 min-w-[200px]">
-                    <option value="">Full National Data</option>
+                    <option value="">Visos Lietuvos apylinkės</option>
                     {% for d in districts %}
                     <option value="{{ d }}" {% if d==selected_district %}selected{% endif %}>{{ d }}</option>
                     {% endfor %}
@@ -87,7 +87,7 @@
                 {% if selected_district %}
                 <select name="precinct" onchange="this.form.submit()"
                     class="rounded-xl border-slate-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 min-w-[200px]">
-                    <option value="">All Precincts</option>
+                    <option value="">Visos apylinkės</option>
                     {% for p in precincts %}
                     <option value="{{ p }}" {% if p==selected_precinct %}selected{% endif %}>{{ p }}</option>
                     {% endfor %}
