@@ -23,7 +23,7 @@
                 <select name="model" onchange="this.form.submit()"
                     class="rounded-xl border-slate-200 text-sm focus:ring-indigo-500 min-w-[150px]">
                     {% for m in available_models %}
-                    <option value="{{ m.id }}" {% if m.id == selected_model %}selected{% endif %}>
+                    <option value="{{ m.id }}" {% if m.id==selected_model %}selected{% endif %}>
                         {{ m.label }}
                     </option>
                     {% endfor %}
@@ -69,236 +69,294 @@
         </form>
     </div>
 
-    {% if error_msg %}
+    <!-- {% if error_msg %}
     <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-amber-800 font-medium">
         ⚠️ {{ error_msg }} — Go to <a href="/training/" class="text-indigo-600 font-bold hover:underline">Models</a> to
         train.
     </div>
-    {% endif %}
+    {% endif %} -->
 
-    <!-- Charts: Actual vs Predicted -->
-    {% if comp_json and scatter_json %}
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
-        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-            <div id="comp-chart" class="w-full h-[500px]"></div>
-        </div>
-        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-            <div id="scatter-chart" class="w-full h-[500px]"></div>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- District → Precinct → Party Breakdown -->
     {% if district_data %}
-    <div>
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-2xl font-bold text-slate-900">District Breakdown</h2>
-            <div class="flex items-center gap-4 text-xs font-bold">
-                <span class="flex items-center gap-1.5"><span
-                        class="w-3 h-3 rounded-full bg-indigo-600 inline-block"></span> Actual</span>
-                <span class="flex items-center gap-1.5"><span
-                        class="w-3 h-3 rounded-full bg-amber-400 inline-block"></span> Predicted</span>
-            </div>
-        </div>
-        <div class="space-y-3" id="district-list">
-            {% for dist in district_data %}
-            {% set dist_idx = loop.index %}
-            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-                <!-- District Header (clickable) -->
-                <button onclick="toggleDistrict('dist-{{ loop.index }}')"
-                    class="w-full flex items-center justify-between p-5 hover:bg-slate-50 transition-colors text-left gap-4">
-                    <div class="flex items-center gap-4 flex-grow min-w-0">
-                        <div class="w-2.5 h-2.5 rounded-full bg-indigo-400 flex-shrink-0"></div>
-                        <div class="min-w-0">
-                            <h3 class="font-bold text-slate-900 truncate">{{ dist.name }}</h3>
-                            <div class="flex flex-wrap gap-x-4 gap-y-1 mt-0.5">
-                                <span class="text-xs text-slate-500">
-                                    Actual: <strong class="text-indigo-700">{{ dist.top_actual }}</strong>
-                                </span>
-                                <span class="text-xs text-slate-500">
-                                    Predicted: <strong class="text-amber-600">{{ dist.top_predicted }}</strong>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-4 flex-shrink-0">
-                        {% if dist.winner_match %}
-                        <span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-[10px] font-black uppercase">Match</span>
-                        {% else %}
-                        <span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded text-[10px] font-black uppercase">Miss</span>
-                        {% endif %}
-                        <svg class="w-5 h-5 text-slate-400 transform transition-transform" id="arrow-dist-{{ loop.index }}"
-                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </div>
-                </button>
+    {% set ns = namespace(match_dist=0, total_dist=0, match_prec=0, total_prec=0, err_sum=0, err_count=0) %}
 
-                <!-- District Body -->
-                <div id="dist-{{ loop.index }}" class="hidden border-t border-slate-50">
-                    <!-- District Level Party Comparison Table -->
-                    <div class="p-5 pb-3">
-                        <h4 class="text-xs uppercase font-black text-slate-400 tracking-wider mb-3">District-Level
-                            Results</h4>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm">
-                                <thead>
-                                    <tr class="text-xs text-slate-400 uppercase font-black border-b border-slate-100">
-                                        <th class="text-left pb-2">Party</th>
-                                        <th class="text-right pb-2">Actual</th>
-                                        <th class="text-right pb-2">Predicted</th>
-                                        <th class="text-right pb-2">Δ Error</th>
-                                        <th class="pb-2 w-40"></th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-50">
-                                    {% for p in dist.parties %}
-                                    {% set err = (p.PREDICTED - p.ACTUAL) %}
-                                    <tr class="hover:bg-slate-50">
-                                        <td class="py-2 pr-4 font-medium text-slate-800 max-w-[200px] truncate">{{
-                                            p.SARASO_PAVADINIMAS }}</td>
-                                        <td class="py-2 text-right text-indigo-600 font-bold">{{
-                                            "%.1f"|format(p.ACTUAL) }}%</td>
-                                        <td class="py-2 text-right text-amber-600 font-bold">{{
-                                            "%.1f"|format(p.PREDICTED) }}%</td>
-                                        <td
-                                            class="py-2 text-right font-bold {% if err > 0 %}text-emerald-600{% else %}text-rose-500{% endif %}">
-                                            {{ "%+.1f"|format(err) }}pp
-                                        </td>
-                                        <td class="py-2 pl-3">
-                                            <div class="flex gap-0.5 items-center h-4">
-                                                {% set act_val = p.ACTUAL * 1.5 %}
-                                                {% if act_val > 100 %}{% set act_val = 100 %}{% endif %}
-                                                {% set prd_val = p.PREDICTED * 1.5 %}
-                                                {% if prd_val > 100 %}{% set prd_val = 100 %}{% endif %}
-                                                <div class="bg-indigo-400 rounded-l h-3"
-                                                    style="width: {{ act_val|int }}px;"></div>
-                                                <div class="bg-amber-400 rounded-r h-3"
-                                                    style="width: {{ prd_val|int }}px;"></div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+    {% for d in district_data %}
+    {% set ns.total_dist = ns.total_dist + 1 %}
+    {% if d.winner_match %}{% set ns.match_dist = ns.match_dist + 1 %}{% endif %}
 
-                    <!-- Precinct Sub-list -->
-                    {% if dist.precincts %}
-                    <div class="border-t border-slate-100 px-5 py-3">
-                        <h4 class="text-xs uppercase font-black text-slate-400 tracking-wider mb-3">
-                            Precincts ({{ dist.precincts|length }})
-                        </h4>
-                        <div class="space-y-2">
-                            {% for prec in dist.precincts %}
-                            <div class="bg-slate-50 rounded-xl overflow-hidden">
-                                <button onclick="toggleDistrict('prec-{{ dist_idx }}-{{ loop.index }}')"
-                                    class="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-100 transition-colors text-left text-xs gap-4">
-                                    <div class="flex-grow min-w-0">
-                                        <span class="font-semibold text-slate-700 block truncate">{{ prec.name }}</span>
-                                        <div class="flex flex-wrap gap-x-4 gap-y-1 mt-1">
-                                            <span class="text-[10px] text-slate-400">
-                                                Actual: <strong class="text-indigo-600">{{ prec.top_actual[:30] }}</strong>
-                                            </span>
-                                            <span class="text-[10px] text-slate-400">
-                                                Predicted: <strong class="text-amber-600">{{ prec.top_predicted[:30] }}</strong>
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center gap-3 flex-shrink-0">
-                                        {% if prec.winner_match %}
-                                        <span class="bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded text-[9px] font-black uppercase">Match</span>
-                                        {% else %}
-                                        <span class="bg-rose-100 text-rose-700 px-1.5 py-0.5 rounded text-[9px] font-black uppercase">Miss</span>
-                                        {% endif %}
-                                        <svg class="w-3 h-3 text-slate-400 transform transition-transform"
-                                            id="arrow-prec-{{ dist_idx }}-{{ loop.index }}" fill="none" viewBox="0 0 24 24"
-                                            stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M19 9l-7 7-7-7" />
-                                        </svg>
-                                    </div>
-                                </button>
-                                <div id="prec-{{ dist_idx }}-{{ loop.index }}" class="hidden px-4 pb-3">
-                                    <table class="w-full text-xs">
-                                        <thead>
-                                            <tr
-                                                class="text-[10px] text-slate-400 uppercase font-black border-b border-slate-200">
-                                                <th class="text-left pb-1.5">Party</th>
-                                                <th class="text-right pb-1.5">Actual</th>
-                                                <th class="text-right pb-1.5">Predicted</th>
-                                                <th class="text-right pb-1.5">Δ</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="divide-y divide-slate-100">
-                                            {% for p in prec.parties %}
-                                            {% set err = (p.PREDICTED - p.ACTUAL) %}
-                                            <tr>
-                                                <td
-                                                    class="py-1.5 pr-3 font-medium text-slate-700 max-w-[180px] truncate">
-                                                    {{ p.SARASO_PAVADINIMAS }}</td>
-                                                <td class="py-1.5 text-right text-indigo-600 font-semibold">{{
-                                                    "%.1f"|format(p.ACTUAL) }}%</td>
-                                                <td class="py-1.5 text-right text-amber-600 font-semibold">{{
-                                                    "%.1f"|format(p.PREDICTED) }}%</td>
-                                                <td
-                                                    class="py-1.5 text-right {% if err > 0 %}text-emerald-600{% else %}text-rose-500{% endif %} font-semibold">
-                                                    {{ "%+.1f"|format(err) }}pp
-                                                </td>
-                                            </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
+    {% if d.precincts %}
+    {% for p in d.precincts %}
+    {% set ns.total_prec = ns.total_prec + 1 %}
+    {% if p.winner_match %}{% set ns.match_prec = ns.match_prec + 1 %}{% endif %}
+    {% endfor %}
     {% endif %}
 
-    <!-- Trained Models Grid -->
-    <div>
-        <h2 class="text-2xl font-bold text-slate-900 mb-4">Model Performance Statistics</h2>
-        {% if metrics %}
-        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-            {% for model_name, stats in metrics.items() %}
-            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-                <div class="flex justify-between items-start mb-3">
-                    <div>
-                        <h3 class="font-bold text-lg text-slate-900">{{ model_name }}</h3>
-                        <span
-                            class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-indigo-100 text-indigo-700">
-                            {{ stats.type | upper if stats.type else 'Active' }}
-                        </span>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 gap-3">
-                    <div class="bg-indigo-50 p-3 rounded-xl text-center">
-                        <span class="block text-[10px] text-indigo-400 uppercase font-black mb-0.5">Mean Absolute Error
-                            (MAE)</span>
-                        <span class="text-2xl font-black text-indigo-700">{{ "%.4f"|format(stats.mae) }}</span>
-                    </div>
-                </div>
-                <p class="mt-3 text-[10px] text-slate-400 text-right">Trained: {{ stats.date.strftime('%Y-%m-%d %H:%M')
-                    }}</p>
+    {% for party in d.parties %}
+    {% set err = party.PREDICTED - party.ACTUAL %}
+    {% if err < 0 %}{% set err=err * -1 %}{% endif %} {% set ns.err_sum=ns.err_sum + err %} {% set
+        ns.err_count=ns.err_count + 1 %} {% endfor %} {% endfor %} <div
+        class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+
+        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col relative overflow-hidden">
+            <div class="absolute right-0 top-0 p-6 opacity-5">
+                <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                    <path fill-rule="evenodd"
+                        d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
+                        clip-rule="evenodd" />
+                </svg>
             </div>
-            {% endfor %}
+            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Apygardų
+                Nugalėtojai</span>
+            <div class="flex items-baseline gap-2 mt-2">
+                <span class="text-4xl font-black text-indigo-600">{{ ns.match_dist }}</span>
+                <span class="text-lg font-bold text-slate-400">/ {{ ns.total_dist }}</span>
+            </div>
+            {% if ns.total_dist > 0 %}
+            <div class="w-full bg-slate-100 h-1.5 rounded-full mt-4 overflow-hidden">
+                <div class="bg-indigo-500 h-full" style="width: {{ (ns.match_dist / ns.total_dist * 100)|round }}%">
+                </div>
+            </div>
+            {% endif %}
         </div>
-        {% else %}
-        <div class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-12 text-center">
-            <p class="text-slate-400">No model performance data available. Please run training first.</p>
+
+        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col relative overflow-hidden">
+            <div class="absolute right-0 top-0 p-6 opacity-5">
+                <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                        d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+                </svg>
+            </div>
+            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Apylinkių
+                Nugalėtojai</span>
+            <div class="flex items-baseline gap-2 mt-2">
+                <span class="text-4xl font-black text-indigo-600">{{ ns.match_prec }}</span>
+                <span class="text-lg font-bold text-slate-400">/ {{ ns.total_prec }}</span>
+            </div>
+            {% if ns.total_prec > 0 %}
+            <div class="w-full bg-slate-100 h-1.5 rounded-full mt-4 overflow-hidden">
+                <div class="bg-indigo-500 h-full" style="width: {{ (ns.match_prec / ns.total_prec * 100)|round }}%">
+                </div>
+            </div>
+            {% else %}
+            <span class="text-xs text-slate-400 mt-4 italic">Apylinkių duomenys neužkrauti</span>
+            {% endif %}
         </div>
-        {% endif %}
-    </div>
+
+        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col relative overflow-hidden">
+            <div class="absolute right-0 top-0 p-6 opacity-5">
+                <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd"
+                        d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 0l-2 2a1 1 0 101.414 1.414L8 10.414l1.293 1.293a1 1 0 001.414 0l4-4z"
+                        clip-rule="evenodd" />
+                </svg>
+            </div>
+            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Vidutinė Paklaida
+                (MAE)</span>
+            <div class="flex items-baseline gap-2 mt-2">
+                {% set mae = (ns.err_sum / ns.err_count) if ns.err_count > 0 else 0 %}
+                <span
+                    class="text-4xl font-black {% if mae < 2.0 %}text-emerald-500{% elif mae < 4.0 %}text-amber-500{% else %}text-rose-500{% endif %}">
+                    {{ "%.2f"|format(mae) }}
+                </span>
+                <span class="text-lg font-bold text-slate-400">pp</span>
+            </div>
+            <span class="text-xs font-medium text-slate-400 mt-4">Vidutinis nukrypimas nuo tikrų balsų</span>
+        </div>
 
 </div>
+{% endif %}
+
+<!-- Charts: Actual vs Predicted -->
+{% if comp_json and scatter_json %}
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+    <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+        <div id="comp-chart" class="w-full h-[500px]"></div>
+    </div>
+    <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+        <div id="scatter-chart" class="w-full h-[500px]"></div>
+    </div>
+</div>
+{% endif %}
+
+<!-- District → Precinct → Party Breakdown -->
+{% if district_data %}
+<div>
+    <div class="flex items-center justify-between mb-4">
+        <h2 class="text-2xl font-bold text-slate-900">District Breakdown</h2>
+        <div class="flex items-center gap-4 text-xs font-bold">
+            <span class="flex items-center gap-1.5"><span
+                    class="w-3 h-3 rounded-full bg-indigo-600 inline-block"></span> Actual</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-400 inline-block"></span>
+                Predicted</span>
+        </div>
+    </div>
+    <div class="space-y-3" id="district-list">
+        {% for dist in district_data %}
+        {% set dist_idx = loop.index %}
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+            <!-- District Header (clickable) -->
+            <button onclick="toggleDistrict('dist-{{ loop.index }}')"
+                class="w-full flex items-center justify-between p-5 hover:bg-slate-50 transition-colors text-left gap-4">
+                <div class="flex items-center gap-4 flex-grow min-w-0">
+                    <div class="w-2.5 h-2.5 rounded-full bg-indigo-400 flex-shrink-0"></div>
+                    <div class="min-w-0">
+                        <h3 class="font-bold text-slate-900 truncate">{{ dist.name }}</h3>
+                        <div class="flex flex-wrap gap-x-4 gap-y-1 mt-0.5">
+                            <span class="text-xs text-slate-500">
+                                Actual: <strong class="text-indigo-700">{{ dist.top_actual }}</strong>
+                            </span>
+                            <span class="text-xs text-slate-500">
+                                Predicted: <strong class="text-amber-600">{{ dist.top_predicted }}</strong>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4 flex-shrink-0">
+                    {% if dist.winner_match %}
+                    <span
+                        class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-[10px] font-black uppercase">Match</span>
+                    {% else %}
+                    <span
+                        class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded text-[10px] font-black uppercase">Miss</span>
+                    {% endif %}
+                    <svg class="w-5 h-5 text-slate-400 transform transition-transform" id="arrow-dist-{{ loop.index }}"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </div>
+            </button>
+
+            <!-- District Body -->
+            <div id="dist-{{ loop.index }}" class="hidden border-t border-slate-50">
+                <!-- District Level Party Comparison Table -->
+                <div class="p-5 pb-3">
+                    <h4 class="text-xs uppercase font-black text-slate-400 tracking-wider mb-3">District-Level
+                        Results</h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="text-xs text-slate-400 uppercase font-black border-b border-slate-100">
+                                    <th class="text-left pb-2">Party</th>
+                                    <th class="text-right pb-2">Actual</th>
+                                    <th class="text-right pb-2">Predicted</th>
+                                    <th class="text-right pb-2">Δ Error</th>
+                                    <th class="pb-2 w-40"></th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-50">
+                                {% for p in dist.parties %}
+                                {% set err = (p.PREDICTED - p.ACTUAL) %}
+                                <tr class="hover:bg-slate-50">
+                                    <td class="py-2 pr-4 font-medium text-slate-800 max-w-[200px] truncate">{{
+                                        p.SARASO_PAVADINIMAS }}</td>
+                                    <td class="py-2 text-right text-indigo-600 font-bold">{{
+                                        "%.1f"|format(p.ACTUAL) }}%</td>
+                                    <td class="py-2 text-right text-amber-600 font-bold">{{
+                                        "%.1f"|format(p.PREDICTED) }}%</td>
+                                    <td
+                                        class="py-2 text-right font-bold {% if err > 0 %}text-emerald-600{% else %}text-rose-500{% endif %}">
+                                        {{ "%+.1f"|format(err) }}pp
+                                    </td>
+                                    <td class="py-2 pl-3">
+                                        <div class="flex gap-0.5 items-center h-4">
+                                            {% set act_val = p.ACTUAL * 1.5 %}
+                                            {% if act_val > 100 %}{% set act_val = 100 %}{% endif %}
+                                            {% set prd_val = p.PREDICTED * 1.5 %}
+                                            {% if prd_val > 100 %}{% set prd_val = 100 %}{% endif %}
+                                            <div class="bg-indigo-400 rounded-l h-3"
+                                                style="width: {{ act_val|int }}px;"></div>
+                                            <div class="bg-amber-400 rounded-r h-3" style="width: {{ prd_val|int }}px;">
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Precinct Sub-list -->
+                {% if dist.precincts %}
+                <div class="border-t border-slate-100 px-5 py-3">
+                    <h4 class="text-xs uppercase font-black text-slate-400 tracking-wider mb-3">
+                        Precincts ({{ dist.precincts|length }})
+                    </h4>
+                    <div class="space-y-2">
+                        {% for prec in dist.precincts %}
+                        <div class="bg-slate-50 rounded-xl overflow-hidden">
+                            <button onclick="toggleDistrict('prec-{{ dist_idx }}-{{ loop.index }}')"
+                                class="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-100 transition-colors text-left text-xs gap-4">
+                                <div class="flex-grow min-w-0">
+                                    <span class="font-semibold text-slate-700 block truncate">{{ prec.name }}</span>
+                                    <div class="flex flex-wrap gap-x-4 gap-y-1 mt-1">
+                                        <span class="text-[10px] text-slate-400">
+                                            Actual: <strong class="text-indigo-600">{{ prec.top_actual[:30]
+                                                }}</strong>
+                                        </span>
+                                        <span class="text-[10px] text-slate-400">
+                                            Predicted: <strong class="text-amber-600">{{ prec.top_predicted[:30]
+                                                }}</strong>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3 flex-shrink-0">
+                                    {% if prec.winner_match %}
+                                    <span
+                                        class="bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded text-[9px] font-black uppercase">Match</span>
+                                    {% else %}
+                                    <span
+                                        class="bg-rose-100 text-rose-700 px-1.5 py-0.5 rounded text-[9px] font-black uppercase">Miss</span>
+                                    {% endif %}
+                                    <svg class="w-3 h-3 text-slate-400 transform transition-transform"
+                                        id="arrow-prec-{{ dist_idx }}-{{ loop.index }}" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+                            </button>
+                            <div id="prec-{{ dist_idx }}-{{ loop.index }}" class="hidden px-4 pb-3">
+                                <table class="w-full text-xs">
+                                    <thead>
+                                        <tr
+                                            class="text-[10px] text-slate-400 uppercase font-black border-b border-slate-200">
+                                            <th class="text-left pb-1.5">Party</th>
+                                            <th class="text-right pb-1.5">Actual</th>
+                                            <th class="text-right pb-1.5">Predicted</th>
+                                            <th class="text-right pb-1.5">Δ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        {% for p in prec.parties %}
+                                        {% set err = (p.PREDICTED - p.ACTUAL) %}
+                                        <tr>
+                                            <td class="py-1.5 pr-3 font-medium text-slate-700 max-w-[180px] truncate">
+                                                {{ p.SARASO_PAVADINIMAS }}</td>
+                                            <td class="py-1.5 text-right text-indigo-600 font-semibold">{{
+                                                "%.1f"|format(p.ACTUAL) }}%</td>
+                                            <td class="py-1.5 text-right text-amber-600 font-semibold">{{
+                                                "%.1f"|format(p.PREDICTED) }}%</td>
+                                            <td
+                                                class="py-1.5 text-right {% if err > 0 %}text-emerald-600{% else %}text-rose-500{% endif %} font-semibold">
+                                                {{ "%+.1f"|format(err) }}pp
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
 
 <!-- Charts Script -->
 {% if comp_json and scatter_json %}

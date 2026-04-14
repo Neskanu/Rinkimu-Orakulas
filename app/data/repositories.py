@@ -41,3 +41,38 @@ class ElectionRepository:
         # Sukuriame Pandas DataFrame tiesiai iš SQLAlchemy užklausos
         df = pd.read_sql(stmt, self.session.bind)
         return df
+
+    def get_national_results(self, year: int) -> pd.DataFrame:
+        """Ištraukia visus nurodytų metų rinkimų rezultatus į Pandas DataFrame grafikams."""
+        
+        stmt = (
+            select(
+                District.name.label("APYGARDOS_PAVADINIMAS"),
+                Precinct.name.label("APYLINKES_PAVADINIMAS"),
+                Participant.name.label("SARASO_PAVADINIMAS"),
+                VoteResult.votes_total,
+                Precinct.total_participated
+            )
+            .select_from(VoteResult)
+            .join(Precinct, VoteResult.precinct_id == Precinct.id)
+            .join(District, Precinct.district_id == District.id)
+            .join(Election, District.election_id == Election.id)
+            .join(Participant, VoteResult.participant_id == Participant.id)
+            .where(Election.year == year)
+        )
+
+        results = self.session.execute(stmt).all()
+        
+        if not results:
+            return pd.DataFrame()
+
+        # Paverčiame į DataFrame
+        df = pd.DataFrame(results)
+        
+        # Suskaičiuojame procentinę balsų dalį (VOTE_SHARE)
+        # Apsauga nuo dalybos iš nulio apylinkėse be balsuotojų
+        df['VOTE_SHARE'] = 0.0
+        mask = df['total_participated'] > 0
+        df.loc[mask, 'VOTE_SHARE'] = (df.loc[mask, 'votes_total'] / df.loc[mask, 'total_participated']) * 100
+
+        return df

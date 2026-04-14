@@ -2,7 +2,11 @@ from flask import Blueprint, render_template, request, jsonify
 from app.data.database import SessionLocal
 from app.data.models import EnsembleConfig
 from app.ml.pipeline.processor import DataProcessor
-from app.ml.pipeline.models import EnsembleModel, TreeModel, XGBModel, LGBMModel, PolyElasticNetModel, CatBoostModel
+from app.ml.pipeline.models import (
+    EnsembleModel, TreeModel, XGBModel, LGBMModel, 
+    PolyElasticNetModel, CatBoostModel, NNModel,
+    DeepNNModel, WideNNModel, SVRModel  # <-- PRIDĖKITE ŠIAS TRIS
+)
 import joblib
 import pandas as pd
 import numpy as np
@@ -14,8 +18,11 @@ forecast_bp = Blueprint('forecast', __name__)
 MODEL_MAP = {
     'rf': TreeModel,
     'xgboost': XGBModel,
-    'lgbm': LGBMModel,
-    'elasticnet': PolyElasticNetModel
+    'catboost': CatBoostModel,
+    'nn': NNModel,
+    'dnn': DeepNNModel,   # Pridėta
+    'wnn': WideNNModel,   # Pridėta
+    'svr': SVRModel       # Pridėta
 }
 
 # 2028 Archetype Mapping - Standartizuoti pavadinimai (sutampa su processor.py)
@@ -34,7 +41,7 @@ def load_ensemble():
     session.close()
 
     models_dict = {}
-    for mid in ['rf', 'xgboost', 'lgbm', 'elasticnet']:
+    for mid in ['rf', 'xgboost', 'lgbm', 'elasticnet', 'nn']:
         path = f'app/ml/models/{mid}_tuned.pkl'
         if os.path.exists(path):
             try:
@@ -64,9 +71,20 @@ def predict_2028():
     data = request.json
     contestants = data.get('contestants', []) 
     turnout_adj = data.get('turnout_adj', 0) / 100
-    
-    # Ištraukiame vartotojo pasirinktą modelį (numatytasis - catboost)
     selected_model = data.get('model', 'catboost')
+
+    # --- LIETUVIŠKO CIKLO LOGIKA ---
+    # Seka: socdem -> conservative -> independent (nauja) -> social_democrat
+    # Kadangi 2024 m. laimėjo Socdemai, 2028 m. boostą gauna Konservatoriai
+    last_winner_profile = "social_democrat"
+    cycle_boost_map = {
+        "social_democrat": "conservative",
+        "conservative": "independent",
+        "independent": "social_democrat",
+        "liberal": "social_democrat",
+        "populist": "conservative"
+    }
+    target_boost_profile = cycle_boost_map.get(last_winner_profile)
 
     processor = DataProcessor()
     template = processor.prepare_2028_template()
@@ -75,61 +93,62 @@ def predict_2028():
 
     ensemble, _ = load_ensemble()
     if not ensemble or selected_model not in ensemble.models:
-        return jsonify({"error": f"Modelis '{selected_model.upper()}' nerastas. Pirmiausia apmokykite jį."}), 400
+        return jsonify({"error": f"Modelis '{selected_model.upper()}' nerastas."}), 400
 
-    # Jei tai ne CatBoost, mums būtinai reikia transformatoriaus (OneHotEncoder)
+    # Transformatoriaus krovimas kitiems modeliams nei CatBoost
     preprocessor = None
     if selected_model != 'catboost':
         preprocessor_path = 'app/ml/models/preprocessor.joblib'
         if os.path.exists(preprocessor_path):
             preprocessor = joblib.load(preprocessor_path)
         else:
-            return jsonify({"error": "Nerastas preprocessor.joblib failas. Apmokykite modelius iš naujo."}), 400
+            return jsonify({"error": "Nerastas preprocessor.joblib. Apmokykite modelius."}), 400
 
-    # Ensure numeric for template
+    # Duomenų paruošimas
     template['VISO_DALYVAVO'] = pd.to_numeric(template['VISO_DALYVAVO'], errors='coerce').fillna(0)
     template['RINKEJU_SKAICIUS'] = pd.to_numeric(template['RINKEJU_SKAICIUS'], errors='coerce').replace(0, 1)
     template['VISO_DALYVAVO'] = template['VISO_DALYVAVO'] * (1 + turnout_adj)
 
     results = []
-    # PATAISYTA: Bazė nepriklausomiems (4.5% - 8.0%), nes skalė yra 0-100
     avg_preds_base = np.random.uniform(4.5, 8.0, len(template))
 
     for cont in contestants:
         name = cont['name']
         profile = cont['profile']
+        
         if profile == 'independent':
-            # PATAISYTA: Triukšmas pritaikytas 0-100 skalei
             preds = avg_preds_base + np.random.normal(0, 0.5, len(template))
         else:
             archetype = ARCHETYPES.get(profile, ARCHETYPES['populist'])
-            
             X_raw = template[['APYGARDOS_PAVADINIMAS', 'RINKEJU_SKAICIUS']].copy()
             X_raw['SARASO_PAVADINIMAS'] = archetype
             X_raw = X_raw[['SARASO_PAVADINIMAS', 'APYGARDOS_PAVADINIMAS', 'RINKEJU_SKAICIUS']]
             
-            # --- MODELIO INFERENCIJOS LOGIKA ---
             if selected_model == 'catboost':
-                X_raw['SARASO_PAVADINIMAS'] = X_raw['SARASO_PAVADINIMAS'].astype(str)
-                X_raw['APYGARDOS_PAVADINIMAS'] = X_raw['APYGARDOS_PAVADINIMAS'].astype(str)
                 preds = ensemble.models[selected_model].predict(X_raw)
             else:
-                # Scikit-Learn ir XGBoost modeliams naudojame užkoduotą matricą
                 X_encoded = preprocessor.transform(X_raw)
                 preds = ensemble.models[selected_model].predict(X_encoded)
             
-            # PATAISYTA: Triukšmas pritaikytas 0-100 skalei (0.3% svyravimas)
+            # Atsitiktinis triukšmas (0.3%)
             preds = preds + np.random.normal(0, 0.3, len(template))
-            preds = np.clip(preds, 0, 100)
+
+        # --- CIKLO KOREKCIJA ---
+        cycle_multiplier = 1.0
+        if profile == target_boost_profile:
+            cycle_multiplier = 1.15 # +15% švytuoklės efektas
+        elif profile == last_winner_profile:
+            cycle_multiplier = 0.90 # -10% valdžios nuovargis
+
+        preds = np.clip(preds * cycle_multiplier, 0, 100)
 
         cont_df = template[['APYGARDOS_PAVADINIMAS']].copy()
         cont_df['PRED_SHARE'] = preds
         cont_df['PARTY'] = name
         results.append(cont_df)
 
+    # Normalizacija į 100% per apygardą
     final_df = pd.concat(results)
-    
-    # DISTRICT Normalization to 100% for contestants
     chart_data = []
     for dist in final_df['APYGARDOS_PAVADINIMAS'].unique():
         dist_p = final_df[final_df['APYGARDOS_PAVADINIMAS'] == dist].copy()

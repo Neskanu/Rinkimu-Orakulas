@@ -19,3 +19,4 @@ all_fixed = sorted(set(fix_encoding(r[0]) for r in rows))
 for d in all_fixed:
     print(" ", d)
 c.close()
+

@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase, relationship
-from sqlalchemy import String, Integer, Float, DateTime, ForeignKey, Enum
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Text
 from datetime import datetime
 from typing import Optional, List
 import enum
@@ -106,13 +106,20 @@ class ForecastScenario(Base):
     predictions: Mapped[str] = mapped_column(String)
 
 class EnsembleConfig(Base):
-    __tablename__ = "ensemble_configs"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    rf_weight: Mapped[float] = mapped_column(Float, default=0.20)
-    nn_weight: Mapped[float] = mapped_column(Float, default=0.20)
-    catboost_weight: Mapped[float] = mapped_column(Float, default=0.20)
-    xgboost_weight: Mapped[float] = mapped_column(Float, default=0.20)
-    lgbm_weight: Mapped[float] = mapped_column(Float, default=0.10)
-    elasticnet_weight: Mapped[float] = mapped_column(Float, default=0.10)
-    is_active: Mapped[bool] = mapped_column(default=True)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    __tablename__ = 'ensemble_configs'
+    
+    id = Column(Integer, primary_key=True)
+    model_name = Column(String, default="Default Ensemble")
+    
+    # Esami svoriai
+    rf_weight = Column(Float, default=0.2)
+    nn_weight = Column(Float, default=0.2)
+    catboost_weight = Column(Float, default=0.2)
+    xgboost_weight = Column(Float, default=0.15)
+    lgbm_weight = Column(Float, default=0.15)
+    elasticnet_weight = Column(Float, default=0.1)
+    
+    # NAUJI SVORIAI (Užtikrinkite, kad Column ir Float yra importuoti viršuje!)
+    dnn_weight = Column(Float, default=0.0)
+    wnn_weight = Column(Float, default=0.0)
+    svr_weight = Column(Float, default=0.0)

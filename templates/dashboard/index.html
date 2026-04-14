@@ -52,29 +52,7 @@
     </div>
 
     <!-- Modelių statistika išimta, nes ne iki galo veikia -->
-    <!-- <div class="mt-8">
-        <h2 class="text-2xl font-bold text-slate-900 mb-4">Model Performance</h2>
-        {% if metrics %}
-        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {% for model_name, stats in metrics.items() %}
-            <div class="bg-indigo-900 text-white p-4 rounded-2xl shadow-lg border border-indigo-700">
-                <span class="text-[10px] uppercase font-black opacity-60">{{ model_name }}</span>
-                <p class="text-xl font-black">{{ "%.4f"|format(stats.mae) }}</p>
-                <span class="text-[10px] opacity-40">MAE</span>
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="bg-slate-100 border border-slate-200 p-6 rounded-2xl text-center text-slate-500 italic">
-            No trained models found. Please run training in the Models section.
-        </div>
-        {% endif %}
-    </div>
-    {% else %}
-    <div class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl p-20 text-center w-full">
-        <p class="text-slate-400">No data found for the selected filters. Please try another year or district.</p>
-    </div>
-    {% endif %} -->
+    {% endif %}
 </div>
 
 {% if plot_json %}

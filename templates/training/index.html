@@ -34,12 +34,15 @@
             {% set model_configs = [
             ('rf', 'Random Forest', [('n_estimators', 100, 'number'), ('max_depth', 12, 'number')]),
             ('nn', 'Neural Network', [('hidden_layer_sizes', '64,32', 'text'), ('max_iter', 200, 'number')]),
+            ('dnn', 'Deep NN', [('hidden_layer_sizes', '128,64,32', 'text'), ('max_iter', 500, 'number')]),
+            ('wnn', 'Wide NN', [('hidden_layer_sizes', '256', 'text'), ('max_iter', 500, 'number')]),
             ('catboost', 'CatBoost', [('iterations', 500, 'number'), ('learning_rate', 0.1, 'number')]),
             ('xgboost', 'XGBoost', [('n_estimators', 100, 'number'), ('max_depth', 6, 'number'), ('learning_rate', 0.1,
             'number')]),
             ('lgbm', 'LightGBM', [('n_estimators', 100, 'number'), ('max_depth', -1, 'number'), ('learning_rate', 0.1,
             'number')]),
-            ('elasticnet', 'ElasticNet', [('alpha', 1.0, 'number'), ('l1_ratio', 0.5, 'number')])
+            ('elasticnet', 'ElasticNet', [('alpha', 1.0, 'number'), ('l1_ratio', 0.5, 'number')]),
+            ('svr', 'SVR (Stable)', [('C', 1.0, 'number'), ('epsilon', 0.1, 'number')])
             ] %}
 
             {% for mid, label, params in model_configs %}
@@ -191,10 +194,13 @@
             {% set mixing_models = [
             ('rf', 'Random Forest', config.rf_weight),
             ('nn', 'Neural Network', config.nn_weight),
+            ('dnn', 'Deep NN', config.dnn_weight),
+            ('wnn', 'Wide NN', config.wnn_weight),
             ('catboost', 'CatBoost', config.catboost_weight),
             ('xgboost', 'XGBoost', config.xgboost_weight),
             ('lgbm', 'LightGBM', config.lgbm_weight),
-            ('elasticnet', 'ElasticNet', config.elasticnet_weight)
+            ('elasticnet', 'ElasticNet', config.elasticnet_weight),
+            ('svr', 'SVR', config.svr_weight)
             ] %}
 
             {% for id, name, weight in mixing_models %}
@@ -230,8 +236,12 @@
 <script>
     let isTraining = false;
     let lastMsg = "";
-    const modelIds = ['rf', 'nn', 'catboost', 'xgboost', 'lgbm', 'elasticnet'];
-    let locks = { rf: false, nn: false, catboost: false, xgboost: false, lgbm: false, elasticnet: false };
+    const modelIds = ['rf', 'nn', 'dnn', 'wnn', 'catboost', 'xgboost', 'lgbm', 'elasticnet', 'svr'];
+    let locks = {
+        rf: false, nn: false, dnn: false, wnn: false,
+        catboost: false, xgboost: false, lgbm: false,
+        elasticnet: false, svr: false
+    };
 
     function toggleSettings(id) {
         document.getElementById(`settings-${id}`).classList.toggle('hidden');
@@ -281,14 +291,31 @@
 
     async function saveWeights() {
         const data = {};
+        // modelIds masyvas jau turi visus 9 id: ['rf', 'nn', 'dnn', 'wnn', 'catboost', 'xgboost', 'lgbm', 'elasticnet', 'svr']
         modelIds.forEach(id => {
             const slider = document.getElementById(`slider-${id}`);
             if (slider) {
                 data[id] = parseInt(slider.value) / 100;
             }
         });
-        const resp = await fetch('/training/update_weights', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-        if (resp.ok) alert('Ensemble weights deployed!');
+
+        try {
+            const resp = await fetch('/training/update_weights', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (resp.ok) {
+                // Galime panaudoti tavo showToast funkciją, jei ji yra base.html
+                alert('🚀 Ansamblio miksas sėkmingai užrakintas ir paruoštas prognozėms!');
+            } else {
+                alert('❌ Klaida saugant svorius. Patikrinkite serverio konsolę.');
+            }
+        } catch (err) {
+            console.error("Save weights error:", err);
+            alert('❌ Serverio ryšio klaida.');
+        }
     }
 
     // Pridėkite 'event' parametrą į funkciją
