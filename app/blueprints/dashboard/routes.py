@@ -86,8 +86,34 @@ def load_model_by_id(model_id=None):
         return None, None, None
 
 def run_inference_on_2024(test_df, model_id=None):
-    model, model_type, actual_id = load_model_by_id(model_id)
-    if model is None: return None, "No valid model found", None
+    """Vykdo prognozę naudodamas konkretų modelį arba visą ansamblį."""
+    
+    # --- ANSAMBLIO LOGIKA ---
+    if model_id == 'ensemble':
+        try:
+            from app.blueprints.forecasting.routes import load_ensemble
+            model, active_mids = load_ensemble()
+            model_type = "ensemble"
+            actual_id = "ensemble"
+        except ImportError as e:
+            print(f"Importo klaida: {e}")
+            return None, "Nepavyko rasti forecasting modulio", None
+        
+        if not model:
+            return None, "Ansamblio failas nerastas", None
+    else:
+        # Krauname įprastą modelį iš DB registro
+        model, model_type, actual_id = load_model_by_id(model_id)
+    
+    if model is None: 
+        return None, "No valid model found", None
+    else:
+        # Krauname įprastą modelį iš DB registro
+        model, model_type, actual_id = load_model_by_id(model_id)
+    # --- LOGIKOS PABAIGA ---
+
+    if model is None: 
+        return None, "No valid model found", None
 
     cat_features = ['SARASO_PAVADINIMAS', 'APYGARDOS_PAVADINIMAS']
     num_features = ['RINKEJU_SKAICIUS']
@@ -104,6 +130,8 @@ def run_inference_on_2024(test_df, model_id=None):
         if model_type == 'catboost':
             X[cat_features] = X[cat_features].astype(str)
             preds = model.predict(X)
+        elif model_type == 'ensemble':
+            preds = model.predict(test_df) # Ansamblis pats viduje naudoja preprocessor.joblib
         else:
             import warnings
             preprocessor_path = 'app/ml/models/preprocessor.joblib'
@@ -260,7 +288,21 @@ def backtest():
     precinct_filter = fix_lt_encoding_global(raw_precinct) if raw_precinct else None
     
     raw_model_id = request.args.get('model')
-    model_id = int(raw_model_id) if raw_model_id and raw_model_id.isdigit() else None
+    
+    # 1. Nustatome model_id (tekstas arba skaičius)
+    if raw_model_id == 'ensemble':
+        model_id = 'ensemble'
+    else:
+        model_id = int(raw_model_id) if raw_model_id and raw_model_id.isdigit() else None
+
+    # 2. Surandame geriausią modelį, jei nieko nepasirinkta
+    if not model_id:
+        with SessionLocal() as session:
+            best_model = session.execute(select(MLModelRegistry).order_by(MLModelRegistry.mae.asc())).scalars().first()
+            if best_model: model_id = best_model.id
+    
+    # 3. Svarbu: cache_key visada paverčiam į string
+    cache_key = str(model_id)
 
     scatter_json, comp_json = None, None
     district_data = []

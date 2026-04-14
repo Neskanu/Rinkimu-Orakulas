@@ -82,8 +82,14 @@
                     <span class="text-[10px] text-slate-400 uppercase font-black mb-1">Modelis</span>
                     <select name="model" onchange="this.form.submit()"
                         class="rounded-xl border-slate-200 text-sm focus:ring-indigo-500 min-w-[150px]">
+
+                        <!-- <option value="ensemble" {% if selected_model|string=='ensemble' %}selected{% endif %}
+                            class="font-bold text-indigo-600">
+                            ✨ SUPER ANSAMBLIS (Visi modeliai)
+                        </option> -->
+
                         {% for m in available_models %}
-                        <option value="{{ m.id }}" {% if m.id==selected_model %}selected{% endif %}>
+                        <option value="{{ m.id }}" {% if m.id|string==selected_model|string %}selected{% endif %}>
                             {{ m.label }}
                         </option>
                         {% endfor %}

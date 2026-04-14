@@ -155,8 +155,9 @@ class EnsembleModel:
     def __init__(self, models=None, weights=None):
         self.models = models or {}
         self.weights = weights or {
-            'rf': 0.20, 'nn': 0.20, 'catboost': 0.20,
-            'xgboost': 0.15, 'lgbm': 0.15, 'elasticnet': 0.10
+            'rf': 0.11, 'nn': 0.11, 'dnn': 0.11, 'wnn': 0.11,
+            'catboost': 0.12, 'xgboost': 0.11, 'lgbm': 0.11,
+            'elasticnet': 0.11, 'svr': 0.11
         }
 
     def predict(self, X):
