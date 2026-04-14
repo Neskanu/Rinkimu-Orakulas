@@ -17,6 +17,17 @@ except ImportError:
     LGBMRegressor = None
 import joblib
 
+from sklearn.ensemble import BaggingRegressor
+from sklearn.svm import SVR
+
+# Sukuriame ansamblį, kuris naudos SVR
+fast_svr = BaggingRegressor(
+    estimator=SVR(kernel='rbf', C=1.0),
+    n_estimators=10,      # Apmokys 10 mažesnių modelių
+    n_jobs=-1,            # NAUDOTI VISUS BRANDUOLIUS
+    max_samples=0.2       # Kiekvienas modelis matys tik 20% duomenų
+)
+
 class BaseModel:
     def train(self, X, y, **kwargs):
         pass
@@ -264,11 +275,27 @@ class WideNNModel(BaseModel):
 
 
 class SVRModel(BaseModel):
-    """Support Vector Regression - stabilus ir atsparus išskirtims."""
-    def __init__(self, C=1.0, epsilon=0.1, **kwargs):
+    """Support Vector Regression - Greita versija naudojant visus branduolius (Bagging)."""
+    def __init__(self, C=0.1, epsilon=0.2, **kwargs):
+        # Sukuriame bazinį SVR su jūsų nustatytais saugikliais
+        base_svr = SVR(
+            kernel='rbf', 
+            cache_size=1000, 
+            max_iter=5000,  # Sumažiname iki 5000 greitesniam Bagging sukimui
+            C=float(C), 
+            epsilon=float(epsilon)
+        )
+        
+        # Įdedame SVR į BaggingRegressor, kad naudotų visus branduolius
         self.model = Pipeline([
             ('scaler', StandardScaler(with_mean=False)),
-            ('svr', SVR(kernel='rbf', C=float(C), epsilon=float(epsilon)))
+            ('bagging', BaggingRegressor(
+                estimator=base_svr,
+                n_estimators=10,      # Apmokys 10 mažesnių modelių lygiagrečiai
+                n_jobs=-1,            # NAUDOTI VISUS PROCESORIAUS BRANDUOLIUS
+                max_samples=0.3,      # Kiekvienas modelis matys 30% duomenų (greičiau skaičiuoja)
+                random_state=42
+            ))
         ])
 
     def train(self, X, y, **kwargs):

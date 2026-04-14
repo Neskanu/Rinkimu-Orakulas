@@ -27,4 +27,4 @@ if __name__ == '__main__':
     print("\n" + "="*50)
     print("--- STARTING ELECTION ORACLE V2 (PORT 5001) ---")
     print("="*50 + "\n")
-    app.run(debug=True, port=5001, use_reloader=True)
+    app.run(debug=True, port=5001, use_reloader=False)
