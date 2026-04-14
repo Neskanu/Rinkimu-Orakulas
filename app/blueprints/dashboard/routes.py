@@ -191,7 +191,7 @@ def index():
     fig_bar.update_layout(
         template='plotly_white',
         margin=dict(l=10, r=40, t=50, b=20),
-        yaxis={'categoryorder': 'total ascending', 'showgrid': False},
+        yaxis={'categoryorder': 'total ascending', 'showgrid': False, 'showticklabels': True, 'title': '', 'side': 'right'},
         xaxis=dict(range=[0, max_share * 1.25], showgrid=True, gridcolor='rgba(0,0,0,0.05)'),
         showlegend=False,
         font=dict(family="Outfit, sans-serif")
@@ -331,19 +331,40 @@ def backtest():
                     scatter_json = json.dumps(fig_scatter, cls=plotly.utils.PlotlyJSONEncoder)
 
                     # Bar grafikas
-                    comp_df = party_agg.sort_values('ACTUAL', ascending=False).head(15).copy()
-                    comp_df = comp_df.melt(id_vars=['SARASO_PAVADINIMAS'],
-                                            value_vars=['ACTUAL', 'PREDICTED'],
-                                            var_name='Type', value_name='Share')
-                    fig_comp = px.bar(
-                        comp_df, x='Share', y='SARASO_PAVADINIMAS', color='Type',
-                        orientation='h', barmode='group',
-                        title=f"Actual vs Predicted — Top 15 Parties ({district_filter or 'National'})",
-                        labels={'Share': 'Vote Share', 'SARASO_PAVADINIMAS': 'Party'},
-                        color_discrete_map={'ACTUAL': '#6366f1', 'PREDICTED': '#f59e0b'}
+                    # 1. Pirmiausia sukuriame trumpus pavadinimus
+                    party_agg['SHORT_NAME'] = party_agg['SARASO_PAVADINIMAS'].apply(
+                        lambda x: x[:20] + '...' if len(str(x)) > 20 else x
                     )
-                    fig_comp.update_layout(template='plotly_white', margin=dict(l=200))
-                    comp_json = json.dumps(fig_comp, cls=plotly.utils.PlotlyJSONEncoder)
+
+                    # 2. Įtraukiame SHORT_NAME į melt ir Bar grafiką
+                    comp_df = party_agg.head(12).melt(id_vars=['SARASO_PAVADINIMAS', 'SHORT_NAME'], value_vars=['ACTUAL', 'PREDICTED'])
+                    fig_bar = px.bar(
+                        comp_df, x='value', y='SHORT_NAME', color='variable',
+                        hover_name='SARASO_PAVADINIMAS', # Iššokančiame lange rodysime pilną pavadinimą
+                        barmode='group', orientation='h', title="Top 12 partijų palyginimas",
+                        template='plotly_white', color_discrete_map={'ACTUAL': '#6366f1', 'PREDICTED': '#f59e0b'}
+                    )
+                    
+                    # 3. Padarome grafiko išvaizdą švaresnę ir perkeliame ašį
+                    fig_bar.update_layout(
+                        yaxis={
+                            'categoryorder':'total ascending', 
+                            'title': '',  
+                            'tickmode': 'linear',
+                            'side': 'right' # NAUJA: Perkeliame visus pavadinimus į dešinę
+                        }, 
+                        xaxis={'title': 'Balsų dalis (%)'},
+                        legend=dict(
+                            title="", 
+                            orientation="h", 
+                            yanchor="top", y=-0.15, 
+                            xanchor="center", x=0.5
+                        ),
+                        # NAUJA: Suteikiame daug vietos dešinėje (r=150), o kairėje sumažiname (l=10)
+                        margin=dict(l=10, r=150, t=50, b=0) 
+                    )
+                    
+                    comp_json = json.dumps(fig_bar, cls=plotly.utils.PlotlyJSONEncoder)
 
                     # Detalūs apygardų rezultatai
                     for dist in sorted(result_df['APYGARDOS_PAVADINIMAS'].unique()):

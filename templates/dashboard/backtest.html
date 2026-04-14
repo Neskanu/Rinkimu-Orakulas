@@ -6,12 +6,12 @@
     <!-- Header + Filters -->
     <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-bold text-slate-900">Backtest Analysis</h1>
-            <p class="text-slate-500 mt-1">Model predictions vs. actual 2024 election results.</p>
+            <h1 class="text-3xl font-bold text-slate-900">Modelio tikslumo analizė</h1>
+            <p class="text-slate-500 mt-1">Modelių spėjimai vs. 2024 rinkimų rezultatai.</p>
             {% if model_type_label and model_type_label != 'None' %}
             <span
                 class="inline-flex items-center mt-2 px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700">
-                Active model: {{ model_type_label | upper }}
+                Aktyvus modelis: {{ model_type_label | upper }}
             </span>
             {% endif %}
         </div>
