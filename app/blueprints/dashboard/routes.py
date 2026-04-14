@@ -263,7 +263,7 @@ def index():
                      hole=0.45, color='Party', color_discrete_map=color_map, custom_data=['Votes'])
 
     fig_pie.update_traces(textposition='inside', textinfo='percent', textfont=dict(size=12, color='white', family="Outfit"),
-        hovertemplate='<b>%{label}</b><br>Balsai: %{customdata[0]:,.0f}<br>Dalis: %{value:.2f}%<extra></extra>',
+        hovertemplate='<b>%{label}</b><br>Dalis: %{value:.2f}%<extra></extra>',
         marker=dict(line=dict(color='white', width=2)))
 
     fig_pie.update_layout(
