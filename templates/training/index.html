@@ -4,20 +4,20 @@
 <div class="flex flex-col space-y-8">
     <div class="flex flex-col md:flex-row justify-between items-start gap-6">
         <div>
-            <h1 class="text-4xl font-black text-slate-900 tracking-tight">Model Management</h1>
-            <p class="text-slate-500 text-lg">Configure your ensemble and trigger automated training.</p>
+            <h1 class="text-4xl font-black text-slate-900 tracking-tight">Modelių valdymas</h1>
+            <p class="text-slate-500 text-lg">Nustatykite savo ansamblį ir paleiskite automatizuotą mokymą.</p>
         </div>
 
         <div
             class="bg-white p-6 rounded-3xl border border-slate-200 shadow-xl shadow-slate-100 flex flex-col md:flex-row gap-6 items-center w-full md:w-auto">
-            <div class="flex flex-col">
+            <!-- <div class="flex flex-col">
                 <span class="text-[10px] text-slate-400 uppercase font-black mb-1">Training Timeout (s)</span>
                 <input type="number" id="timeout" value="60"
                     class="w-24 bg-slate-50 border-0 rounded-xl px-4 py-2 text-xl font-black text-indigo-700 focus:ring-2 focus:ring-indigo-500">
-            </div>
+            </div> -->
             <button onclick="startTraining()"
                 class="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-4 rounded-2xl font-black text-lg transition-all shadow-lg shadow-indigo-100 transform hover:-translate-y-1 active:scale-95">
-                🚀 Retrain Suite
+                🚀 Naujas mokymas
             </button>
         </div>
     </div>
@@ -25,10 +25,10 @@
     <!-- Active Models Selection & Advanced Settings -->
     <div class="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden">
         <div class="bg-slate-50 px-8 py-4 border-b border-slate-200 flex justify-between items-center">
-            <h2 class="font-black text-slate-500 uppercase text-xs tracking-widest">Selected Models & Hyperparameters
-            </h2>
-            <span class="text-[10px] text-slate-400 font-bold italic">Click gear icon to configure individual
-                models</span>
+            <h2 class="font-black text-slate-500 uppercase text-xs tracking-widest">Parametrai</h2>
+            <span class="text-[10px] text-slate-400 font-bold italic">Spauskite dantratį, kad pakeistumėte atskirų
+                modelių
+                parametrus</span>
         </div>
         <div class="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {% set model_configs = [
@@ -170,7 +170,7 @@
     </div>
 
     <!-- Ensemble Mixing Sliders -->
-    <div class="bg-slate-900 p-10 rounded-[3rem] shadow-2xl space-y-10 relative overflow-hidden">
+    <!-- <div class="bg-slate-900 p-10 rounded-[3rem] shadow-2xl space-y-10 relative overflow-hidden">
         <div class="absolute top-0 right-0 p-12 opacity-10 pointer-events-none">
             <svg class="w-64 h-64 text-white" fill="currentColor" viewBox="0 0 24 24">
                 <path
@@ -230,242 +230,242 @@
             {% endfor %}
         </div>
     </div>
-</div>
+</div> -->
 
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-<script>
-    let isTraining = false;
-    let lastMsg = "";
-    const modelIds = ['rf', 'nn', 'dnn', 'wnn', 'catboost', 'xgboost', 'lgbm', 'elasticnet', 'svr'];
-    let locks = {
-        rf: false, nn: false, dnn: false, wnn: false,
-        catboost: false, xgboost: false, lgbm: false,
-        elasticnet: false, svr: false
-    };
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script>
+        let isTraining = false;
+        let lastMsg = "";
+        const modelIds = ['rf', 'nn', 'dnn', 'wnn', 'catboost', 'xgboost', 'lgbm', 'elasticnet', 'svr'];
+        let locks = {
+            rf: false, nn: false, dnn: false, wnn: false,
+            catboost: false, xgboost: false, lgbm: false,
+            elasticnet: false, svr: false
+        };
 
-    function toggleSettings(id) {
-        document.getElementById(`settings-${id}`).classList.toggle('hidden');
-    }
-
-    function toggleLock(id) {
-        locks[id] = !locks[id];
-        document.getElementById(`icon-${id}-locked`).classList.toggle('hidden', !locks[id]);
-        document.getElementById(`icon-${id}-unlocked`).classList.toggle('hidden', locks[id]);
-        document.getElementById(`slider-${id}`).disabled = locks[id];
-        document.getElementById(`slider-${id}`).classList.toggle('opacity-30', locks[id]);
-    }
-
-    function onSliderChange(changedId) {
-        let changedEl = document.getElementById(`slider-${changedId}`);
-        let newVal = parseInt(changedEl.value);
-        let otherIds = modelIds.filter(id => id !== changedId && !locks[id]);
-        let lockedSum = modelIds.filter(id => id !== changedId && locks[id])
-            .reduce((sum, id) => sum + parseInt(document.getElementById(`slider-${id}`).value), 0);
-
-        let remaining = 100 - lockedSum - newVal;
-        if (remaining < 0) {
-            newVal = 100 - lockedSum;
-            changedEl.value = newVal;
-            remaining = 0;
+        function toggleSettings(id) {
+            document.getElementById(`settings-${id}`).classList.toggle('hidden');
         }
 
-        let othersSum = otherIds.reduce((sum, id) => sum + parseInt(document.getElementById(`slider-${id}`).value), 0);
-        if (othersSum === 0 && remaining > 0) {
-            otherIds.forEach(id => document.getElementById(`slider-${id}`).value = Math.floor(remaining / otherIds.length));
-        } else if (othersSum > 0) {
-            otherIds.forEach(id => {
-                let current = parseInt(document.getElementById(`slider-${id}`).value);
-                document.getElementById(`slider-${id}`).value = Math.round((current / othersSum) * remaining);
-            });
+        function toggleLock(id) {
+            locks[id] = !locks[id];
+            document.getElementById(`icon-${id}-locked`).classList.toggle('hidden', !locks[id]);
+            document.getElementById(`icon-${id}-unlocked`).classList.toggle('hidden', locks[id]);
+            document.getElementById(`slider-${id}`).disabled = locks[id];
+            document.getElementById(`slider-${id}`).classList.toggle('opacity-30', locks[id]);
         }
 
-        let currentTotal = modelIds.reduce((sum, id) => sum + parseInt(document.getElementById(`slider-${id}`).value), 0);
-        if (currentTotal !== 100 && otherIds.length > 0) {
-            let lastId = otherIds[otherIds.length - 1];
-            document.getElementById(`slider-${lastId}`).value = Math.max(0, parseInt(document.getElementById(`slider-${lastId}`).value) + (100 - currentTotal));
-        }
+        function onSliderChange(changedId) {
+            let changedEl = document.getElementById(`slider-${changedId}`);
+            let newVal = parseInt(changedEl.value);
+            let otherIds = modelIds.filter(id => id !== changedId && !locks[id]);
+            let lockedSum = modelIds.filter(id => id !== changedId && locks[id])
+                .reduce((sum, id) => sum + parseInt(document.getElementById(`slider-${id}`).value), 0);
 
-        modelIds.forEach(id => document.getElementById(`val-${id}`).innerText = document.getElementById(`slider-${id}`).value);
-        document.getElementById('mix-total').innerText = modelIds.reduce((sum, id) => sum + parseInt(document.getElementById(`slider-${id}`).value), 0) + "%";
-    }
-
-    async function saveWeights() {
-        const data = {};
-        // modelIds masyvas jau turi visus 9 id: ['rf', 'nn', 'dnn', 'wnn', 'catboost', 'xgboost', 'lgbm', 'elasticnet', 'svr']
-        modelIds.forEach(id => {
-            const slider = document.getElementById(`slider-${id}`);
-            if (slider) {
-                data[id] = parseInt(slider.value) / 100;
+            let remaining = 100 - lockedSum - newVal;
+            if (remaining < 0) {
+                newVal = 100 - lockedSum;
+                changedEl.value = newVal;
+                remaining = 0;
             }
-        });
 
-        try {
-            const resp = await fetch('/training/update_weights', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-
-            if (resp.ok) {
-                // Galime panaudoti tavo showToast funkciją, jei ji yra base.html
-                alert('🚀 Ansamblio miksas sėkmingai užrakintas ir paruoštas prognozėms!');
-            } else {
-                alert('❌ Klaida saugant svorius. Patikrinkite serverio konsolę.');
-            }
-        } catch (err) {
-            console.error("Save weights error:", err);
-            alert('❌ Serverio ryšio klaida.');
-        }
-    }
-
-    // Pridėkite 'event' parametrą į funkciją
-    async function startTraining(event) {
-        // 1. SUSTABDOMAS PUSLAPIO PERSIKROVIMAS
-        if (event) event.preventDefault();
-
-        const selectedModels = Array.from(document.querySelectorAll('input[name="models"]:checked')).map(cb => cb.value);
-        if (selectedModels.length === 0) return alert("Select at least one model.");
-
-        const params = {};
-        selectedModels.forEach(mid => {
-            params[mid] = {};
-            const paramContainer = document.getElementById(`settings-${mid}`);
-            if (paramContainer) {
-                paramContainer.querySelectorAll('input').forEach(inp => {
-                    let val = inp.value;
-                    let key = inp.id.split('-').slice(2).join('_');
-                    if (inp.type === 'number') val = parseFloat(val);
-                    if (key === 'hidden_layer_sizes') val = val.split(',').map(n => parseInt(n.trim()));
-                    params[mid][key] = val;
+            let othersSum = otherIds.reduce((sum, id) => sum + parseInt(document.getElementById(`slider-${id}`).value), 0);
+            if (othersSum === 0 && remaining > 0) {
+                otherIds.forEach(id => document.getElementById(`slider-${id}`).value = Math.floor(remaining / otherIds.length));
+            } else if (othersSum > 0) {
+                otherIds.forEach(id => {
+                    let current = parseInt(document.getElementById(`slider-${id}`).value);
+                    document.getElementById(`slider-${id}`).value = Math.round((current / othersSum) * remaining);
                 });
             }
-        });
 
-        // Pakeičiame mygtuką
-        const btn = event ? event.target.querySelector('button[type="submit"]') : null;
-        if (btn) {
-            btn.innerHTML = 'Apmokoma fone...';
-            btn.disabled = true;
+            let currentTotal = modelIds.reduce((sum, id) => sum + parseInt(document.getElementById(`slider-${id}`).value), 0);
+            if (currentTotal !== 100 && otherIds.length > 0) {
+                let lastId = otherIds[otherIds.length - 1];
+                document.getElementById(`slider-${lastId}`).value = Math.max(0, parseInt(document.getElementById(`slider-${lastId}`).value) + (100 - currentTotal));
+            }
+
+            modelIds.forEach(id => document.getElementById(`val-${id}`).innerText = document.getElementById(`slider-${id}`).value);
+            document.getElementById('mix-total').innerText = modelIds.reduce((sum, id) => sum + parseInt(document.getElementById(`slider-${id}`).value), 0) + "%";
         }
 
-        // 2. Siunčiame užklausą į foninį maršrutą
-        try {
-            const response = await fetch('/training/start_training', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ models: selectedModels, params: params }) // Pridedame ir parametrus!
+        async function saveWeights() {
+            const data = {};
+            // modelIds masyvas jau turi visus 9 id: ['rf', 'nn', 'dnn', 'wnn', 'catboost', 'xgboost', 'lgbm', 'elasticnet', 'svr']
+            modelIds.forEach(id => {
+                const slider = document.getElementById(`slider-${id}`);
+                if (slider) {
+                    data[id] = parseInt(slider.value) / 100;
+                }
             });
 
-            if (typeof showToast === 'function') {
-                showToast("Apmokymas pradėtas fone! Sekite pranešimus ekrano kampe.", false);
+            try {
+                const resp = await fetch('/training/update_weights', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (resp.ok) {
+                    // Galime panaudoti tavo showToast funkciją, jei ji yra base.html
+                    alert('🚀 Ansamblio miksas sėkmingai užrakintas ir paruoštas prognozėms!');
+                } else {
+                    alert('❌ Klaida saugant svorius. Patikrinkite serverio konsolę.');
+                }
+            } catch (err) {
+                console.error("Save weights error:", err);
+                alert('❌ Serverio ryšio klaida.');
             }
-        } catch (e) {
-            if (typeof showToast === 'function') showToast("Klaida siunčiant užklausą", true);
         }
-    }
 
-    let emptyCount = 0;
-    async function pollMetrics() {
-        if (!isTraining) return;
-        try {
-            const resp = await fetch('/training/metrics');
-            const data = await resp.json();
+        // Pridėkite 'event' parametrą į funkciją
+        async function startTraining(event) {
+            // 1. SUSTABDOMAS PUSLAPIO PERSIKROVIMAS
+            if (event) event.preventDefault();
 
-            if (Object.keys(data).length === 0) {
-                emptyCount++;
-                if (emptyCount > 5) {
-                    document.getElementById('current-stage').innerHTML = `<span class="text-slate-400 italic">Engine Idle</span>`;
-                    document.getElementById('training-message').innerText = "Waiting for data from training engine...";
+            const selectedModels = Array.from(document.querySelectorAll('input[name="models"]:checked')).map(cb => cb.value);
+            if (selectedModels.length === 0) return alert("Select at least one model.");
+
+            const params = {};
+            selectedModels.forEach(mid => {
+                params[mid] = {};
+                const paramContainer = document.getElementById(`settings-${mid}`);
+                if (paramContainer) {
+                    paramContainer.querySelectorAll('input').forEach(inp => {
+                        let val = inp.value;
+                        let key = inp.id.split('-').slice(2).join('_');
+                        if (inp.type === 'number') val = parseFloat(val);
+                        if (key === 'hidden_layer_sizes') val = val.split(',').map(n => parseInt(n.trim()));
+                        params[mid][key] = val;
+                    });
                 }
-                if (isTraining) setTimeout(pollMetrics, 2000);
-                return;
+            });
+
+            // Pakeičiame mygtuką
+            const btn = event ? event.target.querySelector('button[type="submit"]') : null;
+            if (btn) {
+                btn.innerHTML = 'Apmokoma fone...';
+                btn.disabled = true;
             }
 
-            emptyCount = 0;
-            const modelKeys = Object.keys(data).filter(k => k !== 'suite_history' && k !== 'SYSTEM');
-            const activeModelKey = modelKeys.find(k => data[k].current_stage != 'Finished' && data[k].current_stage != 'Failed' && data[k].current_stage != 'CRITICAL ERROR');
-            const displayKey = activeModelKey || modelKeys.reverse()[0];
-            if (displayKey) {
-                const modelData = data[displayKey];
-                const newTitle = `${displayKey.toUpperCase()}: ${modelData.current_stage}`;
-                document.getElementById('current-stage').innerText = newTitle;
-                document.getElementById('latest-metric').innerText = (modelData.metrics && modelData.metrics.mae) ? modelData.metrics.mae.toFixed(4) : "--";
-                document.getElementById('r2-metric').innerText = (modelData.metrics && modelData.metrics.r2) ? modelData.metrics.r2.toFixed(4) : "--";
-                document.getElementById('rmse-metric').innerText = (modelData.metrics && modelData.metrics.rmse) ? modelData.metrics.rmse.toFixed(4) : "--";
-                document.getElementById('training-message').innerText = modelData.message || "";
+            // 2. Siunčiame užklausą į foninį maršrutą
+            try {
+                const response = await fetch('/training/start_training', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ models: selectedModels, params: params }) // Pridedame ir parametrus!
+                });
 
-                // Update Log
-                if (modelData.message && modelData.message !== lastMsg) {
-                    const log = document.getElementById('training-log');
-                    const entry = document.createElement('div');
-                    entry.className = "text-white opacity-90 mb-1";
-                    entry.innerText = `> [${new Date().toLocaleTimeString()}] ${modelData.message}`;
-                    log.appendChild(entry);
-                    log.scrollTop = log.scrollHeight;
-                    lastMsg = modelData.message;
+                if (typeof showToast === 'function') {
+                    showToast("Apmokymas pradėtas fone! Sekite pranešimus ekrano kampe.", false);
                 }
+            } catch (e) {
+                if (typeof showToast === 'function') showToast("Klaida siunčiant užklausą", true);
+            }
+        }
 
-                if (modelData.current_stage === 'CRITICAL ERROR') {
-                    document.getElementById('pipeline-status-text').innerText = "Halted";
-                    document.getElementById('pipeline-status-text').className = "px-3 py-1 bg-red-100 text-red-700 rounded-lg font-black text-xs";
-                    document.getElementById('progress-title').innerText = "Pipeline Failure";
-                    document.getElementById('progress-spinner').classList.add('hidden');
-                    isTraining = false;
+        let emptyCount = 0;
+        async function pollMetrics() {
+            if (!isTraining) return;
+            try {
+                const resp = await fetch('/training/metrics');
+                const data = await resp.json();
+
+                if (Object.keys(data).length === 0) {
+                    emptyCount++;
+                    if (emptyCount > 5) {
+                        document.getElementById('current-stage').innerHTML = `<span class="text-slate-400 italic">Engine Idle</span>`;
+                        document.getElementById('training-message').innerText = "Waiting for data from training engine...";
+                    }
+                    if (isTraining) setTimeout(pollMetrics, 2000);
                     return;
                 }
 
-                if (data.suite_history && data.suite_history.length > 0) {
-                    const trace = {
-                        x: data.suite_history.map(h => h.name.toUpperCase()),
-                        y: data.suite_history.map(h => h.value),
-                        type: 'bar',
-                        marker: {
-                            color: data.suite_history.map((h, i) => i % 2 == 0 ? '#6366f1' : '#818cf8'),
-                            line: { width: 0 }
-                        },
-                        text: data.suite_history.map(h => h.value.toFixed(4)),
-                        textposition: 'auto',
-                    };
+                emptyCount = 0;
+                const modelKeys = Object.keys(data).filter(k => k !== 'suite_history' && k !== 'SYSTEM');
+                const activeModelKey = modelKeys.find(k => data[k].current_stage != 'Finished' && data[k].current_stage != 'Failed' && data[k].current_stage != 'CRITICAL ERROR');
+                const displayKey = activeModelKey || modelKeys.reverse()[0];
+                if (displayKey) {
+                    const modelData = data[displayKey];
+                    const newTitle = `${displayKey.toUpperCase()}: ${modelData.current_stage}`;
+                    document.getElementById('current-stage').innerText = newTitle;
+                    document.getElementById('latest-metric').innerText = (modelData.metrics && modelData.metrics.mae) ? modelData.metrics.mae.toFixed(4) : "--";
+                    document.getElementById('r2-metric').innerText = (modelData.metrics && modelData.metrics.r2) ? modelData.metrics.r2.toFixed(4) : "--";
+                    document.getElementById('rmse-metric').innerText = (modelData.metrics && modelData.metrics.rmse) ? modelData.metrics.rmse.toFixed(4) : "--";
+                    document.getElementById('training-message').innerText = modelData.message || "";
 
-                    const layout = {
-                        margin: { t: 0, r: 20, b: 40, l: 40 },
-                        paper_bgcolor: 'rgba(0,0,0,0)',
-                        plot_bgcolor: 'rgba(0,0,0,0)',
-                        xaxis: {
-                            showgrid: false,
-                            tickfont: { family: 'Outfit', size: 10, color: '#94a3b8', weight: 'bold' }
-                        },
-                        yaxis: {
-                            showgrid: true,
-                            gridcolor: '#f1f5f9',
-                            tickfont: { family: 'Outfit', size: 10, color: '#94a3b8' },
-                            title: { text: 'MAE', font: { size: 10, color: '#cbd5e1' } }
-                        },
-                        bargap: 0.4
-                    };
+                    // Update Log
+                    if (modelData.message && modelData.message !== lastMsg) {
+                        const log = document.getElementById('training-log');
+                        const entry = document.createElement('div');
+                        entry.className = "text-white opacity-90 mb-1";
+                        entry.innerText = `> [${new Date().toLocaleTimeString()}] ${modelData.message}`;
+                        log.appendChild(entry);
+                        log.scrollTop = log.scrollHeight;
+                        lastMsg = modelData.message;
+                    }
 
-                    Plotly.react('progress-graph', [trace], layout, { responsive: true, displayModeBar: false });
+                    if (modelData.current_stage === 'CRITICAL ERROR') {
+                        document.getElementById('pipeline-status-text').innerText = "Halted";
+                        document.getElementById('pipeline-status-text').className = "px-3 py-1 bg-red-100 text-red-700 rounded-lg font-black text-xs";
+                        document.getElementById('progress-title').innerText = "Pipeline Failure";
+                        document.getElementById('progress-spinner').classList.add('hidden');
+                        isTraining = false;
+                        return;
+                    }
+
+                    if (data.suite_history && data.suite_history.length > 0) {
+                        const trace = {
+                            x: data.suite_history.map(h => h.name.toUpperCase()),
+                            y: data.suite_history.map(h => h.value),
+                            type: 'bar',
+                            marker: {
+                                color: data.suite_history.map((h, i) => i % 2 == 0 ? '#6366f1' : '#818cf8'),
+                                line: { width: 0 }
+                            },
+                            text: data.suite_history.map(h => h.value.toFixed(4)),
+                            textposition: 'auto',
+                        };
+
+                        const layout = {
+                            margin: { t: 0, r: 20, b: 40, l: 40 },
+                            paper_bgcolor: 'rgba(0,0,0,0)',
+                            plot_bgcolor: 'rgba(0,0,0,0)',
+                            xaxis: {
+                                showgrid: false,
+                                tickfont: { family: 'Outfit', size: 10, color: '#94a3b8', weight: 'bold' }
+                            },
+                            yaxis: {
+                                showgrid: true,
+                                gridcolor: '#f1f5f9',
+                                tickfont: { family: 'Outfit', size: 10, color: '#94a3b8' },
+                                title: { text: 'MAE', font: { size: 10, color: '#cbd5e1' } }
+                            },
+                            bargap: 0.4
+                        };
+
+                        Plotly.react('progress-graph', [trace], layout, { responsive: true, displayModeBar: false });
+                    }
                 }
-            }
-            const allFinishedOrFailed = Object.keys(data)
-                .filter(k => k !== 'suite_history' && k !== 'SYSTEM')
-                .every(k => ['Finished', 'Failed', 'CRITICAL ERROR'].includes(data[k].current_stage));
-            if (allFinishedOrFailed && Object.keys(data).length > 0) {
-                isTraining = false;
-                document.getElementById('progress-title').innerText = "✨ Training Finished";
-                document.getElementById('progress-spinner').classList.add('hidden');
+                const allFinishedOrFailed = Object.keys(data)
+                    .filter(k => k !== 'suite_history' && k !== 'SYSTEM')
+                    .every(k => ['Finished', 'Failed', 'CRITICAL ERROR'].includes(data[k].current_stage));
+                if (allFinishedOrFailed && Object.keys(data).length > 0) {
+                    isTraining = false;
+                    document.getElementById('progress-title').innerText = "✨ Training Finished";
+                    document.getElementById('progress-spinner').classList.add('hidden');
 
-                // Build Final Results Table
-                const tbody = document.getElementById('results-table-body');
-                tbody.innerHTML = "";
-                Object.keys(data).forEach(mid => {
-                    if (mid === 'SYSTEM' || mid === 'suite_history') return;
-                    const m = data[mid];
-                    const row = document.createElement('tr');
-                    const isSuccess = m.current_stage === 'Finished';
-                    const statusClass = isSuccess ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
+                    // Build Final Results Table
+                    const tbody = document.getElementById('results-table-body');
+                    tbody.innerHTML = "";
+                    Object.keys(data).forEach(mid => {
+                        if (mid === 'SYSTEM' || mid === 'suite_history') return;
+                        const m = data[mid];
+                        const row = document.createElement('tr');
+                        const isSuccess = m.current_stage === 'Finished';
+                        const statusClass = isSuccess ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
 
-                    row.innerHTML = `
+                        row.innerHTML = `
                         <td class="px-6 py-4 font-black">${mid.toUpperCase()}</td>
                         <td class="px-6 py-4">
                             <span class="px-2 py-1 ${statusClass} rounded-lg text-[10px] uppercase font-black">${m.current_stage}</span>
@@ -473,16 +473,16 @@
                         <td class="px-6 py-4 text-slate-500">${(m.metrics && m.metrics.mae) ? m.metrics.mae.toFixed(4) : '--'}</td>
                         <td class="px-6 py-4 text-indigo-600">${(m.metrics && m.metrics.r2) ? m.metrics.r2.toFixed(4) : '--'}</td>
                     `;
-                    tbody.appendChild(row);
-                });
-                document.getElementById('results-summary-container').classList.remove('hidden');
+                        tbody.appendChild(row);
+                    });
+                    document.getElementById('results-summary-container').classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error("Polling error:", err);
+                if (isTraining) setTimeout(pollMetrics, 3000);
+            } finally {
+                if (isTraining) setTimeout(pollMetrics, 2000);
             }
-        } catch (err) {
-            console.error("Polling error:", err);
-            if (isTraining) setTimeout(pollMetrics, 3000);
-        } finally {
-            if (isTraining) setTimeout(pollMetrics, 2000);
         }
-    }
-</script>
-{% endblock %}
+    </script>
+    {% endblock %}

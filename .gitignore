@@ -8,20 +8,9 @@ rinkimai.db.bak
 rinkimai_v2.db.bak
 
 # Python
-__pycache__/
 *.py[cod]
 *$py.class
-venv/
 .env
-
-# Models and Training Data
-app/ml/models/*.pkl
-app/ml/models/*.cbm
-app/ml/models/*.pt
-app/ml/models/*.joblib
-app/data/training/*.csv
-app/data/training/*.xlsx
-
 __pycache__/
 *.pyc
 *.pyo
@@ -31,6 +20,16 @@ venv/
 .env
 .env.local
 *.env.*
+
+
+# Models and Training Data
+app/ml/models/*.pkl
+app/ml/models/*.cbm
+app/ml/models/*.pt
+app/ml/models/*.joblib
+app/data/training/*.csv
+app/data/training/*.xlsx
+
 
 # Build artifacts
 dist/

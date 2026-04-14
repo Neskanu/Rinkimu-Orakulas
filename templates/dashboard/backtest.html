@@ -1,382 +1,522 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="flex flex-col space-y-8">
 
-    <!-- Header + Filters -->
-    <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
-        <div>
-            <h1 class="text-3xl font-bold text-slate-900">Modelio tikslumo analizė</h1>
-            <p class="text-slate-500 mt-1">Modelių spėjimai vs. 2024 rinkimų rezultatai.</p>
-            {% if model_type_label and model_type_label != 'None' %}
-            <span
-                class="inline-flex items-center mt-2 px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700">
-                Aktyvus modelis: {{ model_type_label | upper }}
-            </span>
-            {% endif %}
+<div id="loading-overlay"
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] hidden flex-col items-center justify-center transition-opacity duration-300 opacity-0">
+    <div class="bg-white p-10 rounded-[2rem] shadow-2xl flex flex-col items-center max-w-sm text-center transform scale-95 transition-transform duration-300"
+        id="loading-box">
+
+        <div class="relative w-20 h-20 mb-6">
+            <div class="absolute inset-0 border-4 border-indigo-100 rounded-full"></div>
+            <div class="absolute inset-0 border-4 border-indigo-600 rounded-full border-t-transparent animate-spin">
+            </div>
+            <div class="absolute inset-0 bg-indigo-50 rounded-full animate-pulse opacity-50 scale-75"></div>
         </div>
 
-        <form id="filter-form"
-            class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-wrap items-end gap-4">
-            <div class="flex flex-col">
-                <span class="text-[10px] text-slate-400 uppercase font-black mb-1">Model Selection</span>
-                <select name="model" onchange="this.form.submit()"
-                    class="rounded-xl border-slate-200 text-sm focus:ring-indigo-500 min-w-[150px]">
-                    {% for m in available_models %}
-                    <option value="{{ m.id }}" {% if m.id==selected_model %}selected{% endif %}>
-                        {{ m.label }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="flex flex-col">
-                <span class="text-[10px] text-slate-400 uppercase font-black mb-1">District (Apygarda)</span>
-                <select name="district" onchange="this.form.submit()"
-                    class="rounded-xl border-slate-200 text-sm focus:ring-indigo-500 min-w-[200px]">
-                    <option value="">National (All)</option>
-                    {% for d in districts %}
-                    <option value="{{ d }}" {% if d==selected_district %}selected{% endif %}>{{ d }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            {% if selected_district %}
-            <div class="flex flex-col">
-                <span class="text-[10px] text-slate-400 uppercase font-black mb-1">Precinct (Apylinkė)</span>
-                <select name="precinct" onchange="this.form.submit()"
-                    class="rounded-xl border-slate-200 text-sm focus:ring-indigo-500 min-w-[200px]">
-                    <option value="">All Precincts</option>
-                    {% for p in precincts %}
-                    <option value="{{ p }}" {% if p==selected_precinct %}selected{% endif %}>{{ p }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            {% endif %}
-            <button type="submit"
-                class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-black text-sm transition-all shadow-lg shadow-indigo-100 flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                Run Analysis
-            </button>
-            <a href="/dashboard/backtest" class="text-slate-400 hover:text-indigo-600 p-2 mb-1" title="Reset filters">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-            </a>
-        </form>
+        <h3 class="text-2xl font-black text-slate-900 mb-2">Skaičiuojama...</h3>
+        <p class="text-sm text-slate-500 font-medium leading-relaxed">
+            Analizuojame dešimtis tūkstančių apylinkių įrašų.<br>Tai gali užtrukti kelias sekundes.
+        </p>
     </div>
+</div>
 
-    <!-- {% if error_msg %}
+<script>
+    // Parodo krovimo ekraną su animacija
+    function showLoading() {
+        const overlay = document.getElementById("loading-overlay");
+        const box = document.getElementById("loading-box");
+        if (overlay && box) {
+            overlay.classList.remove("hidden");
+            // Leidžiame naršyklei nupiešti "display: flex" prieš keičiant permatomumą
+            setTimeout(() => {
+                overlay.classList.remove("opacity-0");
+                overlay.classList.add("opacity-100");
+                box.classList.remove("scale-95");
+                box.classList.add("scale-100");
+            }, 10);
+        }
+    }
+
+    // Prikabiname krovimo ekraną prie VISŲ nuorodų ir formų
+    document.addEventListener("DOMContentLoaded", function () {
+        // 1. Reaguoja į Dropdown pakeitimus ir formos mygtukus
+        const forms = document.querySelectorAll("form");
+        forms.forEach(form => {
+            form.addEventListener("submit", showLoading);
+        });
+
+        // 2. Reaguoja į visus mygtukus ir nuorodas, kurios veda į kitą puslapį (pvz., /backtest)
+        // Ignoruojame CSV atsisiuntimo mygtuką, nes jis neperkrauna puslapio!
+        const links = document.querySelectorAll("a:not([href*='export'])");
+        links.forEach(link => {
+            link.addEventListener("click", function (e) {
+                // Jei tai nėra in-page nuoroda (pvz., #top) arba naujas tabas
+                if (this.href && !this.href.startsWith('javascript:') && !this.href.includes('#') && this.target !== '_blank') {
+                    showLoading();
+                }
+            });
+        });
+    });
+</script>
+
+<div class="flex flex-col space-y-8 relative">
+    <div class="flex flex-col space-y-8">
+
+        <!-- Header + Filters -->
+        <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-900">Modelio tikslumo analizė</h1>
+                <p class="text-slate-500 mt-1">Modelių spėjimai vs. 2024 rinkimų rezultatai.</p>
+                {% if model_type_label and model_type_label != 'None' %}
+                <span
+                    class="inline-flex items-center mt-2 px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700">
+                    Aktyvus modelis: {{ model_type_label | upper }}
+                </span>
+                {% endif %}
+            </div>
+
+            <form id="filter-form"
+                class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-wrap items-end gap-4">
+                <div class="flex flex-col">
+                    <span class="text-[10px] text-slate-400 uppercase font-black mb-1">Modelis</span>
+                    <select name="model" onchange="this.form.submit()"
+                        class="rounded-xl border-slate-200 text-sm focus:ring-indigo-500 min-w-[150px]">
+
+                        <!-- <option value="ensemble" {% if selected_model|string=='ensemble' %}selected{% endif %}
+                            class="font-bold text-indigo-600">
+                            ✨ SUPER ANSAMBLIS (Visi modeliai)
+                        </option> -->
+
+                        {% for m in available_models %}
+                        <option value="{{ m.id }}" {% if m.id|string==selected_model|string %}selected{% endif %}>
+                            {{ m.label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="flex flex-col">
+                    <span class="text-[10px] text-slate-400 uppercase font-black mb-1">Apygarda</span>
+                    <select name="district" onchange="this.form.submit()"
+                        class="rounded-xl border-slate-200 text-sm focus:ring-indigo-500 min-w-[200px]">
+                        <option value="">Visos apygardos</option>
+                        {% for d in districts %}
+                        <option value="{{ d }}" {% if d==selected_district %}selected{% endif %}>{{ d }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% if selected_district %}
+                <div class="flex flex-col">
+                    <span class="text-[10px] text-slate-400 uppercase font-black mb-1">Precinct (Apylinkė)</span>
+                    <select name="precinct" onchange="this.form.submit()"
+                        class="rounded-xl border-slate-200 text-sm focus:ring-indigo-500 min-w-[200px]">
+                        <option value="">Visos apylinkės</option>
+                        {% for p in precincts %}
+                        <option value="{{ p }}" {% if p==selected_precinct %}selected{% endif %}>{{ p }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+                <button type="submit"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-black text-sm transition-all shadow-lg shadow-indigo-100 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    Analizuoti
+                </button>
+                <a href="/dashboard/backtest" class="text-slate-400 hover:text-indigo-600 p-2 mb-1"
+                    title="Reset filters">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                </a>
+            </form>
+        </div>
+
+        <!-- {% if error_msg %}
     <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-amber-800 font-medium">
         ⚠️ {{ error_msg }} — Go to <a href="/training/" class="text-indigo-600 font-bold hover:underline">Models</a> to
         train.
     </div>
     {% endif %} -->
 
-    {% if district_data %}
-    {% set ns = namespace(match_dist=0, total_dist=0, match_prec=0, total_prec=0, err_sum=0, err_count=0) %}
+        {% if district_data %}
+        {% set ns = namespace(match_dist=0, total_dist=0, match_prec=0, total_prec=0, err_sum=0, err_count=0) %}
 
-    {% for d in district_data %}
-    {% set ns.total_dist = ns.total_dist + 1 %}
-    {% if d.winner_match %}{% set ns.match_dist = ns.match_dist + 1 %}{% endif %}
+        {% for d in district_data %}
+        {% set ns.total_dist = ns.total_dist + 1 %}
+        {% if d.winner_match %}{% set ns.match_dist = ns.match_dist + 1 %}{% endif %}
 
-    {% if d.precincts %}
-    {% for p in d.precincts %}
-    {% set ns.total_prec = ns.total_prec + 1 %}
-    {% if p.winner_match %}{% set ns.match_prec = ns.match_prec + 1 %}{% endif %}
-    {% endfor %}
-    {% endif %}
+        {% if d.precincts %}
+        {% for p in d.precincts %}
+        {% set ns.total_prec = ns.total_prec + 1 %}
+        {% if p.winner_match %}{% set ns.match_prec = ns.match_prec + 1 %}{% endif %}
+        {% endfor %}
+        {% endif %}
 
-    {% for party in d.parties %}
-    {% set err = party.PREDICTED - party.ACTUAL %}
-    {% if err < 0 %}{% set err=err * -1 %}{% endif %} {% set ns.err_sum=ns.err_sum + err %} {% set
-        ns.err_count=ns.err_count + 1 %} {% endfor %} {% endfor %} <div
-        class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {% for party in d.parties %}
+        {% set err = party.PREDICTED - party.ACTUAL %}
+        {% if err < 0 %}{% set err=err * -1 %}{% endif %} {% set ns.err_sum=ns.err_sum + err %} {% set
+            ns.err_count=ns.err_count + 1 %} {% endfor %} {% endfor %} <div
+            class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 
-        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col relative overflow-hidden">
-            <div class="absolute right-0 top-0 p-6 opacity-5">
-                <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                    <path fill-rule="evenodd"
-                        d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
-                        clip-rule="evenodd" />
-                </svg>
-            </div>
-            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Apygardų
-                Nugalėtojai</span>
-            <div class="flex items-baseline gap-2 mt-2">
-                <span class="text-4xl font-black text-indigo-600">{{ ns.match_dist }}</span>
-                <span class="text-lg font-bold text-slate-400">/ {{ ns.total_dist }}</span>
-            </div>
-            {% if ns.total_dist > 0 %}
-            <div class="w-full bg-slate-100 h-1.5 rounded-full mt-4 overflow-hidden">
-                <div class="bg-indigo-500 h-full" style="width: {{ (ns.match_dist / ns.total_dist * 100)|round }}%">
-                </div>
-            </div>
-            {% endif %}
-        </div>
-
-        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col relative overflow-hidden">
-            <div class="absolute right-0 top-0 p-6 opacity-5">
-                <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                        d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
-                </svg>
-            </div>
-            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Apylinkių
-                Nugalėtojai</span>
-            <div class="flex items-baseline gap-2 mt-2">
-                <span class="text-4xl font-black text-indigo-600">{{ ns.match_prec }}</span>
-                <span class="text-lg font-bold text-slate-400">/ {{ ns.total_prec }}</span>
-            </div>
-            {% if ns.total_prec > 0 %}
-            <div class="w-full bg-slate-100 h-1.5 rounded-full mt-4 overflow-hidden">
-                <div class="bg-indigo-500 h-full" style="width: {{ (ns.match_prec / ns.total_prec * 100)|round }}%">
-                </div>
-            </div>
-            {% else %}
-            <span class="text-xs text-slate-400 mt-4 italic">Apylinkių duomenys neužkrauti</span>
-            {% endif %}
-        </div>
-
-        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col relative overflow-hidden">
-            <div class="absolute right-0 top-0 p-6 opacity-5">
-                <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd"
-                        d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 0l-2 2a1 1 0 101.414 1.414L8 10.414l1.293 1.293a1 1 0 001.414 0l4-4z"
-                        clip-rule="evenodd" />
-                </svg>
-            </div>
-            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Vidutinė Paklaida
-                (MAE)</span>
-            <div class="flex items-baseline gap-2 mt-2">
-                {% set mae = (ns.err_sum / ns.err_count) if ns.err_count > 0 else 0 %}
-                <span
-                    class="text-4xl font-black {% if mae < 2.0 %}text-emerald-500{% elif mae < 4.0 %}text-amber-500{% else %}text-rose-500{% endif %}">
-                    {{ "%.2f"|format(mae) }}
-                </span>
-                <span class="text-lg font-bold text-slate-400">pp</span>
-            </div>
-            <span class="text-xs font-medium text-slate-400 mt-4">Vidutinis nukrypimas nuo tikrų balsų</span>
-        </div>
-
-</div>
-{% endif %}
-
-<!-- Charts: Actual vs Predicted -->
-{% if comp_json and scatter_json %}
-<div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
-    <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-        <div id="comp-chart" class="w-full h-[500px]"></div>
-    </div>
-    <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-        <div id="scatter-chart" class="w-full h-[500px]"></div>
-    </div>
-</div>
-{% endif %}
-
-<!-- District → Precinct → Party Breakdown -->
-{% if district_data %}
-<div>
-    <div class="flex items-center justify-between mb-4">
-        <h2 class="text-2xl font-bold text-slate-900">District Breakdown</h2>
-        <div class="flex items-center gap-4 text-xs font-bold">
-            <span class="flex items-center gap-1.5"><span
-                    class="w-3 h-3 rounded-full bg-indigo-600 inline-block"></span> Actual</span>
-            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-400 inline-block"></span>
-                Predicted</span>
-        </div>
-    </div>
-    <div class="space-y-3" id="district-list">
-        {% for dist in district_data %}
-        {% set dist_idx = loop.index %}
-        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-            <!-- District Header (clickable) -->
-            <button onclick="toggleDistrict('dist-{{ loop.index }}')"
-                class="w-full flex items-center justify-between p-5 hover:bg-slate-50 transition-colors text-left gap-4">
-                <div class="flex items-center gap-4 flex-grow min-w-0">
-                    <div class="w-2.5 h-2.5 rounded-full bg-indigo-400 flex-shrink-0"></div>
-                    <div class="min-w-0">
-                        <h3 class="font-bold text-slate-900 truncate">{{ dist.name }}</h3>
-                        <div class="flex flex-wrap gap-x-4 gap-y-1 mt-0.5">
-                            <span class="text-xs text-slate-500">
-                                Actual: <strong class="text-indigo-700">{{ dist.top_actual }}</strong>
-                            </span>
-                            <span class="text-xs text-slate-500">
-                                Predicted: <strong class="text-amber-600">{{ dist.top_predicted }}</strong>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex items-center gap-4 flex-shrink-0">
-                    {% if dist.winner_match %}
-                    <span
-                        class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-[10px] font-black uppercase">Match</span>
-                    {% else %}
-                    <span
-                        class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded text-[10px] font-black uppercase">Miss</span>
-                    {% endif %}
-                    <svg class="w-5 h-5 text-slate-400 transform transition-transform" id="arrow-dist-{{ loop.index }}"
-                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            <div
+                class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col relative overflow-hidden">
+                <div class="absolute right-0 top-0 p-6 opacity-5">
+                    <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                        <path fill-rule="evenodd"
+                            d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
+                            clip-rule="evenodd" />
                     </svg>
                 </div>
-            </button>
-
-            <!-- District Body -->
-            <div id="dist-{{ loop.index }}" class="hidden border-t border-slate-50">
-                <!-- District Level Party Comparison Table -->
-                <div class="p-5 pb-3">
-                    <h4 class="text-xs uppercase font-black text-slate-400 tracking-wider mb-3">District-Level
-                        Results</h4>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm">
-                            <thead>
-                                <tr class="text-xs text-slate-400 uppercase font-black border-b border-slate-100">
-                                    <th class="text-left pb-2">Party</th>
-                                    <th class="text-right pb-2">Actual</th>
-                                    <th class="text-right pb-2">Predicted</th>
-                                    <th class="text-right pb-2">Δ Error</th>
-                                    <th class="pb-2 w-40"></th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-50">
-                                {% for p in dist.parties %}
-                                {% set err = (p.PREDICTED - p.ACTUAL) %}
-                                <tr class="hover:bg-slate-50">
-                                    <td class="py-2 pr-4 font-medium text-slate-800 max-w-[200px] truncate">{{
-                                        p.SARASO_PAVADINIMAS }}</td>
-                                    <td class="py-2 text-right text-indigo-600 font-bold">{{
-                                        "%.1f"|format(p.ACTUAL) }}%</td>
-                                    <td class="py-2 text-right text-amber-600 font-bold">{{
-                                        "%.1f"|format(p.PREDICTED) }}%</td>
-                                    <td
-                                        class="py-2 text-right font-bold {% if err > 0 %}text-emerald-600{% else %}text-rose-500{% endif %}">
-                                        {{ "%+.1f"|format(err) }}pp
-                                    </td>
-                                    <td class="py-2 pl-3">
-                                        <div class="flex gap-0.5 items-center h-4">
-                                            {% set act_val = p.ACTUAL * 1.5 %}
-                                            {% if act_val > 100 %}{% set act_val = 100 %}{% endif %}
-                                            {% set prd_val = p.PREDICTED * 1.5 %}
-                                            {% if prd_val > 100 %}{% set prd_val = 100 %}{% endif %}
-                                            <div class="bg-indigo-400 rounded-l h-3"
-                                                style="width: {{ act_val|int }}px;"></div>
-                                            <div class="bg-amber-400 rounded-r h-3" style="width: {{ prd_val|int }}px;">
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Apygardų
+                    Nugalėtojai</span>
+                <div class="flex items-baseline gap-2 mt-2">
+                    <span class="text-4xl font-black text-indigo-600">{{ ns.match_dist }}</span>
+                    <span class="text-lg font-bold text-slate-400">/ {{ ns.total_dist }}</span>
                 </div>
-
-                <!-- Precinct Sub-list -->
-                {% if dist.precincts %}
-                <div class="border-t border-slate-100 px-5 py-3">
-                    <h4 class="text-xs uppercase font-black text-slate-400 tracking-wider mb-3">
-                        Precincts ({{ dist.precincts|length }})
-                    </h4>
-                    <div class="space-y-2">
-                        {% for prec in dist.precincts %}
-                        <div class="bg-slate-50 rounded-xl overflow-hidden">
-                            <button onclick="toggleDistrict('prec-{{ dist_idx }}-{{ loop.index }}')"
-                                class="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-100 transition-colors text-left text-xs gap-4">
-                                <div class="flex-grow min-w-0">
-                                    <span class="font-semibold text-slate-700 block truncate">{{ prec.name }}</span>
-                                    <div class="flex flex-wrap gap-x-4 gap-y-1 mt-1">
-                                        <span class="text-[10px] text-slate-400">
-                                            Actual: <strong class="text-indigo-600">{{ prec.top_actual[:30]
-                                                }}</strong>
-                                        </span>
-                                        <span class="text-[10px] text-slate-400">
-                                            Predicted: <strong class="text-amber-600">{{ prec.top_predicted[:30]
-                                                }}</strong>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-3 flex-shrink-0">
-                                    {% if prec.winner_match %}
-                                    <span
-                                        class="bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded text-[9px] font-black uppercase">Match</span>
-                                    {% else %}
-                                    <span
-                                        class="bg-rose-100 text-rose-700 px-1.5 py-0.5 rounded text-[9px] font-black uppercase">Miss</span>
-                                    {% endif %}
-                                    <svg class="w-3 h-3 text-slate-400 transform transition-transform"
-                                        id="arrow-prec-{{ dist_idx }}-{{ loop.index }}" fill="none" viewBox="0 0 24 24"
-                                        stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </div>
-                            </button>
-                            <div id="prec-{{ dist_idx }}-{{ loop.index }}" class="hidden px-4 pb-3">
-                                <table class="w-full text-xs">
-                                    <thead>
-                                        <tr
-                                            class="text-[10px] text-slate-400 uppercase font-black border-b border-slate-200">
-                                            <th class="text-left pb-1.5">Party</th>
-                                            <th class="text-right pb-1.5">Actual</th>
-                                            <th class="text-right pb-1.5">Predicted</th>
-                                            <th class="text-right pb-1.5">Δ</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-slate-100">
-                                        {% for p in prec.parties %}
-                                        {% set err = (p.PREDICTED - p.ACTUAL) %}
-                                        <tr>
-                                            <td class="py-1.5 pr-3 font-medium text-slate-700 max-w-[180px] truncate">
-                                                {{ p.SARASO_PAVADINIMAS }}</td>
-                                            <td class="py-1.5 text-right text-indigo-600 font-semibold">{{
-                                                "%.1f"|format(p.ACTUAL) }}%</td>
-                                            <td class="py-1.5 text-right text-amber-600 font-semibold">{{
-                                                "%.1f"|format(p.PREDICTED) }}%</td>
-                                            <td
-                                                class="py-1.5 text-right {% if err > 0 %}text-emerald-600{% else %}text-rose-500{% endif %} font-semibold">
-                                                {{ "%+.1f"|format(err) }}pp
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        {% endfor %}
+                {% if ns.total_dist > 0 %}
+                <div class="w-full bg-slate-100 h-1.5 rounded-full mt-4 overflow-hidden">
+                    <div class="bg-indigo-500 h-full" style="width: {{ (ns.match_dist / ns.total_dist * 100)|round }}%">
                     </div>
                 </div>
                 {% endif %}
             </div>
-        </div>
-        {% endfor %}
+
+            <div
+                class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col relative overflow-hidden">
+                <div class="absolute right-0 top-0 p-6 opacity-5">
+                    <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                            d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+                    </svg>
+                </div>
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Apylinkių
+                    Nugalėtojai</span>
+                <div class="flex items-baseline gap-2 mt-2">
+                    <span class="text-4xl font-black text-indigo-600">{{ ns.match_prec }}</span>
+                    <span class="text-lg font-bold text-slate-400">/ {{ ns.total_prec }}</span>
+                </div>
+                {% if ns.total_prec > 0 %}
+                <div class="w-full bg-slate-100 h-1.5 rounded-full mt-4 overflow-hidden">
+                    <div class="bg-indigo-500 h-full" style="width: {{ (ns.match_prec / ns.total_prec * 100)|round }}%">
+                    </div>
+                </div>
+                {% else %}
+                <span class="text-xs text-slate-400 mt-4 italic">Apylinkių duomenys neužkrauti</span>
+                {% endif %}
+            </div>
+
+            <div
+                class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col relative overflow-hidden">
+                <div class="absolute right-0 top-0 p-6 opacity-5">
+                    <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 0l-2 2a1 1 0 101.414 1.414L8 10.414l1.293 1.293a1 1 0 001.414 0l4-4z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Vidutinė Paklaida
+                    (MAE)</span>
+                <div class="flex items-baseline gap-2 mt-2">
+                    {% set mae = (ns.err_sum / ns.err_count) if ns.err_count > 0 else 0 %}
+                    <span
+                        class="text-4xl font-black {% if mae < 2.0 %}text-emerald-500{% elif mae < 4.0 %}text-amber-500{% else %}text-rose-500{% endif %}">
+                        {{ "%.2f"|format(mae) }}
+                    </span>
+                    <span class="text-lg font-bold text-slate-400">pp</span>
+                </div>
+                <span class="text-xs font-medium text-slate-400 mt-4">Vidutinis nukrypimas nuo tikrų balsų</span>
+            </div>
+
     </div>
-</div>
-{% endif %}
+    {% endif %}
 
-<!-- Charts Script -->
-{% if comp_json and scatter_json %}
-<script>
-    const compData = {{ comp_json | safe }};
-    const scatterData = {{ scatter_json | safe }};
-    const cfg = { responsive: true, displayModeBar: false };
-    Plotly.newPlot('comp-chart', compData.data, compData.layout, cfg);
-    Plotly.newPlot('scatter-chart', scatterData.data, scatterData.layout, cfg);
-</script>
-{% endif %}
+    <!-- Charts: Actual vs Predicted -->
+    {% if comp_json and scatter_json %}
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+            <div id="comp-chart" class="w-full h-[500px]"></div>
+        </div>
+        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+            <div id="scatter-chart" class="w-full h-[500px]"></div>
+        </div>
+    </div>
+    {% endif %}
 
-<script>
-    function toggleDistrict(id) {
-        const el = document.getElementById(id);
-        const arrow = document.getElementById('arrow-' + id);
-        if (!el) return;
-        const isHidden = el.classList.contains('hidden');
-        el.classList.toggle('hidden');
-        if (arrow) arrow.classList.toggle('rotate-180');
-    }
-</script>
-{% endblock %}
+    <!-- District → Precinct → Party Breakdown -->
+    {% if district_data %}
+    <div>
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-2xl font-bold text-slate-900">Apygardu duomenys</h2>
+            <div class="flex items-center gap-4 text-xs font-bold">
+                <span class="flex items-center gap-1.5"><span
+                        class="w-3 h-3 rounded-full bg-indigo-600 inline-block"></span> Realūs</span>
+                <span class="flex items-center gap-1.5"><span
+                        class="w-3 h-3 rounded-full bg-amber-400 inline-block"></span>
+                    Prognozuojami</span>
+            </div>
+        </div>
+        <div class="space-y-3" id="district-list">
+            {% for dist in district_data %}
+            {% set dist_idx = loop.index %}
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                <!-- District Header (clickable) -->
+                <button onclick="toggleDistrict('dist-{{ loop.index }}')"
+                    class="w-full flex items-center justify-between p-5 hover:bg-slate-50 transition-colors text-left gap-4">
+                    <div class="flex items-center gap-4 flex-grow min-w-0">
+                        <div class="w-2.5 h-2.5 rounded-full bg-indigo-400 flex-shrink-0"></div>
+                        <div class="min-w-0">
+                            <h3 class="font-bold text-slate-900 truncate">{{ dist.name }}</h3>
+                            <div class="flex flex-wrap gap-x-4 gap-y-1 mt-0.5">
+                                <span class="text-xs text-slate-500">
+                                    Realūs: <strong class="text-indigo-700">{{ dist.top_actual }}</strong>
+                                </span>
+                                <span class="text-xs text-slate-500">
+                                    Prognozuojami: <strong class="text-amber-600">{{ dist.top_predicted }}</strong>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 flex-shrink-0">
+                        {% if dist.winner_match %}
+                        <span
+                            class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-[10px] font-black uppercase">Match</span>
+                        {% else %}
+                        <span
+                            class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded text-[10px] font-black uppercase">Miss</span>
+                        {% endif %}
+                        <svg class="w-5 h-5 text-slate-400 transform transition-transform"
+                            id="arrow-dist-{{ loop.index }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </button>
+
+                <!-- District Body -->
+                <div id="dist-{{ loop.index }}" class="hidden border-t border-slate-50">
+                    <!-- District Level Party Comparison Table -->
+                    <div class="p-5 pb-3">
+                        <h4 class="text-xs uppercase font-black text-slate-400 tracking-wider mb-3">District-Level
+                            Results</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead>
+                                    <tr class="text-xs text-slate-400 uppercase font-black border-b border-slate-100">
+                                        <th class="text-left pb-2">Party</th>
+                                        <th class="text-right pb-2">Actual</th>
+                                        <th class="text-right pb-2">Predicted</th>
+                                        <th class="text-right pb-2">Δ Error</th>
+                                        <th class="pb-2 w-40"></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-50">
+                                    {% for p in dist.parties %}
+                                    {% set err = (p.PREDICTED - p.ACTUAL) %}
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="py-2 pr-4 font-medium text-slate-800 max-w-[200px] truncate">{{
+                                            p.SARASO_PAVADINIMAS }}</td>
+                                        <td class="py-2 text-right text-indigo-600 font-bold">{{
+                                            "%.1f"|format(p.ACTUAL) }}%</td>
+                                        <td class="py-2 text-right text-amber-600 font-bold">{{
+                                            "%.1f"|format(p.PREDICTED) }}%</td>
+                                        <td
+                                            class="py-2 text-right font-bold {% if err > 0 %}text-emerald-600{% else %}text-rose-500{% endif %}">
+                                            {{ "%+.1f"|format(err) }}pp
+                                        </td>
+                                        <td class="py-2 pl-3">
+                                            <div class="flex gap-0.5 items-center h-4">
+                                                {% set act_val = p.ACTUAL * 1.5 %}
+                                                {% if act_val > 100 %}{% set act_val = 100 %}{% endif %}
+                                                {% set prd_val = p.PREDICTED * 1.5 %}
+                                                {% if prd_val > 100 %}{% set prd_val = 100 %}{% endif %}
+                                                <div class="bg-indigo-400 rounded-l h-3"
+                                                    style="width: {{ act_val|int }}px;"></div>
+                                                <div class="bg-amber-400 rounded-r h-3"
+                                                    style="width: {{ prd_val|int }}px;">
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Precinct Sub-list -->
+                    {% if dist.precincts %}
+                    <div class="border-t border-slate-100 px-5 py-3">
+                        <h4 class="text-xs uppercase font-black text-slate-400 tracking-wider mb-3">
+                            Apylinkės ({{ dist.precincts|length }})
+                        </h4>
+                        <div class="space-y-2">
+                            {% for prec in dist.precincts %}
+                            <div class="bg-slate-50 rounded-xl overflow-hidden">
+                                <button onclick="toggleDistrict('prec-{{ dist_idx }}-{{ loop.index }}')"
+                                    class="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-100 transition-colors text-left text-xs gap-4">
+                                    <div class="flex-grow min-w-0">
+                                        <span class="font-semibold text-slate-700 block truncate">{{ prec.name }}</span>
+                                        <div class="flex flex-wrap gap-x-4 gap-y-1 mt-1">
+                                            <span class="text-[10px] text-slate-400">
+                                                Actual: <strong class="text-indigo-600">{{ prec.top_actual[:30]
+                                                    }}</strong>
+                                            </span>
+                                            <span class="text-[10px] text-slate-400">
+                                                Predicted: <strong class="text-amber-600">{{ prec.top_predicted[:30]
+                                                    }}</strong>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-3 flex-shrink-0">
+                                        {% if prec.winner_match %}
+                                        <span
+                                            class="bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded text-[9px] font-black uppercase">Match</span>
+                                        {% else %}
+                                        <span
+                                            class="bg-rose-100 text-rose-700 px-1.5 py-0.5 rounded text-[9px] font-black uppercase">Miss</span>
+                                        {% endif %}
+                                        <svg class="w-3 h-3 text-slate-400 transform transition-transform"
+                                            id="arrow-prec-{{ dist_idx }}-{{ loop.index }}" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </div>
+                                </button>
+                                <div id="prec-{{ dist_idx }}-{{ loop.index }}" class="hidden px-4 pb-3">
+                                    <table class="w-full text-xs">
+                                        <thead>
+                                            <tr
+                                                class="text-[10px] text-slate-400 uppercase font-black border-b border-slate-200">
+                                                <th class="text-left pb-1.5">Party</th>
+                                                <th class="text-right pb-1.5">Actual</th>
+                                                <th class="text-right pb-1.5">Predicted</th>
+                                                <th class="text-right pb-1.5">Δ</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-slate-100">
+                                            {% for p in prec.parties %}
+                                            {% set err = (p.PREDICTED - p.ACTUAL) %}
+                                            <tr>
+                                                <td
+                                                    class="py-1.5 pr-3 font-medium text-slate-700 max-w-[180px] truncate">
+                                                    {{ p.SARASO_PAVADINIMAS }}</td>
+                                                <td class="py-1.5 text-right text-indigo-600 font-semibold">{{
+                                                    "%.1f"|format(p.ACTUAL) }}%</td>
+                                                <td class="py-1.5 text-right text-amber-600 font-semibold">{{
+                                                    "%.1f"|format(p.PREDICTED) }}%</td>
+                                                <td
+                                                    class="py-1.5 text-right {% if err > 0 %}text-emerald-600{% else %}text-rose-500{% endif %} font-semibold">
+                                                    {{ "%+.1f"|format(err) }}pp
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Charts Script -->
+    {% if comp_json and scatter_json %}
+    <script>
+        const compData = {{ comp_json | safe }};
+        const scatterData = {{ scatter_json | safe }};
+        const cfg = { responsive: true, displayModeBar: false };
+        Plotly.newPlot('comp-chart', compData.data, compData.layout, cfg);
+        Plotly.newPlot('scatter-chart', scatterData.data, scatterData.layout, cfg);
+    </script>
+    {% endif %}
+
+    <script>
+        function toggleDistrict(id) {
+            const el = document.getElementById(id);
+            const arrow = document.getElementById('arrow-' + id);
+            if (!el) return;
+            const isHidden = el.classList.contains('hidden');
+            el.classList.toggle('hidden');
+            if (arrow) arrow.classList.toggle('rotate-180');
+        }
+    </script>
+    <div id="loading-overlay"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99999; background-color: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease;">
+
+        <div id="loading-box"
+            style="background-color: white; padding: 2.5rem; border-radius: 2rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); display: flex; flex-direction: column; align-items: center; max-width: 24rem; text-align: center; transform: scale(0.95); transition: transform 0.3s ease;">
+
+            <div style="position: relative; width: 5rem; height: 5rem; margin-bottom: 1.5rem;">
+                <div style="position: absolute; inset: 0; border: 4px solid #e0e7ff; border-radius: 9999px;"></div>
+                <div class="animate-spin"
+                    style="position: absolute; inset: 0; border: 4px solid #4f46e5; border-radius: 9999px; border-top-color: transparent;">
+                </div>
+                <div class="animate-pulse"
+                    style="position: absolute; inset: 0; background-color: #eef2ff; border-radius: 9999px; opacity: 0.5; transform: scale(0.75);">
+                </div>
+            </div>
+
+            <h3 style="font-size: 1.5rem; font-weight: 900; color: #0f172a; margin-bottom: 0.5rem;">Skaičiuojama...</h3>
+            <p style="font-size: 0.875rem; color: #64748b; font-weight: 500; line-height: 1.625;">
+                Analizuojame dešimtis tūkstančių apylinkių įrašų.<br>Tai gali užtrukti kelias sekundes.
+            </p>
+        </div>
+
+    </div>
+
+    <script>
+        // Parodo krovimo ekraną su animacija
+        function showLoading() {
+            const overlay = document.getElementById("loading-overlay");
+            const box = document.getElementById("loading-box");
+            if (overlay && box) {
+                // Pakeičiame display iš none į flex, kad veiktų lygiavimas centre
+                overlay.style.display = "flex";
+
+                // Nedidelis vėlavimas leidžia CSS tranzicijoms suveikti
+                setTimeout(() => {
+                    overlay.style.opacity = "1";
+                    box.style.transform = "scale(1)";
+                }, 10);
+            }
+        }
+
+        // Prikabiname krovimo ekraną prie VISŲ įmanomų vartotojo veiksmų
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // 1. Reaguoja į visus Dropdown (Select) pakeitimus
+            const selects = document.querySelectorAll("select");
+            selects.forEach(select => {
+                select.addEventListener("change", showLoading);
+            });
+
+            // 2. Reaguoja į formos mygtukus (Run Analysis)
+            const forms = document.querySelectorAll("form");
+            forms.forEach(form => {
+                form.addEventListener("submit", showLoading);
+            });
+
+            // 3. Reaguoja į nuorodas (Reset mygtukas, meniu), ignoruojant CSV atsisiuntimą
+            const links = document.querySelectorAll("a:not([href*='export'])");
+            links.forEach(link => {
+                link.addEventListener("click", function (e) {
+                    if (this.href && !this.href.startsWith('javascript:') && !this.href.includes('#') && this.target !== '_blank') {
+                        showLoading();
+                    }
+                });
+            });
+        });
+    </script>
+    {% endblock %}
