@@ -32,6 +32,35 @@ def get_vote_col(df):
             return col
     return None
 
+def fix_lt_encoding_global(val):
+    """Atstato sugadintą UTF-8 koduotę ir ištaiso lietuviškas raides."""
+    if pd.isna(val):
+        return val
+    text = str(val)
+    
+    try:
+        text = text.encode('latin1').decode('utf-8')
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        pass
+        
+    fixes = {
+        'ā€“': '-', 'â€“': '-', '–': '-',
+        'Å«': 'ū', 'Åª': 'Ū',
+        'Å¡': 'š', 'Å ': 'Š',
+        'Å¾': 'ž', 'Å½': 'Ž',
+        'Å³': 'ų', 'Å²': 'Ų',
+        'Ä—': 'ė', 'Ä–': 'Ė',
+        'Ä¯': 'į', 'Ä®': 'Į',
+        'Ä…': 'ą', 'Ä„': 'Ą',
+        'Ä': 'č', 'ÄŒ': 'Č',
+        'Ä™': 'ę', 'Ä˜': 'Ę'
+    }
+    for bad, good in fixes.items():
+        if bad in text:
+            text = text.replace(bad, good)
+            
+    return text.replace('SÅ«duvos', 'Sūduvos').replace('KÄ™stuÄ io', 'Kęstučio')
+
 def load_model_by_id(model_id=None):
     """Load a model from the registry. If model_id is None, use the one with lowest MAE."""
     session = SessionLocal()
@@ -127,8 +156,17 @@ def index():
 
     repo = ElectionRepository(session)
     df = repo.get_dataframe_for_ml(year)
-    districts = repo.get_districts(year)
-    precincts = repo.get_precincts(year, district) if district else []
+    
+    # KODUOTĖS TAISYMAS (Kad grafikuose nebūtų šiukšlių)
+    if not df.empty:
+        for col in ['APYGARDOS_PAVADINIMAS', 'APYLINKES_PAVADINIMAS', 'SARASO_PAVADINIMAS']:
+            if col in df.columns:
+                df[col] = df[col].apply(fix_lt_encoding_global)
+
+    # Išvalome ir Dropdown sąrašus
+    districts = [fix_lt_encoding_global(d) for d in repo.get_districts(year)]
+    precincts = [fix_lt_encoding_global(p) for p in (repo.get_precincts(year, district) if district else [])]
+    
     session.close()
 
     if df.empty:
