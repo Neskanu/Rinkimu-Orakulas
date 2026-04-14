@@ -5,7 +5,7 @@ from app.ml.pipeline.processor import DataProcessor
 from app.ml.pipeline.models import (
     EnsembleModel, TreeModel, XGBModel, LGBMModel, 
     PolyElasticNetModel, CatBoostModel, NNModel,
-    DeepNNModel, WideNNModel, SVRModel  # <-- PRIDĖKITE ŠIAS TRIS
+    DeepNNModel, WideNNModel, SVRModel  
 )
 import joblib
 import pandas as pd
@@ -36,20 +36,33 @@ ARCHETYPES = {
 
 def load_ensemble():
     session = SessionLocal()
-    stmt = select(EnsembleConfig).where(EnsembleConfig.is_active == True).order_by(EnsembleConfig.updated_at.desc()).limit(1)
+    stmt = select(EnsembleConfig).order_by(EnsembleConfig.id.desc()).limit(1)
     config = session.execute(stmt).scalar_one_or_none()
     session.close()
 
     models_dict = {}
-    for mid in ['rf', 'xgboost', 'lgbm', 'elasticnet', 'nn']:
-        path = f'app/ml/models/{mid}_tuned.pkl'
-        if os.path.exists(path):
+    
+    # Pridėjome 'lightgbm' kaip galimą failo pavadinimą (kadangi lgbm kartais išsaugomas taip)
+    for mid in ['rf', 'xgboost', 'lgbm', 'lightgbm', 'elasticnet', 'nn']:
+        # Tikriname abu variantus
+        path1 = f'app/ml/models/{mid}_tuned.pkl'
+        path2 = f'app/ml/models/{mid}_model.pkl'
+        
+        target_path = path1 if os.path.exists(path1) else (path2 if os.path.exists(path2) else None)
+
+        if target_path:
             try:
-                wrapped = MODEL_MAP[mid]()
-                wrapped.model = joblib.load(path)
-                models_dict[mid] = wrapped
+                # Naudojame teisingą raktą klasės paieškai
+                map_key = 'lgbm' if mid == 'lightgbm' else mid
+                
+                if map_key in MODEL_MAP:
+                    wrapped = MODEL_MAP[map_key]()
+                    wrapped.model = joblib.load(target_path)
+                    
+                    # Išsaugome modelį naudodami standartizuotą raktą, kad sutaptų su HTML dropdown
+                    models_dict[map_key] = wrapped
             except Exception as e:
-                print(f"Error loading {mid} in forecast: {e}")
+                print(f"Error loading {target_path} in forecast: {e}")
     
     cb_path = 'app/ml/models/catboost_tuned.cbm'
     if os.path.exists(cb_path):
@@ -59,7 +72,10 @@ def load_ensemble():
         models_dict['catboost'] = m
 
     active_mids = list(models_dict.keys())
-    if not active_mids: return None, []
+    if not active_mids: 
+        print("KLAIDA: Nė vienas modelio failas nebuvo sėkmingai užkrautas prognozei.")
+        return None, []
+        
     return EnsembleModel(models_dict, {mid: 1.0/len(active_mids) for mid in active_mids}), active_mids
 
 @forecast_bp.route('/')
