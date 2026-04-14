@@ -4,8 +4,8 @@
 <div class="flex flex-col space-y-8">
     <div class="flex justify-between items-start">
         <div>
-            <h1 class="text-3xl font-bold text-slate-900">2028 Election Oracle</h1>
-            <p class="text-slate-500">Project the future by defining contestants and voter turnout scenarios.</p>
+            <h1 class="text-3xl font-bold text-slate-900">Rinkimų orakulas 2028</h1>
+            <p class="text-slate-500">Prognozuok ateitį apibrėždamas kandidatus ir rinkėjų aktyvumo scenarijus.</p>
         </div>
     </div>
 
@@ -13,7 +13,7 @@
         <!-- Configuration Panel -->
         <div class="lg:col-span-1 space-y-6">
             <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-6">
-                <h2 class="text-xl font-bold text-slate-900">1. Define Contestants</h2>
+                <h2 class="text-xl font-bold text-slate-900">1. Parink kandidatus</h2>
                 <div id="party-list" class="space-y-4">
                     <div class="flex flex-col space-y-2 party-row bg-slate-50 p-3 rounded-2xl border border-slate-100">
                         <div class="flex items-center space-x-2">
@@ -28,11 +28,11 @@
                         </div>
                         <select
                             class="rounded-xl border-slate-200 text-[10px] py-1 uppercase font-black text-slate-500 bg-white party-profile">
-                            <option value="social_democrat" selected>Social Democrat Profile</option>
-                            <option value="conservative">Conservative Profile</option>
-                            <option value="liberal">Liberal Profile</option>
-                            <option value="populist">Populist Profile</option>
-                            <option value="independent">Independent/New Profile</option>
+                            <option value="social_democrat" selected>Socialdemokratų profilis</option>
+                            <option value="conservative">Konservatorių profilis</option>
+                            <option value="liberal">Liberalų profilis</option>
+                            <option value="populist">Populistų profilis</option>
+                            <option value="independent">Nepriklausomas/Naujas profilis</option>
                         </select>
                     </div>
                     <div class="flex flex-col space-y-2 party-row bg-slate-50 p-3 rounded-2xl border border-slate-100">
@@ -48,48 +48,52 @@
                         </div>
                         <select
                             class="rounded-xl border-slate-200 text-[10px] py-1 uppercase font-black text-slate-500 bg-white party-profile">
-                            <option value="social_democrat">Social Democrat Profile</option>
-                            <option value="conservative" selected>Conservative Profile</option>
-                            <option value="liberal">Liberal Profile</option>
-                            <option value="populist">Populist Profile</option>
-                            <option value="independent">Independent/New Profile</option>
+                            <option value="social_democrat">Socialdemokratų profilis</option>
+                            <option value="conservative" selected>Konservatorių profilis</option>
+                            <option value="liberal">Liberalų profilis</option>
+                            <option value="populist">Populistų profilis</option>
+                            <option value="independent">Nepriklausomas/Naujas profilis</option>
                         </select>
                     </div>
                 </div>
                 <button onclick="addParty()"
                     class="w-full py-2 border-2 border-dashed border-slate-200 rounded-xl text-slate-400 text-sm font-bold hover:border-indigo-300 hover:text-indigo-500 transition-all">
-                    + Add New Party
+                    + Pridėti naują partiją
                 </button>
 
                 <hr class="border-slate-100">
 
-                <h2 class="text-xl font-bold text-slate-900">2. Select Prediction Model</h2>
+                <h2 class="text-xl font-bold text-slate-900">2. Pasirink prognozavimo modelį</h2>
                 <select id="model-selector"
                     class="w-full rounded-xl border-slate-200 text-sm py-2 px-3 focus:ring-indigo-500 bg-white">
                     <option value="catboost" selected>CatBoost (Recommended)</option>
                     <option value="xgboost">XGBoost</option>
-                    <option value="rf">Random Forest</option>
                     <option value="lgbm">LightGBM</option>
+                    <option value="rf">Random Forest</option>
                     <option value="elasticnet">ElasticNet</option>
+                    <option value="svr">Support Vector Regressor (SVR)</option>
+                    <option value="nn">Neural Network (Standard)</option>
+                    <option value="dnn">Deep Neural Network (DNN)</option>
+                    <option value="wnn">Wide Neural Network (WNN)</option>
                 </select>
 
                 <hr class="border-slate-100 my-6">
 
-                <h2 class="text-xl font-bold text-slate-900">3. Turnout Scenario</h2>
+                <h2 class="text-xl font-bold text-slate-900">3. Rinkėjų aktyvumo scenarijus</h2>
 
                 <div class="space-y-4">
                     <input type="range" id="turnout-slider" min="-20" max="20" value="0"
                         class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
                     <div class="flex justify-between text-xs font-bold text-slate-400">
-                        <span>-20% (Apathy)</span>
+                        <span>-20% (Apatija)</span>
                         <span id="turnout-val" class="text-indigo-600 text-lg">0%</span>
-                        <span>+20% (Surge)</span>
+                        <span>+20% (Mobilizacija)</span>
                     </div>
                 </div>
 
                 <button onclick="runOracle()"
                     class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-lg hover:bg-black transition-all shadow-xl shadow-slate-200">
-                    Run 2028 Oracle
+                    Paleisti 2028 Orakulą
                 </button>
             </div>
         </div>
@@ -98,12 +102,12 @@
         <div class="lg:col-span-2 space-y-6">
             <div id="oracle-loader"
                 class="hidden bg-white p-12 rounded-3xl border border-slate-100 shadow-sm text-center space-y-6">
-                <h2 class="text-xl font-bold text-slate-700">Oracle is simulating 2028...</h2>
+                <h2 class="text-xl font-bold text-slate-700">Orakulas simuliuoja 2028...</h2>
                 <div class="w-full bg-slate-100 h-4 rounded-full overflow-hidden">
                     <div id="oracle-progress" class="bg-indigo-600 h-full w-0 transition-all duration-300 ease-out">
                     </div>
                 </div>
-                <p id="oracle-status" class="text-slate-400 text-sm animate-pulse">Analyzing district demographics...
+                <p id="oracle-status" class="text-slate-400 text-sm animate-pulse">Analizuojama rinkėjų demografija...
                 </p>
             </div>
 
@@ -115,9 +119,10 @@
                             d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
                 </div>
-                <h2 class="text-xl font-bold text-slate-400">Waiting for Configuration</h2>
-                <p class="text-slate-300 text-sm max-w-xs mx-auto">Configure your 2028 contestants and turnout scenario
-                    on the left to see the prediction.</p>
+                <h2 class="text-xl font-bold text-slate-400">Laukiama Konfigūracijos</h2>
+                <p class="text-slate-300 text-sm max-w-xs mx-auto">Nustatykite savo 2028 m. kandidatus ir rinkėjų
+                    aktyvumo scenarijų
+                    kairėje, kad pamatytumėte prognozę.</p>
             </div>
 
             <div id="results-container" class="hidden space-y-6">
@@ -128,14 +133,14 @@
 
                 <!-- District Breakdown -->
                 <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
-                    <h3 class="text-lg font-bold mb-4">District Level Projections (71 Districts)</h3>
+                    <h3 class="text-lg font-bold mb-4">Apygardų Lygio Prognozės (71 Apygarda)</h3>
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm text-left">
                             <thead class="bg-slate-50 text-slate-500 uppercase text-xs">
                                 <tr>
                                     <th class="px-4 py-3">Apygarda</th>
-                                    <th class="px-4 py-3">Winner Projection</th>
-                                    <th class="px-4 py-3">Top Share</th>
+                                    <th class="px-4 py-3">Laimėtojo Prognozė</th>
+                                    <th class="px-4 py-3">Vidutinis Rezultatas</th>
                                 </tr>
                             </thead>
                             <tbody id="district-table-body" class="divide-y divide-slate-100">
