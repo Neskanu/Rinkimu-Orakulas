@@ -324,43 +324,103 @@
             if (event) event.preventDefault();
 
             const selectedModels = Array.from(document.querySelectorAll('input[name="models"]:checked')).map(cb => cb.value);
-            if (selectedModels.length === 0) return alert("Select at least one model.");
+            if (selectedModels.length === 0) return alert("Prašome pasirinkti bent vieną modelį.");
 
             const params = {};
-            selectedModels.forEach(mid => {
+            let hasErrors = false; // Mūsų klaidų detektorius
+
+            // Naudojame paprastą for...of ciklą, kad galėtume lengviau valdyti logiką
+            for (const mid of selectedModels) {
                 params[mid] = {};
                 const paramContainer = document.getElementById(`settings-${mid}`);
+
                 if (paramContainer) {
-                    paramContainer.querySelectorAll('input').forEach(inp => {
+                    const inputs = paramContainer.querySelectorAll('input');
+                    for (const inp of inputs) {
+                        // APSAUGA 1: Naršyklės lygio patikrinimas (tušti laukai, blogas formatas)
+                        if (!inp.checkValidity()) {
+                            hasErrors = true;
+                            inp.reportValidity(); // Parodo burbulą prie klaidingo laukelio
+                            document.getElementById(`settings-${mid}`).classList.remove('hidden');
+                            break; // Stabdo šio modelio parametrų skaitymą
+                        }
+
                         let val = inp.value;
                         let key = inp.id.split('-').slice(2).join('_');
-                        if (inp.type === 'number') val = parseFloat(val);
-                        if (key === 'hidden_layer_sizes') val = val.split(',').map(n => parseInt(n.trim()));
+
+                        // APSAUGA 2: Skaičių tikrinimas
+                        if (inp.type === 'number') {
+                            val = parseFloat(val);
+                            if (isNaN(val) || val <= 0) {
+                                hasErrors = true;
+                                alert(`Klaida modelio ${mid.toUpperCase()} parametre ${key}: turi būti teigiamas skaičius.`);
+                                document.getElementById(`settings-${mid}`).classList.remove('hidden');
+                                inp.focus();
+                                break;
+                            }
+                        }
+
+                        // APSAUGA 3: Neuroninių tinklų tekstinių sluoksnių tikrinimas
+                        if (key === 'hidden_layer_sizes') {
+                            // Pašaliname tarpus ir tuščias reikšmes
+                            const parsedVal = val.split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n) && n > 0);
+                            if (parsedVal.length === 0) {
+                                hasErrors = true;
+                                alert(`Klaida modelio ${mid.toUpperCase()} sluoksniuose: turi būti bent vienas sveikas skaičius (pvz., 64,32).`);
+                                document.getElementById(`settings-${mid}`).classList.remove('hidden');
+                                inp.focus();
+                                break;
+                            }
+                            val = parsedVal; // Priskiriame išvalytą masyvą
+                        }
+
                         params[mid][key] = val;
-                    });
+                    }
                 }
-            });
+                // Jei radome klaidą šiame modelyje, visiškai stabdome ciklą
+                if (hasErrors) break;
+            }
+
+            // GRIEŽTAS STABDYMAS: Jei rasta nors viena klaida, funkcija baigiasi čia.
+            if (hasErrors) {
+                console.warn("Mokymas sustabdytas dėl neteisingų parametrų.");
+                return;
+            }
+
+            // --- Jei kodas pasiekė šią vietą, vadinasi, duomenys idealūs ---
 
             // Pakeičiame mygtuką
-            const btn = event ? event.target.querySelector('button[type="submit"]') : null;
+            const btn = event ? event.target.closest('button') : null;
             if (btn) {
                 btn.innerHTML = 'Apmokoma fone...';
                 btn.disabled = true;
+                btn.classList.add('opacity-75', 'cursor-not-allowed');
             }
 
-            // 2. Siunčiame užklausą į foninį maršrutą
+            // Siunčiame užklausą į foninį maršrutą
             try {
                 const response = await fetch('/training/start_training', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ models: selectedModels, params: params }) // Pridedame ir parametrus!
+                    body: JSON.stringify({ models: selectedModels, params: params })
                 });
 
                 if (typeof showToast === 'function') {
                     showToast("Apmokymas pradėtas fone! Sekite pranešimus ekrano kampe.", false);
                 }
+
+                // Prijungiame stebėtoją (Polling)
+                isTraining = true;
+                document.getElementById('training-status').classList.remove('hidden');
+                pollMetrics();
+
             } catch (e) {
                 if (typeof showToast === 'function') showToast("Klaida siunčiant užklausą", true);
+                if (btn) {
+                    btn.innerHTML = '🚀 Naujas mokymas';
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                }
             }
         }
 
